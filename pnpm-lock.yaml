@@ -264,12 +264,6 @@ importers:
       '@coral-xyz/anchor':
         specifier: ^0.31.1
         version: 0.31.1(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      '@mercurial-finance/dynamic-amm-sdk':
-        specifier: ^1.1.23
-        version: 1.1.23(@solana/buffer-layout@4.0.1)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      '@mercurial-finance/vault-sdk':
-        specifier: ^2.2.1
-        version: 2.2.1(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@meteora-ag/cp-amm-sdk':
         specifier: ^1.0.10
         version: 1.0.10(@types/node@20.19.4)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(jiti@2.4.2)(postcss@8.5.6)(tsx@4.20.3)(typescript@5.8.3)(utf-8-validate@5.0.10)(yaml@2.8.0)
@@ -277,11 +271,14 @@ importers:
         specifier: ^1.4.7
         version: 1.5.4(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@meteora-ag/dynamic-amm-sdk':
-        specifier: ^1.3.5-rc.0
+        specifier: ^1.3.8
         version: 1.3.8(@solana/buffer-layout@4.0.1)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@meteora-ag/dynamic-bonding-curve-sdk':
         specifier: ^1.2.4
         version: 1.3.1(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
+      '@meteora-ag/vault-sdk':
+        specifier: ^2.3.1
+        version: 2.3.1(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@solana/spl-token':
         specifier: ^0.4.13
         version: 0.4.13(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
@@ -490,10 +487,6 @@ packages:
     resolution: {integrity: sha512-jYnje+JyZG5YThjHiF28oT4SIZLnYOcSBb6+SDaFIyzDVSkXQmQQYclJ2R+YxcdmK0AX6x1E5OQNtuh3jHDrUg==}
     engines: {node: '>=6.9.0'}
 
-  '@coral-xyz/anchor-errors@0.30.1':
-    resolution: {integrity: sha512-9Mkradf5yS5xiLWrl9WrpjqOrAV+/W2RQHDlbnAZBivoGpOs1ECjoDCkVk4aRG8ZdiFiB8zQEVlxf+8fKkmSfQ==}
-    engines: {node: '>=10'}
-
   '@coral-xyz/anchor-errors@0.31.1':
     resolution: {integrity: sha512-NhNEku4F3zzUSBtrYz84FzYWm48+9OvmT1Hhnwr6GnPQry2dsEqH/ti/7ASjjpoFTWRnPXrjAIT1qM6Isop+LQ==}
     engines: {node: '>=10'}
@@ -504,10 +497,6 @@ packages:
 
   '@coral-xyz/anchor@0.29.0':
     resolution: {integrity: sha512-eny6QNG0WOwqV0zQ7cs/b1tIuzZGmP7U7EcH+ogt4Gdbl8HDmIYVMh/9aTmYZPaFWjtUaI8qSn73uYEXWfATdA==}
-    engines: {node: '>=11'}
-
-  '@coral-xyz/anchor@0.30.1':
-    resolution: {integrity: sha512-gDXFoF5oHgpriXAaLpxyWBHdCs8Awgf/gLHIo6crv7Aqm937CNdY+x+6hoj7QR5vaJV7MxWSQ0NGFzL3kPbWEQ==}
     engines: {node: '>=11'}
 
   '@coral-xyz/anchor@0.31.1':
@@ -1136,17 +1125,9 @@ packages:
   '@lit/reactive-element@2.1.0':
     resolution: {integrity: sha512-L2qyoZSQClcBmq0qajBVbhYEcG6iK0XfLn66ifLe/RfC0/ihpc+pl0Wdn8bJ8o+hj38cG0fGXRgSS20MuXn7qA==}
 
-  '@mercurial-finance/dynamic-amm-sdk@1.1.23':
-    resolution: {integrity: sha512-bI1X+785iqGiys5iLbuI6G1oGSP5crE1Taw2HEFIhKGbEssi6nRHVI9F6YyZbKq00PKKi8DjFoVAwN7J3RNmPg==}
-    peerDependencies:
-      '@solana/buffer-layout': ^3 || ^4
-
   '@mercurial-finance/token-math@6.0.0':
     resolution: {integrity: sha512-/o2Kr+gXXE4UvkBJ4QLcbiBmKUyBvU1C0tty6y4smJxEItJYiH6yQzRSWpkBhP5Q387n/j05nqoizX4uZkBlwg==}
     engines: {node: '>=10'}
-
-  '@mercurial-finance/vault-sdk@2.2.0':
-    resolution: {integrity: sha512-Q6Ejkl/mDXR+d4K1p9TL0FJ8p18hQH2rUwPwq+1twLxoHvmHeHM+9bfU3iMLQ+odcC6vh3LXBiMEBdyzgMGXlg==}
 
   '@mercurial-finance/vault-sdk@2.2.1':
     resolution: {integrity: sha512-65EG57BCRGg5tys9wcuAfhW1fGedMHTCN1Gdzn9qrz44ctQIM2hg3unb/KKSpk+BahtQRXhq8y7M3gtcCkTMQQ==}
@@ -1181,9 +1162,6 @@ packages:
 
   '@meteora-ag/m3m3@1.0.10':
     resolution: {integrity: sha512-dIpnXqjGj8DNfYDWOVsPlQn8LVR6C6pFwC76G0koy0hrvMrvAilFOR8q3NCtl6ru/ZY0FGFUaF0cgLzS0Zicag==}
-
-  '@meteora-ag/m3m3@1.0.4':
-    resolution: {integrity: sha512-tjNsQ7qCE9LAyZ8TpyNsg8kOiaarAQ91ckAGObKO/gcDkUfm5m/qrDo3qypN9aCAcFnNmvsuJecrJnLhRGq33g==}
 
   '@meteora-ag/vault-sdk@2.3.1':
     resolution: {integrity: sha512-I42o02fTpXdBcD/po/mXHnrOfVshr8vj9i7r+s7KG/FNdwC9/z+KZXvjXSTakKe/2CnLm75u3UFJly3j0KraSg==}
@@ -2416,9 +2394,6 @@ packages:
 
   '@socket.io/component-emitter@3.1.2':
     resolution: {integrity: sha512-9BCxFwvbGg/RsZK9tjXd8s4UcwR0MWeFQ1XEKIQVVvAGJyINdrqKMcTRyLoK8Rse1GjzLV9cwjWV1olXRWEXVA==}
-
-  '@solana-developers/helpers@2.8.1':
-    resolution: {integrity: sha512-xvoOj+ewL18+h6fMrXp1vTss0WBLnhQHnBb6mMPfEQE32w0THlxm8OPXNUY8g4tREX7ugU5cDEP7c2teye1Z7A==}
 
   '@solana-mobile/mobile-wallet-adapter-protocol-web3js@2.2.2':
     resolution: {integrity: sha512-XmLJrEdkAJ3CBV+bkYDKSBqF6QfjGTIeX+tFGPcwcc9rQ68sE1MPhpUKV9ehRwDLrZXcin2UDMOpWB/S6FJWBQ==}
@@ -8597,8 +8572,6 @@ snapshots:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.27.1
 
-  '@coral-xyz/anchor-errors@0.30.1': {}
-
   '@coral-xyz/anchor-errors@0.31.1': {}
 
   '@coral-xyz/anchor@0.28.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)':
@@ -8627,29 +8600,6 @@ snapshots:
   '@coral-xyz/anchor@0.29.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)':
     dependencies:
       '@coral-xyz/borsh': 0.29.0(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))
-      '@noble/hashes': 1.8.0
-      '@solana/web3.js': 1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      bn.js: 5.2.2
-      bs58: 4.0.1
-      buffer-layout: 1.2.2
-      camelcase: 6.3.0
-      cross-fetch: 3.2.0
-      crypto-hash: 1.3.0
-      eventemitter3: 4.0.7
-      pako: 2.1.0
-      snake-case: 3.0.4
-      superstruct: 0.15.5
-      toml: 3.0.0
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - typescript
-      - utf-8-validate
-
-  '@coral-xyz/anchor@0.30.1(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)':
-    dependencies:
-      '@coral-xyz/anchor-errors': 0.30.1
-      '@coral-xyz/borsh': 0.30.1(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))
       '@noble/hashes': 1.8.0
       '@solana/web3.js': 1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
       bn.js: 5.2.2
@@ -9350,56 +9300,12 @@ snapshots:
     dependencies:
       '@lit-labs/ssr-dom-shim': 1.3.0
 
-  '@mercurial-finance/dynamic-amm-sdk@1.1.23(@solana/buffer-layout@4.0.1)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)':
-    dependencies:
-      '@coral-xyz/anchor': 0.28.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      '@coral-xyz/borsh': 0.28.0(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))
-      '@mercurial-finance/token-math': 6.0.0
-      '@mercurial-finance/vault-sdk': 2.2.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      '@metaplex-foundation/mpl-token-metadata': 2.13.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      '@meteora-ag/m3m3': 1.0.4(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      '@project-serum/anchor': 0.24.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      '@solana/buffer-layout': 4.0.1
-      '@solana/spl-token': 0.4.13(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      '@solana/spl-token-registry': 0.2.4574
-      '@solana/web3.js': 1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      bn-sqrt: 1.0.0
-      bn.js: 5.2.1
-      decimal.js: 10.6.0
-      dotenv: 16.6.1
-      invariant: 2.2.4
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - fastestsmallesttextencoderdecoder
-      - supports-color
-      - typescript
-      - utf-8-validate
-
   '@mercurial-finance/token-math@6.0.0':
     dependencies:
       '@types/big.js': 6.2.2
       big.js: 6.2.2
       tiny-invariant: 1.3.3
       tslib: 2.8.1
-
-  '@mercurial-finance/vault-sdk@2.2.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)':
-    dependencies:
-      '@coral-xyz/anchor': 0.28.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      '@solana/buffer-layout': 4.0.1
-      '@solana/spl-token': 0.4.13(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      '@solana/spl-token-registry': 0.2.4574
-      '@solana/web3.js': 1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      bn.js: 5.2.1
-      cross-fetch: 3.2.0
-      decimal.js: 10.3.1
-      jsbi: 4.3.0
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - fastestsmallesttextencoderdecoder
-      - typescript
-      - utf-8-validate
 
   '@mercurial-finance/vault-sdk@2.2.1(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)':
     dependencies:
@@ -9556,22 +9462,6 @@ snapshots:
     dependencies:
       '@coral-xyz/anchor': 0.29.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@coral-xyz/borsh': 0.30.1(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))
-      '@solana/spl-token': 0.4.13(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      '@solana/web3.js': 1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      bn.js: 5.2.2
-      decimal.js: 10.6.0
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - fastestsmallesttextencoderdecoder
-      - typescript
-      - utf-8-validate
-
-  '@meteora-ag/m3m3@1.0.4(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)':
-    dependencies:
-      '@coral-xyz/anchor': 0.28.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      '@coral-xyz/borsh': 0.30.1(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))
-      '@solana-developers/helpers': 2.8.1(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@solana/spl-token': 0.4.13(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@solana/web3.js': 1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
       bn.js: 5.2.2
@@ -11324,22 +11214,6 @@ snapshots:
       '@sinonjs/commons': 3.0.1
 
   '@socket.io/component-emitter@3.1.2': {}
-
-  '@solana-developers/helpers@2.8.1(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)':
-    dependencies:
-      '@coral-xyz/anchor': 0.30.1(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      '@solana/spl-token': 0.4.13(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      '@solana/spl-token-metadata': 0.1.6(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)
-      '@solana/web3.js': 1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      bn.js: 5.2.2
-      bs58: 6.0.0
-      dotenv: 16.6.1
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - fastestsmallesttextencoderdecoder
-      - typescript
-      - utf-8-validate
 
   '@solana-mobile/mobile-wallet-adapter-protocol-web3js@2.2.2(@solana/wallet-adapter-base@0.9.23(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)))(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(react-native@0.80.1(@babel/core@7.28.0)(@types/react@19.1.8)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)':
     dependencies:
