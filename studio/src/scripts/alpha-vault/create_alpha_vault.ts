@@ -21,8 +21,8 @@ import {
   getQuoteMint,
   parseConfigFromCli,
   safeParseKeypairFromFile,
+  parseCsv,
 } from '../../helpers';
-import { parseCsv } from '../../helpers/csv';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 import {
   createFcfsAlphaVault,

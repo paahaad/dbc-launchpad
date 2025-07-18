@@ -28,12 +28,12 @@ import {
   ProrataAlphaVaultConfig,
   WhitelistModeConfig,
 } from '../utils/types';
-import { getAmountInLamports } from '../helpers';
 import {
+  getAmountInLamports,
   handleSendTxs,
   modifyComputeUnitPriceIx,
   runSimulateTransaction,
-} from '../helpers/transaction';
+} from '../helpers';
 
 export function getAlphaVaultWhitelistMode(mode: WhitelistModeConfig): WhitelistMode {
   if (mode == WhitelistModeConfig.Permissionless) {

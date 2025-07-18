@@ -24,8 +24,13 @@ import {
   sendAndConfirmTransaction,
 } from '@solana/web3.js';
 import { ActivationTypeConfig, MeteoraConfig } from '../utils/types';
-import { getAmountInLamports, getDecimalizedAmount, getQuoteDecimals } from '../helpers';
-import { modifyComputeUnitPriceIx, runSimulateTransaction } from '../helpers/transaction';
+import {
+  getAmountInLamports,
+  getDecimalizedAmount,
+  getQuoteDecimals,
+  modifyComputeUnitPriceIx,
+  runSimulateTransaction,
+} from '../helpers';
 import { DEFAULT_SEND_TX_MAX_RETRIES } from '../utils/constants';
 
 export function getDammV2ActivationType(activationType: ActivationTypeConfig): ActivationType {
