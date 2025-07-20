@@ -1,3 +1,6 @@
+import { PublicKey } from '@solana/web3.js';
+import BN from 'bn.js';
+
 export interface CliArguments {
   config?: string | undefined;
 }
@@ -208,3 +211,9 @@ export enum WhitelistModeConfig {
   PermissionedWithMerkleProof = 'permissioned_with_merkle_proof',
   PermissionedWithAuthority = 'permissioned_with_authority',
 }
+
+export type AllocationByAmount = {
+  address: PublicKey;
+  amount: BN;
+  percentage: number;
+};
