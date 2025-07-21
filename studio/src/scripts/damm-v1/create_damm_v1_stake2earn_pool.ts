@@ -1,4 +1,4 @@
-import { BN, Wallet } from '@coral-xyz/anchor';
+import { Wallet } from '@coral-xyz/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { MeteoraConfig } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';

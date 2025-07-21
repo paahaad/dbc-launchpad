@@ -6,7 +6,7 @@ import {
   createTokenMint,
 } from '../../helpers';
 import { Wallet } from '@coral-xyz/anchor';
-import { createPermissionlessDynamicPool } from '../../lib/damm-v1';
+import { createPermissionlessDammV1Pool } from '../../lib/damm-v1';
 import { MeteoraConfig } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 
@@ -47,7 +47,7 @@ async function main() {
 
   /// --------------------------------------------------------------------------
   if (config.dynamicAmm && !config.dlmm) {
-    await createPermissionlessDynamicPool(config, connection, wallet, baseMint, quoteMint);
+    await createPermissionlessDammV1Pool(config, connection, wallet, baseMint, quoteMint);
   } else {
     throw new Error('Must provide DAMM V1 configuration');
   }

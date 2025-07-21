@@ -16,13 +16,7 @@ import {
   PoolFeesParams,
 } from '@meteora-ag/cp-amm-sdk';
 import { TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID, unpackMint } from '@solana/spl-token';
-import {
-  Cluster,
-  Connection,
-  Keypair,
-  PublicKey,
-  sendAndConfirmTransaction,
-} from '@solana/web3.js';
+import { Connection, Keypair, PublicKey, sendAndConfirmTransaction } from '@solana/web3.js';
 import { ActivationTypeConfig, MeteoraConfig } from '../utils/types';
 import {
   getAmountInLamports,
@@ -43,16 +37,12 @@ export function getDammV2ActivationType(activationType: ActivationTypeConfig): A
   }
 }
 
-export async function createDammV2OneSidedPool(
+export async function createDammV2OneSidedTokenAPool(
   config: MeteoraConfig,
   connection: Connection,
   wallet: Wallet,
   baseTokenMint: PublicKey,
-  quoteTokenMint: PublicKey,
-  opts?: {
-    cluster?: Cluster;
-    programId?: PublicKey;
-  }
+  quoteTokenMint: PublicKey
 ) {
   if (!config.dynamicAmmV2) {
     throw new Error('Missing dynamic amm v2 configuration');
@@ -239,11 +229,7 @@ export async function createDammV2BalancedPool(
   connection: Connection,
   wallet: Wallet,
   baseTokenMint: PublicKey,
-  quoteTokenMint: PublicKey,
-  opts?: {
-    cluster?: Cluster;
-    programId?: PublicKey;
-  }
+  quoteTokenMint: PublicKey
 ) {
   if (!config.dynamicAmmV2) {
     throw new Error('Missing dynamic amm v2 configuration');

@@ -30,7 +30,7 @@ export function getDynamicAmmActivationType(activationType: ActivationTypeConfig
   }
 }
 
-export async function createPermissionlessDynamicPool(
+export async function createPermissionlessDammV1Pool(
   config: MeteoraConfig,
   connection: Connection,
   wallet: Wallet,
