@@ -1,10 +1,5 @@
 import { Wallet } from '@coral-xyz/anchor';
-import AlphaVault, {
-  PoolType,
-  SEED,
-  WalletDepositCap,
-  WhitelistMode,
-} from '@meteora-ag/alpha-vault';
+import AlphaVault, { PoolType, WalletDepositCap, WhitelistMode } from '@meteora-ag/alpha-vault';
 import {
   Cluster,
   Connection,
@@ -33,8 +28,9 @@ import {
   handleSendTxs,
   modifyComputeUnitPriceIx,
   runSimulateTransaction,
+  deriveAlphaVault,
+  deriveMerkleRootConfig,
 } from '../helpers';
-import { deriveAlphaVault, deriveMerkleRootConfig } from '../helpers/accounts';
 
 export function getAlphaVaultWhitelistMode(mode: WhitelistModeConfig): WhitelistMode {
   if (mode == WhitelistModeConfig.Permissionless) {

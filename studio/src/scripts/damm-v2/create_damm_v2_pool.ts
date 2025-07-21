@@ -8,7 +8,7 @@ import {
   parseConfigFromCli,
   safeParseKeypairFromFile,
 } from '../../helpers';
-import { createDammV2CustomizablePool } from '../../lib/damm_v2';
+import { createDammV2OneSidedPool } from '../../lib/damm_v2';
 
 async function main() {
   const config: MeteoraConfig = await parseConfigFromCli();
@@ -47,7 +47,7 @@ async function main() {
 
   /// --------------------------------------------------------------------------
   if (config.dynamicAmmV2) {
-    await createDammV2CustomizablePool(config, connection, wallet, baseMint, quoteMint);
+    await createDammV2OneSidedPool(config, connection, wallet, baseMint, quoteMint);
   } else {
     throw new Error('Must provide Dynamic V2 configuration');
   }

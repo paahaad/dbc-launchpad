@@ -5,3 +5,4 @@ export * from './token';
 export * from './utils';
 export * from './validation';
 export * from './transaction';
+export * from './accounts';
