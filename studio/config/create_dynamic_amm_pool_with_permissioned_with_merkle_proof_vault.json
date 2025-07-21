@@ -22,7 +22,7 @@
 		"maxBuyingCap": 100,
 		"escrowFee": 0,
 		"whitelistMode": "permissioned_with_merkle_proof",
-		"whitelistFilepath": "./config/whitelist_wallet.csv",
+		"whitelistFilepath": "./data/whitelist_wallet.csv",
 		"merkleProofBaseUrl": "https://example.workers.dev/",
 		"cloudflareKvProofUpload": {
 			"kvNamespaceId": "",

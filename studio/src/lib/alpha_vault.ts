@@ -34,6 +34,7 @@ import {
   modifyComputeUnitPriceIx,
   runSimulateTransaction,
 } from '../helpers';
+import { deriveAlphaVault, deriveMerkleRootConfig } from '../helpers/accounts';
 
 export function getAlphaVaultWhitelistMode(mode: WhitelistModeConfig): WhitelistMode {
   if (mode == WhitelistModeConfig.Permissionless) {
@@ -271,7 +272,7 @@ export async function createPermissionedAlphaVaultWithMerkleProof(
       throw new Error(`Invalid alpha vault program id ${alphaVaultProgramId}`);
   }
 
-  const [alphaVaultPubkey] = deriveAlphaVault(wallet.publicKey, poolAddress, alphaVaultProgramId);
+  const alphaVaultPubkey = deriveAlphaVault(wallet.publicKey, poolAddress, alphaVaultProgramId);
 
   const alphaVaultAccountInfo = await connection.getAccountInfo(
     alphaVaultPubkey,
@@ -337,11 +338,7 @@ export async function createPermissionedAlphaVaultWithMerkleProof(
     console.log(`- Tree version ${i}`);
     const version = new BN(i);
 
-    const [merkleRootConfig] = deriveMerkleRootConfig(
-      alphaVaultPubkey,
-      version,
-      alphaVaultProgramId
-    );
+    const merkleRootConfig = deriveMerkleRootConfig(alphaVaultPubkey, version, alphaVaultProgramId);
 
     const offset = i * chunkSize;
     const endOffset = Math.min(offset + chunkSize, whitelistList.length);
@@ -463,7 +460,7 @@ export async function createPermissionedAlphaVaultWithAuthority(
       throw new Error(`Invalid alpha vault program id ${alphaVaultProgramId}`);
   }
 
-  const [alphaVaultPubkey] = deriveAlphaVault(wallet.publicKey, poolAddress, alphaVaultProgramId);
+  const alphaVaultPubkey = deriveAlphaVault(wallet.publicKey, poolAddress, alphaVaultProgramId);
 
   const alphaVaultAccountInfo = await connection.getAccountInfo(
     alphaVaultPubkey,
@@ -528,30 +525,7 @@ export async function createPermissionedAlphaVaultWithAuthority(
   );
 }
 
-// Derive alpha vault public key
-export function deriveAlphaVault(
-  base: PublicKey,
-  lbPair: PublicKey,
-  alphaVaultProgramId: PublicKey
-) {
-  return PublicKey.findProgramAddressSync(
-    [Buffer.from(SEED.vault), base.toBuffer(), lbPair.toBuffer()],
-    alphaVaultProgramId
-  );
-}
-
-export function deriveMerkleRootConfig(alphaVault: PublicKey, version: BN, programId: PublicKey) {
-  return PublicKey.findProgramAddressSync(
-    [
-      Buffer.from(SEED.merkleRoot),
-      alphaVault.toBuffer(),
-      new Uint8Array(version.toArrayLike(Buffer, 'le', 8)),
-    ],
-    programId
-  );
-}
-
-export function createMerkleTree(walletDepositCap: WalletDepositCap[]) {
+export function createMerkleTree(walletDepositCap: WalletDepositCap[]): BalanceTree {
   const tree = new BalanceTree(
     walletDepositCap.map((info) => {
       return {

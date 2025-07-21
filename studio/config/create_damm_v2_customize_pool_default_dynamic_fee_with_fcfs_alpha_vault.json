@@ -1,7 +1,7 @@
 {
 	"rpcUrl": "https://api.devnet.solana.com",
 	"dryRun": false,
-	"keypairFilePath": "id.json",
+	"keypairFilePath": "../keypair.json",
 	"computeUnitPriceMicroLamports": 100000,
 	"baseMint": "Qbx2eTsKQ57vGdB8DbKjeUBHQZ5BnJuFSTpKtWAM1s7",
 	"quoteSymbol": "SOL",

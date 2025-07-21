@@ -1,5 +1,6 @@
 import { Keypair } from '@solana/web3.js';
 import fs from 'fs/promises';
+import { PriceRoundingConfig } from '../utils/types';
 
 export async function safeParseJsonFromFile<T>(filePath: string): Promise<T> {
   try {
@@ -16,4 +17,8 @@ export async function safeParseKeypairFromFile(filePath: string): Promise<Keypai
   const keypairBytes = Uint8Array.from(keypairJson);
   const keypair = Keypair.fromSecretKey(keypairBytes);
   return keypair;
+}
+
+export function isPriceRoundingUp(priceRoundingConfig: PriceRoundingConfig): boolean {
+  return priceRoundingConfig == PriceRoundingConfig.Up;
 }

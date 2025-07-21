@@ -1,9 +1,6 @@
 import { WalletDepositCap } from '@meteora-ag/alpha-vault';
 import { BalanceTree } from './balance_tree';
 
-export * from './balance_tree';
-export * from './merkle_tree';
-
 export const createMerkleTree = async (
   whitelistedWallets: WalletDepositCap[]
 ): Promise<BalanceTree> => {
@@ -18,3 +15,6 @@ export const createMerkleTree = async (
 
   return tree;
 };
+
+export * from './balance_tree';
+export * from './merkle_tree';

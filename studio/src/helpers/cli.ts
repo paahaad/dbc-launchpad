@@ -2,6 +2,8 @@ import { CliArguments, MeteoraConfig } from '../utils/types';
 import { parseArgs } from 'util';
 import { safeParseJsonFromFile } from './utils';
 import { validateConfig } from './validation';
+import { parse } from 'csv-parse';
+import fs from 'fs';
 
 export function parseCliArguments(): CliArguments {
   const { values } = parseArgs({
@@ -31,4 +33,23 @@ export async function parseConfigFromCli(): Promise<MeteoraConfig> {
   validateConfig(config);
 
   return config;
+}
+
+export async function parseCsv<T>(filePath: string): Promise<Array<T>> {
+  const fileStream = fs.createReadStream(filePath);
+
+  return new Promise((resolve, reject) => {
+    const parser = parse({
+      columns: true, // Use the header row as keys
+      skip_empty_lines: true, // Skip empty lines
+    });
+
+    const results: T[] = [];
+
+    fileStream
+      .pipe(parser)
+      .on('data', (row: T) => results.push(row)) // Collect rows
+      .on('end', () => resolve(results)) // Resolve the promise with results
+      .on('error', (err) => reject(err)); // Reject the promise if error occurs
+  });
 }

@@ -11,9 +11,13 @@ import { ActivationTypeConfig, MeteoraConfig } from '../utils/types';
 import { Wallet } from '@coral-xyz/anchor';
 import DLMM, { ActivationType, deriveCustomizablePermissionlessLbPair } from '@meteora-ag/dlmm';
 import BN from 'bn.js';
-import { getQuoteDecimals, modifyComputeUnitPriceIx, runSimulateTransaction } from '../helpers';
+import {
+  getQuoteDecimals,
+  isPriceRoundingUp,
+  modifyComputeUnitPriceIx,
+  runSimulateTransaction,
+} from '../helpers';
 import { getMint } from '@solana/spl-token';
-import { isPriceRoundingUp } from '../helpers/price';
 import { DEFAULT_SEND_TX_MAX_RETRIES, DLMM_PROGRAM_IDS } from '../utils/constants';
 
 export function getDlmmActivationType(activationType: ActivationTypeConfig): ActivationType {

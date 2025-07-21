@@ -1,12 +1,12 @@
 {
     "rpcUrl": "https://api.devnet.solana.com",
-    "dryRun": true,
-    "keypairFilePath": "id.json",
+    "dryRun": false,
+    "keypairFilePath": "./keypair.json",
     "computeUnitPriceMicroLamports": 100000,
-    "baseMint": "HyKWQm6D9HK9V5zpigaSga7UU9Uie7952cesGeven3ke",
+    "baseMint": "APGHMPs7MP8XmChdE5GaJbaDFnseK1TAgTv4GeHjjToo",
     "quoteSymbol": "SOL",
     "dynamicAmmV2": {
-        "creator": "4JTYKJAyS7eAXQRSxvMbmqgf6ajf3LR9JrAXpVEcww2q",
+        "creator": "29zm7bwWhveMx5q3aZuyZBhDPfJfWE5RxYEk8q4ydVjz",
         "baseAmount": 1000,
         "quoteAmount": null,
         "initPrice": 10,
@@ -25,4 +25,4 @@
         "activationType": "timestamp",
         "activationPoint": null
     }
-  }
+}
