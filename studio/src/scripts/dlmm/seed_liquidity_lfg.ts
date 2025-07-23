@@ -38,7 +38,7 @@ async function main() {
   console.log(`- Using base token mint ${baseMint.toString()}`);
   console.log(`- Using quote token mint ${quoteMint.toString()}`);
 
-  const poolKey = deriveCustomizablePermissionlessLbPair(
+  const [poolKey] = deriveCustomizablePermissionlessLbPair(
     baseMint,
     quoteMint,
     new PublicKey(LBCLMM_PROGRAM_IDS['mainnet-beta'])
@@ -49,7 +49,6 @@ async function main() {
     throw new Error(`Missing DLMM LFG seed liquidity in configuration`);
   }
 
-  // @ts-expect-error: Connection version difference
   const pair = await DLMM.create(connection, poolKey, {
     cluster: 'mainnet-beta',
   });

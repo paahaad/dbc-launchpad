@@ -1,7 +1,7 @@
 {
-  "rpcUrl": "https://api.mainnet-beta.solana.com",
-  "dryRun": true,
-  "keypairFilePath": "keypair.json",
+  "rpcUrl": "https://api.devnet.solana.com",
+  "dryRun": false,
+  "keypairFilePath": "./keypair.json",
   "computeUnitPriceMicroLamports": 100000,
   "createBaseToken": {
     "mintBaseTokenAmount": 10000000,

@@ -1,9 +1,9 @@
 {
-  "rpcUrl": "https://api.mainnet-beta.solana.com",
-  "dryRun": false,
-  "keypairFilePath": "keypair.json",
+  "rpcUrl": "https://api.devnet.solana.com",
+  "dryRun": true,
+  "keypairFilePath": "./keypair.json",
   "computeUnitPriceMicroLamports": 100000,
-  "baseMint": "4U8QL1vLicwo1jhU4mXEPdvvtdpCJko17FvTueNTc773",
+  "baseMint": "FkuBwnhsWW58CoozCao7eq22zMcVRqYr4e5PekZpiuEK",
   "quoteSymbol": "SOL",
   "dlmm": {
     "binStep": 80,
@@ -12,16 +12,16 @@
     "activationType": "timestamp",
     "activationPoint": 1734537600,
     "priceRounding": "up",
-    "hasAlphaVault": true
+    "hasAlphaVault": false
   },
   "singleBinSeedLiquidity": {
     "price": 0.25,
     "priceRounding": "up",
     "seedAmount": "100000",
-    "basePositionKeypairFilepath": "keypair.json",
-    "operatorKeypairFilepath": "keypair.json",
-    "positionOwner": "2vqFyczcehkR7hTeZjEkiN5jvYnFXuFRinovqR2gakSb",
-    "feeOwner": "2vqFyczcehkR7hTeZjEkiN5jvYnFXuFRinovqR2gakSb",
+    "basePositionKeypairFilepath": "./keypair.json",
+    "operatorKeypairFilepath": "./keypair.json",
+    "positionOwner": "2VuxXtec8Gpcu49y8VZ4yYutbi98WWtRC6Zvvs8APVy1",
+    "feeOwner": "2VuxXtec8Gpcu49y8VZ4yYutbi98WWtRC6Zvvs8APVy1",
     "lockReleasePoint": 0,
     "seedTokenXToPositionOwner": true
   }

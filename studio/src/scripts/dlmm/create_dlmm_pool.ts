@@ -4,11 +4,23 @@ import {
   safeParseKeypairFromFile,
   parseConfigFromCli,
   createTokenMint,
+  getQuoteDecimals,
 } from '../../helpers';
 import { Wallet } from '@coral-xyz/anchor';
 import { createPermissionlessDlmmPool } from '../../lib/dlmm';
-import { MeteoraConfig } from '../../utils/types';
-import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
+import {
+  MeteoraConfig,
+  AlphaVaultTypeConfig,
+  FcfsAlphaVaultConfig,
+  ProrataAlphaVaultConfig,
+} from '../../utils/types';
+import { DEFAULT_COMMITMENT_LEVEL, DLMM_PROGRAM_IDS } from '../../utils/constants';
+import { deriveCustomizablePermissionlessLbPair } from '@meteora-ag/dlmm';
+import {
+  createFcfsAlphaVault,
+  createProrataAlphaVault,
+  toAlphaVaulSdkPoolType,
+} from '../../lib/alpha_vault';
 
 async function main() {
   const config: MeteoraConfig = await parseConfigFromCli();
@@ -47,7 +59,60 @@ async function main() {
 
   /// --------------------------------------------------------------------------
   if (config.dlmm) {
+    // Create the DLMM pool first
     await createPermissionlessDlmmPool(config, connection, wallet, baseMint, quoteMint);
+
+    // If alpha vault is enabled and config is provided, create the alpha vault automatically
+    if (config.dlmm.hasAlphaVault && config.alphaVault) {
+      console.log('\n> Alpha vault is enabled, creating alpha vault automatically...');
+
+      // Derive the pool address
+      const cluster = 'devnet'; // You can make this configurable if needed
+      const dlmmProgramId = new PublicKey(
+        DLMM_PROGRAM_IDS[cluster as keyof typeof DLMM_PROGRAM_IDS]
+      );
+      const [poolKey] = deriveCustomizablePermissionlessLbPair(baseMint, quoteMint, dlmmProgramId);
+
+      const quoteDecimals = await getQuoteDecimals(
+        connection,
+        config.quoteSymbol,
+        config.quoteMint
+      );
+      const poolType = toAlphaVaulSdkPoolType(config.alphaVault.poolType);
+
+      // Create the appropriate type of alpha vault
+      if (config.alphaVault.alphaVaultType === AlphaVaultTypeConfig.Fcfs) {
+        await createFcfsAlphaVault(
+          connection,
+          wallet,
+          poolType,
+          poolKey,
+          baseMint,
+          quoteMint,
+          quoteDecimals,
+          config.alphaVault as FcfsAlphaVaultConfig,
+          config.dryRun,
+          config.computeUnitPriceMicroLamports
+        );
+      } else if (config.alphaVault.alphaVaultType === AlphaVaultTypeConfig.Prorata) {
+        await createProrataAlphaVault(
+          connection,
+          wallet,
+          poolType,
+          poolKey,
+          baseMint,
+          quoteMint,
+          quoteDecimals,
+          config.alphaVault as ProrataAlphaVaultConfig,
+          config.dryRun,
+          config.computeUnitPriceMicroLamports
+        );
+      } else {
+        throw new Error(`Unsupported alpha vault type: ${config.alphaVault.alphaVaultType}`);
+      }
+
+      console.log('\n>>> DLMM pool and alpha vault created successfully! 🎉');
+    }
   } else {
     throw new Error('Must provide DLMM configuration');
   }

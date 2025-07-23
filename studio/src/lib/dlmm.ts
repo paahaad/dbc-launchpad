@@ -102,7 +102,7 @@ export async function createPermissionlessDlmmPool(
 
   modifyComputeUnitPriceIx(initPoolTx, config.computeUnitPriceMicroLamports);
 
-  const poolKey = deriveCustomizablePermissionlessLbPair(baseMint, quoteMint, dlmmProgramId);
+  const [poolKey] = deriveCustomizablePermissionlessLbPair(baseMint, quoteMint, dlmmProgramId);
 
   console.log(`\n> Pool address: ${poolKey}`);
 
@@ -148,7 +148,7 @@ export async function seedLiquidityLfg(
   const dlmmProgramId =
     opts?.programId ?? new PublicKey(DLMM_PROGRAM_IDS[cluster as keyof typeof DLMM_PROGRAM_IDS]);
 
-  const poolKey = deriveCustomizablePermissionlessLbPair(baseMint, quoteMint, dlmmProgramId);
+  const [poolKey] = deriveCustomizablePermissionlessLbPair(baseMint, quoteMint, dlmmProgramId);
   console.log(`- Using pool key ${poolKey.toString()}`);
 
   console.log(`- Using seedAmount in lamports = ${seedAmount}`);
@@ -167,7 +167,6 @@ export async function seedLiquidityLfg(
     );
   }
 
-  // @ts-expect-error: Connection version difference
   const dlmmInstance = await DLMM.create(connection, poolKey, opts);
 
   const { sendPositionOwnerTokenProveIxs, initializeBinArraysAndPositionIxs, addLiquidityIxs } =
@@ -323,7 +322,7 @@ export async function seedLiquiditySingleBin(
   const dlmmProgramId =
     opts?.programId ?? new PublicKey(DLMM_PROGRAM_IDS[cluster as keyof typeof DLMM_PROGRAM_IDS]);
 
-  const poolKey = deriveCustomizablePermissionlessLbPair(baseMint, quoteMint, dlmmProgramId);
+  const [poolKey] = deriveCustomizablePermissionlessLbPair(baseMint, quoteMint, dlmmProgramId);
   console.log(`- Using pool key ${poolKey.toString()}`);
 
   console.log(`- Using seedAmount in lamports = ${seedAmount}`);
@@ -341,7 +340,6 @@ export async function seedLiquiditySingleBin(
     );
   }
 
-  // @ts-expect-error: Connection version difference
   const dlmmInstance = await DLMM.create(connection, poolKey, opts);
   const { instructions } = await dlmmInstance.seedLiquiditySingleBin(
     payerKeypair.publicKey,

@@ -39,7 +39,7 @@ async function main() {
   console.log(`- Using base token mint ${baseMint.toString()}`);
   console.log(`- Using quote token mint ${quoteMint.toString()}`);
 
-  const poolKey = deriveCustomizablePermissionlessLbPair(baseMint, quoteMint, DLMM_PROGRAM_ID);
+  const [poolKey] = deriveCustomizablePermissionlessLbPair(baseMint, quoteMint, DLMM_PROGRAM_ID);
   console.log(`- Using pool key ${poolKey.toString()}`);
 
   if (!config.singleBinSeedLiquidity) {
