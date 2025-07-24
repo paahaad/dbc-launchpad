@@ -6,7 +6,7 @@ import {
   createTokenMint,
 } from '../../helpers';
 import { Wallet } from '@coral-xyz/anchor';
-import { createPermissionlessDammV1Pool } from '../../lib/damm-v1';
+import { createPermissionlessDammV1Pool } from '../../lib/damm_v1';
 import { MeteoraConfig } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 
