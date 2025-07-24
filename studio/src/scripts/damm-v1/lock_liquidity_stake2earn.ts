@@ -79,8 +79,8 @@ async function main() {
   );
 
   // validate allocations should contains m3m3 fee farm address
-  const allocationContainsFeeFarmAddress = config.lockLiquidity.allocations.some(
-    (allocation) => new PublicKey(allocation.address) === m3m3VaultPubkey
+  const allocationContainsFeeFarmAddress = config.lockLiquidity.allocations.some((allocation) =>
+    new PublicKey(allocation.address).equals(m3m3VaultPubkey)
   );
   if (!allocationContainsFeeFarmAddress) {
     throw new Error('Lock liquidity allocations does not contain M3M3 fee farm address');

@@ -3,11 +3,11 @@
     "dryRun": false,
     "keypairFilePath": "./keypair.json",
     "computeUnitPriceMicroLamports": 100000,
-    // "baseMint": "xYkLPjwe57Tr716pxSZbzV4M2FPdXdPJqoCSC2SQG5N",
-    "createBaseToken": {
-        "mintBaseTokenAmount": 10000000,
-        "baseDecimals": 6
-    },
+    "baseMint": "6KT7tNK8aKifqkhrqmCXWemFwGeEpfPc5Ey1zHdT3GvP",
+    // "createBaseToken": {
+    //     "mintBaseTokenAmount": 10000000,
+    //     "baseDecimals": 6
+    // },
     "quoteSymbol": "SOL",
     "dynamicAmm": {
         "baseAmount": 100,
@@ -43,11 +43,15 @@
         "startFeeDistributeTimestamp": 1753441790
     },
     "lockLiquidity": {
-        "allocations": [
-          {
-            "percentage": 100,
-            "address": "2VuxXtec8Gpcu49y8VZ4yYutbi98WWtRC6Zvvs8APVy1"
-          }
-        ]
-      }
+      "allocations": [
+        {
+          "percentage": 80,
+          "address": "2VuxXtec8Gpcu49y8VZ4yYutbi98WWtRC6Zvvs8APVy1"
+        },
+        {
+          "percentage": 20,
+          "address": "DVqZW2vC26hBmikPixfdw3hQ7kTTepkPQtBZRn4Bm1Cd"
+        }
+      ]
+    }
 }
