@@ -3,14 +3,14 @@
   "dryRun": false,
   "keypairFilePath": "./keypair.json",
   "computeUnitPriceMicroLamports": 100000,
-  "baseMint": "FkuBwnhsWW58CoozCao7eq22zMcVRqYr4e5PekZpiuEK",
+  "baseMint": "HYiYuRUjKTaUHt5PoN3QK3CxEYDSfQKpRZFaWdf4up2g",
   "quoteSymbol": "SOL",
   "dlmm": {
     "binStep": 400,
     "feeBps": 200,
     "initialPrice": 0.0000017,
-    "activationType": "slot",
-    "activationPoint": null,
+    "activationType": "timestamp",
+    "activationPoint": 1753328078,
     "priceRounding": "up",
     "hasAlphaVault": false,
     "creatorPoolOnOffControl": false

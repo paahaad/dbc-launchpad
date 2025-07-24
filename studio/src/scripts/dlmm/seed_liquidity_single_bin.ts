@@ -1,4 +1,4 @@
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Connection, Keypair, PublicKey } from '@solana/web3.js';
 import {
   getAmountInLamports,
   getQuoteMint,
@@ -51,9 +51,7 @@ async function main() {
   if (priceRounding != 'up' && priceRounding != 'down') {
     throw new Error("Invalid selective rounding value. Must be 'up' or 'down'");
   }
-  const baseKeypair = await safeParseKeypairFromFile(
-    config.singleBinSeedLiquidity.basePositionKeypairFilepath
-  );
+  const baseKeypair = Keypair.generate();
   const operatorKeypair = await safeParseKeypairFromFile(
     config.singleBinSeedLiquidity.operatorKeypairFilepath
   );

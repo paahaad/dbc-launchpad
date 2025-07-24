@@ -10,7 +10,6 @@
     "maxPrice": 0.004393,
     "seedAmount": "200000",
     "curvature": 0.6,
-    "basePositionKeypairFilepath": "keypair.json",
     "operatorKeypairFilepath": "keypair.json",
     "positionOwner": "2vqFyczcehkR7hTeZjEkiN5jvYnFXuFRinovqR2gakSb",
     "feeOwner": "2vqFyczcehkR7hTeZjEkiN5jvYnFXuFRinovqR2gakSb",

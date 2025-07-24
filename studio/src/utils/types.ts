@@ -153,7 +153,6 @@ export interface LfgSeedLiquidityConfig {
   maxPrice: number;
   curvature: number;
   seedAmount: string;
-  basePositionKeypairFilepath: string;
   operatorKeypairFilepath: string;
   positionOwner: string;
   feeOwner: string;
@@ -165,7 +164,6 @@ export interface SingleBinSeedLiquidityConfig {
   price: number;
   priceRounding: string;
   seedAmount: string;
-  basePositionKeypairFilepath: string;
   operatorKeypairFilepath: string;
   positionOwner: string;
   feeOwner: string;

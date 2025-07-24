@@ -1,4 +1,4 @@
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Connection, Keypair, PublicKey } from '@solana/web3.js';
 import {
   getAmountInLamports,
   getQuoteMint,
@@ -58,9 +58,7 @@ async function main() {
   const curvature = config.lfgSeedLiquidity.curvature;
   const minPrice = config.lfgSeedLiquidity.minPrice;
   const maxPrice = config.lfgSeedLiquidity.maxPrice;
-  const baseKeypair = await safeParseKeypairFromFile(
-    config.lfgSeedLiquidity.basePositionKeypairFilepath
-  );
+  const baseKeypair = Keypair.generate();
   const operatorKeypair = await safeParseKeypairFromFile(
     config.lfgSeedLiquidity.operatorKeypairFilepath
   );
