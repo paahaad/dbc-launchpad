@@ -12,6 +12,7 @@
     "create-dlmm-pool": "tsx src/scripts/dlmm/create_dlmm_pool.ts",
     "seed-dlmm-pool-single-bin": "tsx src/scripts/dlmm/seed_liquidity_single_bin.ts",
     "create-damm-v1-pool": "tsx src/scripts/damm-v1/create_damm_v1_pool.ts",
+    "create-damm-v1-stake2earn-pool": "tsx src/scripts/damm-v1/create_damm_v1_stake2earn_pool.ts",
     "lock-damm-v1-pool-liquidity": "tsx src/scripts/damm-v1/lock_liquidity.ts",
     "create-damm-v2-pool": "tsx src/scripts/damm-v2/create_damm_v2_pool.ts",
     "create-alpha-vault": "tsx src/scripts/alpha-vault/create_alpha_vault.ts"
@@ -45,7 +46,8 @@
     "date-fns": "^4.1.0",
     "decimal.js": "^10.5.0",
     "dotenv": "^16.5.0",
-    "jito-ts": "^4.2.0"
+    "jito-ts": "^4.2.0",
+    "jsonc-parser": "^3.3.1"
   },
   "devDependencies": {
     "@meteora-invent/config-eslint": "workspace:*",

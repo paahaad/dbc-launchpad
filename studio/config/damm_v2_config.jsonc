@@ -18,11 +18,28 @@
             "totalDuration": 0,
             "feeSchedulerMode": 0,
             "useDynamicFee": true,
-            "dynamicFeeConfig": null
+            "dynamicFeeConfig": {
+                "filterPeriod": 10,
+                "decayPeriod": 120,
+                "reductionFactor": 5000,
+                "variableFeeControl": 14460000,
+                "maxVolatilityAccumulator": 239
+            }
         },
         "hasAlphaVault": false,
         "collectFeeMode": 0,
         "activationType": "timestamp",
         "activationPoint": null
+    },
+    "alphaVault": {
+        "poolType": "damm2",
+        "alphaVaultType": "fcfs",
+        "depositingPoint": 1733626299,
+        "startVestingPoint": 1746808201,
+        "endVestingPoint": 1746808201,
+        "maxDepositCap": 10000,
+        "individualDepositingCap": 1,
+        "escrowFee": 0,
+        "whitelistMode": "permissionless"
     }
 }

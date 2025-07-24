@@ -1,8 +1,9 @@
-import { Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { Connection, Keypair, PublicKey, sendAndConfirmTransaction } from '@solana/web3.js';
 import { M3m3Config } from '../utils/types';
 import { DEFAULT_SEND_TX_MAX_RETRIES, M3M3_PROGRAM_IDS } from '../utils/constants';
 import StakeForFee, { deriveFeeVault } from '@meteora-ag/m3m3';
 import BN from 'bn.js';
+import { modifyComputeUnitPriceIx, runSimulateTransaction } from '../helpers';
 
 export async function createStake2EarnFarm(
   connection: Connection,
@@ -54,16 +55,13 @@ export async function createStake2EarnFarm(
     }
   );
 
-  // @ts-expect-error: Transaction version difference
   modifyComputeUnitPriceIx(createTx, computeUnitPriceMicroLamports);
 
   if (dryRun) {
     console.log(`> Simulating create m3m3 farm tx...`);
-    // @ts-expect-error: Transaction version difference
     await runSimulateTransaction(connection, [payer], payer.publicKey, [createTx]);
   } else {
     console.log(`>> Sending create m3m3 farm transaction...`);
-    // @ts-expect-error: Transaction version difference
     const txHash = await sendAndConfirmTransaction(connection, createTx, [payer], {
       commitment: connection.commitment,
       maxRetries: DEFAULT_SEND_TX_MAX_RETRIES,

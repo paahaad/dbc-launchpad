@@ -1,11 +1,16 @@
 import { Keypair } from '@solana/web3.js';
 import fs from 'fs/promises';
+import { parse as parseJsonc } from 'jsonc-parser';
 import { PriceRoundingConfig } from '../utils/types';
 
 export async function safeParseJsonFromFile<T>(filePath: string): Promise<T> {
   try {
     const rawData = await fs.readFile(filePath, 'utf-8');
-    return JSON.parse(rawData);
+    const result = parseJsonc(rawData);
+    if (result === undefined) {
+      throw new Error('Failed to parse JSON content');
+    }
+    return result as T;
   } catch (error) {
     console.error('Error reading or parsing JSON file:', error);
     throw new Error(`failed to parse file ${filePath}`);
