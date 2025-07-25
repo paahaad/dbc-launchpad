@@ -1,6 +1,6 @@
 import { Connection, Keypair, PublicKey, sendAndConfirmTransaction } from '@solana/web3.js';
-import { M3m3Config } from '../utils/types';
-import { DEFAULT_SEND_TX_MAX_RETRIES, M3M3_PROGRAM_IDS } from '../utils/constants';
+import { Stake2EarnConfig } from '../utils/types';
+import { DEFAULT_SEND_TX_MAX_RETRIES, STAKE2EARN_PROGRAM_IDS } from '../utils/constants';
 import StakeForFee, { deriveFeeVault } from '@meteora-ag/m3m3';
 import BN from 'bn.js';
 import { modifyComputeUnitPriceIx, runSimulateTransaction } from '../helpers';
@@ -10,14 +10,15 @@ export async function createStake2EarnFarm(
   payer: Keypair,
   poolKey: PublicKey,
   stakeMint: PublicKey,
-  config: M3m3Config,
+  config: Stake2EarnConfig,
   dryRun: boolean,
   computeUnitPriceMicroLamports: number,
   opts?: {
     m3m3ProgramId: PublicKey;
   }
 ): Promise<void> {
-  const m3m3ProgramId = opts?.m3m3ProgramId ?? new PublicKey(M3M3_PROGRAM_IDS['mainnet-beta']);
+  const m3m3ProgramId =
+    opts?.m3m3ProgramId ?? new PublicKey(STAKE2EARN_PROGRAM_IDS['mainnet-beta']);
   const m3m3VaultPubkey = deriveFeeVault(poolKey, m3m3ProgramId);
   console.log(`- M3M3 fee vault ${m3m3VaultPubkey}`);
 

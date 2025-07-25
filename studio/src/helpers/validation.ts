@@ -1,6 +1,33 @@
 import Ajv from 'ajv';
 import { CONFIG_SCHEMA } from './config';
-import { MeteoraConfig } from '../utils/types';
+import {
+  MeteoraConfig,
+  DammV1Config,
+  DammV2Config,
+  DlmmConfig,
+  DbcConfig,
+  AlphaVaultConfig,
+} from '../utils/types';
+
+function isDammV1Config(config: MeteoraConfig): config is DammV1Config {
+  return 'tradeFeeNumerator' in config && 'baseAmount' in config && 'quoteAmount' in config;
+}
+
+function isDammV2Config(config: MeteoraConfig): config is DammV2Config {
+  return 'dynamicAmmV2' in config;
+}
+
+function isDlmmConfig(config: MeteoraConfig): config is DlmmConfig {
+  return 'dlmm' in config;
+}
+
+function isDbcConfig(config: MeteoraConfig): config is DbcConfig {
+  return 'dbc' in config;
+}
+
+function isAlphaVaultConfig(config: MeteoraConfig): config is AlphaVaultConfig {
+  return 'alphaVault' in config && Object.keys(config).length === 7; // Only has base properties + alphaVault
+}
 
 export function validateConfig(config: MeteoraConfig) {
   const ajv = new Ajv({
@@ -24,34 +51,80 @@ export function extraConfigValidation(config: MeteoraConfig) {
     throw new Error('Missing rpcUrl in config file.');
   }
 
-  if (config.createBaseToken && config.baseMint) {
+  // Check createBaseToken vs baseMint conflict for applicable config types
+  if ('createBaseToken' in config && config.createBaseToken && config.baseMint) {
     throw new Error('Both createBaseToken and baseMint cannot be set simultaneously.');
   }
 
-  if (config.dynamicAmm && config.dlmm) {
-    throw new Error('Both Dynamic AMM and DLMM configuration cannot be set simultaneously.');
+  // Type-specific validation
+  if (isDammV1Config(config)) {
+    validateDammV1Config(config);
+  } else if (isDammV2Config(config)) {
+    validateDammV2Config(config);
+  } else if (isDlmmConfig(config)) {
+    validateDlmmConfig(config);
+  } else if (isDbcConfig(config)) {
+    validateDbcConfig(config);
+  } else if (isAlphaVaultConfig(config)) {
+    validateAlphaVaultConfig(config);
   }
+}
 
+function validateDammV1Config(config: DammV1Config) {
+  if (config.alphaVault) {
+    validateAlphaVaultCommon(config.alphaVault);
+  }
+}
+
+function validateDammV2Config(config: DammV2Config) {
+  if (config.alphaVault) {
+    validateAlphaVaultCommon(config.alphaVault);
+  }
+}
+
+function validateDlmmConfig(config: DlmmConfig) {
   if (config.dlmm && config.dlmm.hasAlphaVault) {
-    if (config.quoteSymbol == null && config.quoteMint == null) {
-      throw new Error('Either quoteSymbol or quoteMint must be provided for DLMM');
+    if (config.quoteMint == null) {
+      throw new Error('quoteMint must be provided for DLMM');
     }
   }
 
   if (config.alphaVault) {
-    if (
-      config.alphaVault.alphaVaultType != 'fcfs' &&
-      config.alphaVault.alphaVaultType != 'prorata'
-    ) {
-      throw new Error(`Alpha vault type ${config.alphaVault.alphaVaultType} isn't supported.`);
-    }
+    validateAlphaVaultCommon(config.alphaVault);
+  }
+}
 
-    if (
-      config.alphaVault.poolType != 'dynamic' &&
-      config.alphaVault.poolType != 'dlmm' &&
-      config.alphaVault.poolType != 'damm2'
-    ) {
-      throw new Error(`Alpha vault pool tyep ${config.alphaVault.poolType} isn't supported.`);
-    }
+function validateDbcConfig(config: DbcConfig) {
+  if (!config.dbc) {
+    throw new Error('DBC configuration is required but not provided.');
+  }
+
+  if (
+    config.dbc.buildCurveMode !== 0 &&
+    config.dbc.buildCurveMode !== 1 &&
+    config.dbc.buildCurveMode !== 2 &&
+    config.dbc.buildCurveMode !== 3
+  ) {
+    throw new Error(`Build curve mode isn't supported.`);
+  }
+}
+
+function validateAlphaVaultConfig(config: AlphaVaultConfig) {
+  if (config.alphaVault) {
+    validateAlphaVaultCommon(config.alphaVault);
+  }
+}
+
+function validateAlphaVaultCommon(alphaVault: any) {
+  if (alphaVault.alphaVaultType != 'fcfs' && alphaVault.alphaVaultType != 'prorata') {
+    throw new Error(`Alpha vault type ${alphaVault.alphaVaultType} isn't supported.`);
+  }
+
+  if (
+    alphaVault.poolType != 'dynamic' &&
+    alphaVault.poolType != 'dlmm' &&
+    alphaVault.poolType != 'damm2'
+  ) {
+    throw new Error(`Alpha vault pool type ${alphaVault.poolType} isn't supported.`);
   }
 }

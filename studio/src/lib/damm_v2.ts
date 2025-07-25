@@ -17,7 +17,7 @@ import {
 } from '@meteora-ag/cp-amm-sdk';
 import { TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID, unpackMint } from '@solana/spl-token';
 import { Connection, Keypair, PublicKey, sendAndConfirmTransaction } from '@solana/web3.js';
-import { ActivationTypeConfig, MeteoraConfig } from '../utils/types';
+import { ActivationTypeConfig, DammV2Config } from '../utils/types';
 import {
   getAmountInLamports,
   getDecimalizedAmount,
@@ -38,7 +38,7 @@ export function getDammV2ActivationType(activationType: ActivationTypeConfig): A
 }
 
 export async function createDammV2OneSidedTokenAPool(
-  config: MeteoraConfig,
+  config: DammV2Config,
   connection: Connection,
   wallet: Wallet,
   baseTokenMint: PublicKey,
@@ -49,7 +49,7 @@ export async function createDammV2OneSidedTokenAPool(
   }
   console.log('\n> Initializing one-sided Dynamic AMM V2 pool...');
 
-  const quoteDecimals = await getQuoteDecimals(connection, config.quoteSymbol, config.quoteMint);
+  const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
 
   let baseTokenInfo = null;
   let baseTokenProgram = TOKEN_PROGRAM_ID;
@@ -225,7 +225,7 @@ export async function createDammV2OneSidedTokenAPool(
 }
 
 export async function createDammV2BalancedPool(
-  config: MeteoraConfig,
+  config: DammV2Config,
   connection: Connection,
   wallet: Wallet,
   baseTokenMint: PublicKey,
@@ -236,7 +236,7 @@ export async function createDammV2BalancedPool(
   }
   console.log('\n> Initializing balanced Dynamic AMM V2 pool...');
 
-  const quoteDecimals = await getQuoteDecimals(connection, config.quoteSymbol, config.quoteMint);
+  const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
 
   let baseTokenInfo = null;
   let baseTokenProgram = TOKEN_PROGRAM_ID;

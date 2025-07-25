@@ -10,7 +10,7 @@ import { deriveCustomizablePoolAddress } from '@meteora-ag/cp-amm-sdk';
 import {
   AlphaVaultTypeConfig,
   FcfsAlphaVaultConfig,
-  MeteoraConfig,
+  AlphaVaultConfig,
   PoolTypeConfig,
   ProrataAlphaVaultConfig,
   WhitelistModeConfig,
@@ -18,7 +18,6 @@ import {
 import {
   getAmountInLamports,
   getQuoteDecimals,
-  getQuoteMint,
   parseConfigFromCli,
   safeParseKeypairFromFile,
   parseCsv,
@@ -33,7 +32,7 @@ import {
 } from '../../lib/alpha_vault';
 
 async function main() {
-  const config: MeteoraConfig = await parseConfigFromCli();
+  const config = (await parseConfigFromCli()) as AlphaVaultConfig;
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
@@ -51,8 +50,8 @@ async function main() {
     throw new Error('Missing baseMint in configuration');
   }
   const baseMint = new PublicKey(config.baseMint);
-  const quoteMint = getQuoteMint(config.quoteSymbol, config.quoteMint);
-  const quoteDecimals = await getQuoteDecimals(connection, config.quoteSymbol, config.quoteMint);
+  const quoteMint = new PublicKey(config.quoteMint);
+  const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
 
   console.log(`- Using base token mint ${baseMint.toString()}`);
   console.log(`- Using quote token mint ${quoteMint.toString()}`);

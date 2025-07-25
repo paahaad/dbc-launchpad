@@ -1,19 +1,14 @@
 import { Connection, Keypair, PublicKey } from '@solana/web3.js';
-import {
-  getAmountInLamports,
-  getQuoteMint,
-  safeParseKeypairFromFile,
-  parseConfigFromCli,
-} from '../../helpers';
+import { getAmountInLamports, safeParseKeypairFromFile, parseConfigFromCli } from '../../helpers';
 import { LBCLMM_PROGRAM_IDS, deriveCustomizablePermissionlessLbPair } from '@meteora-ag/dlmm';
 import BN from 'bn.js';
 import { unpackMint } from '@solana/spl-token';
-import { MeteoraConfig } from '../../utils/types';
+import { DlmmConfig } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 import { seedLiquiditySingleBin } from '../../lib/dlmm';
 
 async function main() {
-  const config: MeteoraConfig = await parseConfigFromCli();
+  const config: DlmmConfig = (await parseConfigFromCli()) as DlmmConfig;
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
@@ -34,7 +29,7 @@ async function main() {
   const baseMintState = unpackMint(baseMint, baseMintAccount, baseMintAccount.owner);
   const baseDecimals = baseMintState.decimals;
 
-  const quoteMint = getQuoteMint(config.quoteSymbol, config.quoteMint);
+  const quoteMint = new PublicKey(config.quoteMint);
 
   console.log(`- Using base token mint ${baseMint.toString()}`);
   console.log(`- Using quote token mint ${quoteMint.toString()}`);

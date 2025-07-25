@@ -1,12 +1,12 @@
-import { Connection, Keypair } from '@solana/web3.js';
-import { getQuoteMint, safeParseKeypairFromFile, parseConfigFromCli } from '../../helpers';
+import { Connection, Keypair, PublicKey } from '@solana/web3.js';
+import { safeParseKeypairFromFile, parseConfigFromCli } from '../../helpers';
 import { Wallet } from '@coral-xyz/anchor';
-import { MeteoraConfig } from '../../utils/types';
+import { DbcConfig } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 import { createDbcPool } from '../../lib/dbc';
 
 async function main() {
-  const config: MeteoraConfig = await parseConfigFromCli();
+  const config = (await parseConfigFromCli()) as DbcConfig;
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
@@ -19,7 +19,7 @@ async function main() {
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
   const partnerWallet = new Wallet(keypair);
 
-  const quoteMint = getQuoteMint(config.quoteSymbol, config.quoteMint);
+  const quoteMint = new PublicKey(config.quoteMint);
   let baseMint: Keypair;
   if (config.dbc.createPool.baseMintKeypairFilepath) {
     baseMint = await safeParseKeypairFromFile(config.dbc.createPool.baseMintKeypairFilepath);
@@ -28,9 +28,10 @@ async function main() {
   }
 
   console.log(`- Using quote token mint ${quoteMint.toString()}`);
+  console.log(`- Using base token mint ${baseMint.publicKey.toString()}`);
 
   /// --------------------------------------------------------------------------
-  if (config.dbc) {
+  if (config) {
     await createDbcPool(config, connection, partnerWallet, quoteMint, baseMint);
   } else {
     throw new Error('Must provide DAMM V1 configuration');

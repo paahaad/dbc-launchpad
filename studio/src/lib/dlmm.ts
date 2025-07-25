@@ -7,7 +7,7 @@ import {
   sendAndConfirmTransaction,
   Transaction,
 } from '@solana/web3.js';
-import { ActivationTypeConfig, MeteoraConfig } from '../utils/types';
+import { ActivationTypeConfig, DlmmConfig } from '../utils/types';
 import { Wallet } from '@coral-xyz/anchor';
 import DLMM, { ActivationType, deriveCustomizablePermissionlessLbPair } from '@meteora-ag/dlmm';
 import BN from 'bn.js';
@@ -31,7 +31,7 @@ export function getDlmmActivationType(activationType: ActivationTypeConfig): Act
 }
 
 export async function createPermissionlessDlmmPool(
-  config: MeteoraConfig,
+  config: DlmmConfig,
   connection: Connection,
   wallet: Wallet,
   baseMint: PublicKey,
@@ -61,7 +61,7 @@ export async function createPermissionlessDlmmPool(
   console.log(`- Using hasAlphaVault = ${hasAlphaVault}`);
   console.log(`- Using creatorPoolOnOffControl = ${creatorPoolOnOffControl}`);
 
-  const quoteDecimals = await getQuoteDecimals(connection, config.quoteSymbol, config.quoteMint);
+  const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
   const baseMintInfo = await connection.getAccountInfo(baseMint, connection.commitment);
   const baseMintAccount = await getMint(
     connection,
@@ -263,8 +263,6 @@ export async function seedLiquidityLfg(
       connection.commitment
     );
 
-    const transactions: Array<Promise<string>> = [];
-
     // Deposit to positions created in above step. The add liquidity order can be in sequence or not.
     for (const groupIx of addLiquidityIxs) {
       const tx = new Transaction({
@@ -280,15 +278,6 @@ export async function seedLiquidityLfg(
         maxRetries: DEFAULT_SEND_TX_MAX_RETRIES,
       });
     }
-
-    // await Promise.all(transactions)
-    //   .then((txs) => {
-    //     txs.map(console.log);
-    //   })
-    //   .catch((e) => {
-    //     console.error(e);
-    //     throw e;
-    //   });
   }
   console.log(`>>> Finished addLiquidity instructions!`);
 }

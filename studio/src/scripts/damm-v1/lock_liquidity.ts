@@ -1,6 +1,5 @@
 import { Connection, PublicKey, sendAndConfirmTransaction } from '@solana/web3.js';
 import {
-  getQuoteMint,
   safeParseKeypairFromFile,
   parseConfigFromCli,
   modifyComputeUnitPriceIx,
@@ -14,11 +13,11 @@ import {
   createProgram,
   getAssociatedTokenAccount,
 } from '@meteora-ag/dynamic-amm-sdk/dist/cjs/src/amm/utils';
-import { AllocationByAmount, LockLiquidityAllocation, MeteoraConfig } from '../../utils/types';
+import { AllocationByAmount, LockLiquidityAllocation, DammV1Config } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL, DEFAULT_SEND_TX_MAX_RETRIES } from '../../utils/constants';
 
 async function main() {
-  const config: MeteoraConfig = await parseConfigFromCli();
+  const config = (await parseConfigFromCli()) as DammV1Config;
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
@@ -35,7 +34,7 @@ async function main() {
     throw new Error('Missing baseMint in configuration');
   }
   const baseMint = new PublicKey(config.baseMint);
-  const quoteMint = getQuoteMint(config.quoteSymbol, config.quoteMint);
+  const quoteMint = new PublicKey(config.quoteMint);
 
   console.log(`- Using base token mint ${baseMint.toString()}`);
   console.log(`- Using quote token mint ${quoteMint.toString()}`);

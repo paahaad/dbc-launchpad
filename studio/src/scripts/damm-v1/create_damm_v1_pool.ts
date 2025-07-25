@@ -1,17 +1,12 @@
 import { Connection, PublicKey } from '@solana/web3.js';
-import {
-  getQuoteMint,
-  safeParseKeypairFromFile,
-  parseConfigFromCli,
-  createTokenMint,
-} from '../../helpers';
+import { safeParseKeypairFromFile, parseConfigFromCli, createTokenMint } from '../../helpers';
 import { Wallet } from '@coral-xyz/anchor';
 import { createPermissionlessDammV1Pool } from '../../lib/damm_v1';
-import { MeteoraConfig } from '../../utils/types';
+import { DammV1Config } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 
 async function main() {
-  const config: MeteoraConfig = await parseConfigFromCli();
+  const config = (await parseConfigFromCli()) as DammV1Config;
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
@@ -25,7 +20,7 @@ async function main() {
   const wallet = new Wallet(keypair);
 
   let baseMint: PublicKey;
-  const quoteMint = getQuoteMint(config.quoteSymbol, config.quoteMint);
+  const quoteMint = new PublicKey(config.quoteMint);
 
   // If we want to create a new token mint
   if (config.createBaseToken) {
@@ -46,7 +41,7 @@ async function main() {
   console.log(`- Using quote token mint ${quoteMint.toString()}`);
 
   /// --------------------------------------------------------------------------
-  if (config.dynamicAmm && !config.dlmm) {
+  if (config) {
     await createPermissionlessDammV1Pool(config, connection, wallet, baseMint, quoteMint);
   } else {
     throw new Error('Must provide DAMM V1 configuration');

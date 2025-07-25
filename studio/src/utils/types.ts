@@ -5,6 +5,10 @@ export interface CliArguments {
   config?: string | undefined;
 }
 
+/* COMMON */
+
+export type MeteoraConfig = DammV1Config | DammV2Config | DlmmConfig | DbcConfig | AlphaVaultConfig;
+
 export interface CreateTokenMintOptions {
   dryRun: boolean;
   mintTokenAmount: string | number;
@@ -12,31 +16,40 @@ export interface CreateTokenMintOptions {
   computeUnitPriceMicroLamports: number;
 }
 
-export interface MeteoraConfig {
-  rpcUrl: string;
-  dryRun: boolean;
-  keypairFilePath: string;
-  computeUnitPriceMicroLamports: number;
-  createBaseToken: CreateBaseMintConfig | null;
-  baseMint: string | null;
-  quoteSymbol?: string;
-  quoteMint?: string;
-  dynamicAmm: DynamicAmmConfig | null;
-  dynamicAmmV2: DynamicAmmV2Config | null;
-  dlmm: DlmmConfig | null;
-  dbc: DbcConfig | null;
-  alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
-  lockLiquidity: LockLiquidityConfig | null;
-  lfgSeedLiquidity: LfgSeedLiquidityConfig | null;
-  singleBinSeedLiquidity: SingleBinSeedLiquidityConfig | null;
-  m3m3: M3m3Config | null;
-  setDlmmPoolStatus: SetDlmmPoolStatusConfig | null;
-}
-
 export interface CreateBaseMintConfig {
   mintBaseTokenAmount: number | string;
   baseDecimals: number;
 }
+
+export type MeteoraConfigBase = {
+  rpcUrl: string;
+  dryRun: boolean;
+  keypairFilePath: string;
+  computeUnitPriceMicroLamports: number;
+  baseMint?: string | null;
+  quoteMint?: string | null;
+};
+
+export type AllocationByAmount = {
+  address: PublicKey;
+  amount: BN;
+  percentage: number;
+};
+
+export enum ActivationTypeConfig {
+  Slot = 'slot',
+  Timestamp = 'timestamp',
+}
+
+/* DAMM v1 */
+
+export type DammV1Config = MeteoraConfigBase & {
+  createBaseToken: CreateBaseMintConfig | null;
+  dynamicAmm: DynamicAmmConfig | null;
+  alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
+  stake2Earn: Stake2EarnConfig | null;
+  lockLiquidity: LockLiquidityConfig | null;
+};
 
 export interface DynamicAmmConfig {
   baseAmount: number | string;
@@ -46,6 +59,53 @@ export interface DynamicAmmConfig {
   activationPoint: number | null;
   hasAlphaVault: boolean;
 }
+
+export interface LockLiquidityConfig {
+  allocations: LockLiquidityAllocation[];
+}
+
+export interface LockLiquidityAllocation {
+  percentage: number;
+  address: string;
+}
+
+export interface LfgSeedLiquidityConfig {
+  minPrice: number;
+  maxPrice: number;
+  curvature: number;
+  seedAmount: string;
+  operatorKeypairFilepath: string;
+  positionOwner: string;
+  feeOwner: string;
+  lockReleasePoint: number;
+  seedTokenXToPositionOwner: boolean;
+}
+
+export interface SingleBinSeedLiquidityConfig {
+  price: number;
+  priceRounding: string;
+  seedAmount: string;
+  operatorKeypairFilepath: string;
+  positionOwner: string;
+  feeOwner: string;
+  lockReleasePoint: number;
+  seedTokenXToPositionOwner: boolean;
+}
+
+export interface Stake2EarnConfig {
+  topListLength: number;
+  unstakeLockDurationSecs: number;
+  secondsToFullUnlock: number;
+  startFeeDistributeTimestamp: number;
+}
+
+/* DAMM v2 */
+
+export type DammV2Config = MeteoraConfigBase & {
+  createBaseToken: CreateBaseMintConfig | null;
+  dynamicAmmV2: DynamicAmmV2Config | null;
+  alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
+};
 
 export interface DynamicAmmV2Config {
   creator: string;
@@ -76,7 +136,18 @@ export interface DynamicFee {
   maxVolatilityAccumulator: number;
 }
 
-export interface DlmmConfig {
+/* DLMM */
+
+export type DlmmConfig = MeteoraConfigBase & {
+  createBaseToken: CreateBaseMintConfig | null;
+  dlmm: DynamicLmmConfig | null;
+  alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
+  lfgSeedLiquidity: LfgSeedLiquidityConfig | null;
+  singleBinSeedLiquidity: SingleBinSeedLiquidityConfig | null;
+  setDlmmPoolStatus: SetDlmmPoolStatusConfig | null;
+};
+
+export interface DynamicLmmConfig {
   binStep: number;
   feeBps: number;
   initialPrice: number;
@@ -87,6 +158,27 @@ export interface DlmmConfig {
   // Allow creator to turn on/off the pool
   creatorPoolOnOffControl: boolean;
 }
+
+export interface SetDlmmPoolStatusConfig {
+  poolAddress: string;
+  enabled: boolean;
+}
+
+export enum PriceRoundingConfig {
+  Up = 'up',
+  Down = 'down',
+}
+
+/* DBC */
+
+export type DbcConfig = MeteoraConfigBase & {
+  dbc:
+    | (BuildCurve & { buildCurveMode: 0 })
+    | (BuildCurveWithMarketCap & { buildCurveMode: 1 })
+    | (BuildCurveWithTwoSegments & { buildCurveMode: 2 })
+    | (BuildCurveWithLiquidityWeights & { buildCurveMode: 3 })
+    | null;
+};
 
 export type BaseFee =
   | {
@@ -175,17 +267,17 @@ export type BuildCurveWithLiquidityWeights = BuildCurveBase & {
   liquidityWeights: number[];
 };
 
-export type DbcConfig =
-  | (BuildCurve & { buildCurveMode: 0 })
-  | (BuildCurveWithMarketCap & { buildCurveMode: 1 })
-  | (BuildCurveWithTwoSegments & { buildCurveMode: 2 })
-  | (BuildCurveWithLiquidityWeights & { buildCurveMode: 3 });
-
 export interface CloudflareKvProofUploadConfig {
   kvNamespaceId: string;
   accountId: string;
   apiKey: string;
 }
+
+/* Alpha Vault */
+
+export type AlphaVaultConfig = MeteoraConfigBase & {
+  alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
+};
 
 export interface FcfsAlphaVaultConfig {
   poolType: PoolTypeConfig;
@@ -233,60 +325,6 @@ export interface ProrataAlphaVaultConfig {
   cloudflareKvProofUpload?: CloudflareKvProofUploadConfig;
 }
 
-export interface LockLiquidityConfig {
-  allocations: LockLiquidityAllocation[];
-}
-
-export interface LockLiquidityAllocation {
-  percentage: number;
-  address: string;
-}
-
-export interface LfgSeedLiquidityConfig {
-  minPrice: number;
-  maxPrice: number;
-  curvature: number;
-  seedAmount: string;
-  operatorKeypairFilepath: string;
-  positionOwner: string;
-  feeOwner: string;
-  lockReleasePoint: number;
-  seedTokenXToPositionOwner: boolean;
-}
-
-export interface SingleBinSeedLiquidityConfig {
-  price: number;
-  priceRounding: string;
-  seedAmount: string;
-  operatorKeypairFilepath: string;
-  positionOwner: string;
-  feeOwner: string;
-  lockReleasePoint: number;
-  seedTokenXToPositionOwner: boolean;
-}
-
-export interface M3m3Config {
-  topListLength: number;
-  unstakeLockDurationSecs: number;
-  secondsToFullUnlock: number;
-  startFeeDistributeTimestamp: number;
-}
-
-export interface SetDlmmPoolStatusConfig {
-  poolAddress: string;
-  enabled: boolean;
-}
-
-export enum ActivationTypeConfig {
-  Slot = 'slot',
-  Timestamp = 'timestamp',
-}
-
-export enum PriceRoundingConfig {
-  Up = 'up',
-  Down = 'down',
-}
-
 export enum AlphaVaultTypeConfig {
   Fcfs = 'fcfs',
   Prorata = 'prorata',
@@ -303,9 +341,3 @@ export enum WhitelistModeConfig {
   PermissionedWithMerkleProof = 'permissioned_with_merkle_proof',
   PermissionedWithAuthority = 'permissioned_with_authority',
 }
-
-export type AllocationByAmount = {
-  address: PublicKey;
-  amount: BN;
-  percentage: number;
-};

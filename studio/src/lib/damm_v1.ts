@@ -1,5 +1,5 @@
 import { Cluster, Connection, PublicKey, sendAndConfirmTransaction } from '@solana/web3.js';
-import { ActivationTypeConfig, MeteoraConfig } from '../utils/types';
+import { ActivationTypeConfig, DammV1Config } from '../utils/types';
 import { Wallet } from '@coral-xyz/anchor';
 import {
   getAmountInLamports,
@@ -31,7 +31,7 @@ export function getDynamicAmmActivationType(activationType: ActivationTypeConfig
 }
 
 export async function createPermissionlessDammV1Pool(
-  config: MeteoraConfig,
+  config: DammV1Config,
   connection: Connection,
   wallet: Wallet,
   baseMint: PublicKey,
@@ -41,12 +41,12 @@ export async function createPermissionlessDammV1Pool(
     programId?: PublicKey;
   }
 ) {
-  if (!config.dynamicAmm) {
+  if (!config) {
     throw new Error('Missing dynamic amm configuration');
   }
   console.log('\n> Initializing Permissionless Dynamic AMM pool...');
 
-  const quoteDecimals = await getQuoteDecimals(connection, config.quoteSymbol, config.quoteMint);
+  const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
   const baseMintAccount = await getMint(connection, baseMint, connection.commitment);
   const baseDecimals = baseMintAccount.decimals;
 

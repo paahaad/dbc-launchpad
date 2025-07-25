@@ -1,5 +1,5 @@
 import { Connection, Keypair, PublicKey, sendAndConfirmTransaction } from '@solana/web3.js';
-import { MeteoraConfig } from '../utils/types';
+import { DbcConfig } from '../utils/types';
 import { Wallet } from '@coral-xyz/anchor';
 import { modifyComputeUnitPriceIx, runSimulateTransaction } from '../helpers';
 import { DEFAULT_SEND_TX_MAX_RETRIES } from '../utils/constants';
@@ -13,30 +13,29 @@ import {
 } from '@meteora-ag/dynamic-bonding-curve-sdk';
 
 export async function createDbcPool(
-  config: MeteoraConfig,
+  config: DbcConfig,
   connection: Connection,
   wallet: Wallet,
   quoteMint: PublicKey,
   baseMint: Keypair
 ) {
-  if (!config.dbc) {
+  if (!config) {
     throw new Error('Missing dbc configuration');
   }
   console.log('\n> Initializing DBC config...');
 
   let curveConfig: ConfigParameters | null = null;
-  const dbcConfig = config.dbc;
 
-  if (dbcConfig.buildCurveMode === 0) {
-    curveConfig = buildCurve(dbcConfig);
-  } else if (dbcConfig.buildCurveMode === 1) {
-    curveConfig = buildCurveWithMarketCap(dbcConfig);
-  } else if (dbcConfig.buildCurveMode === 2) {
-    curveConfig = buildCurveWithTwoSegments(dbcConfig);
-  } else if (dbcConfig.buildCurveMode === 3) {
-    curveConfig = buildCurveWithLiquidityWeights(dbcConfig);
+  if (config.dbc.buildCurveMode === 0) {
+    curveConfig = buildCurve(config.dbc);
+  } else if (config.dbc.buildCurveMode === 1) {
+    curveConfig = buildCurveWithMarketCap(config.dbc);
+  } else if (config.dbc.buildCurveMode === 2) {
+    curveConfig = buildCurveWithTwoSegments(config.dbc);
+  } else if (config.dbc.buildCurveMode === 3) {
+    curveConfig = buildCurveWithLiquidityWeights(config.dbc);
   } else {
-    throw new Error(`Unsupported DBC build curve mode: ${(dbcConfig as any).buildCurveMode}`);
+    throw new Error(`Unsupported DBC build curve mode: ${(config.dbc as any).buildCurveMode}`);
   }
 
   if (!curveConfig) {
@@ -52,8 +51,8 @@ export async function createDbcPool(
   const createConfigTx = await dbcInstance.partner.createConfig({
     config: configKeypair.publicKey,
     quoteMint,
-    feeClaimer: new PublicKey(dbcConfig.feeClaimer),
-    leftoverReceiver: new PublicKey(dbcConfig.leftoverReceiver),
+    feeClaimer: new PublicKey(config.dbc.feeClaimer),
+    leftoverReceiver: new PublicKey(config.dbc.leftoverReceiver),
     payer: wallet.publicKey,
     ...curveConfig,
   });

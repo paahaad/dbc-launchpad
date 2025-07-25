@@ -1,6 +1,5 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import {
-  getQuoteMint,
   safeParseKeypairFromFile,
   parseConfigFromCli,
   createTokenMint,
@@ -9,7 +8,7 @@ import {
 import { Wallet } from '@coral-xyz/anchor';
 import { createPermissionlessDlmmPool } from '../../lib/dlmm';
 import {
-  MeteoraConfig,
+  DlmmConfig,
   AlphaVaultTypeConfig,
   FcfsAlphaVaultConfig,
   ProrataAlphaVaultConfig,
@@ -23,7 +22,7 @@ import {
 } from '../../lib/alpha_vault';
 
 async function main() {
-  const config: MeteoraConfig = await parseConfigFromCli();
+  const config: DlmmConfig = (await parseConfigFromCli()) as DlmmConfig;
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
@@ -37,7 +36,7 @@ async function main() {
   const wallet = new Wallet(keypair);
 
   let baseMint: PublicKey;
-  const quoteMint = getQuoteMint(config.quoteSymbol, config.quoteMint);
+  const quoteMint = new PublicKey(config.quoteMint);
 
   // If we want to create a new token mint
   if (config.createBaseToken) {
@@ -73,11 +72,7 @@ async function main() {
       );
       const [poolKey] = deriveCustomizablePermissionlessLbPair(baseMint, quoteMint, dlmmProgramId);
 
-      const quoteDecimals = await getQuoteDecimals(
-        connection,
-        config.quoteSymbol,
-        config.quoteMint
-      );
+      const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
       const poolType = toAlphaVaulSdkPoolType(config.alphaVault.poolType);
 
       // Create the appropriate type of alpha vault

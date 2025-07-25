@@ -1,9 +1,4 @@
-import {
-  SOL_TOKEN_DECIMALS,
-  SOL_TOKEN_MINT,
-  USDC_TOKEN_DECIMALS,
-  USDC_TOKEN_MINT,
-} from '../utils/constants';
+import { SOL_TOKEN_DECIMALS, SOL_TOKEN_MINT, USDC_TOKEN_MINT } from '../utils/constants';
 import Decimal from 'decimal.js';
 import BN from 'bn.js';
 import { Signer, PublicKey, Connection } from '@solana/web3.js';
@@ -47,12 +42,8 @@ export function getSigners(
 
 export async function getQuoteDecimals(
   connection: Connection,
-  quoteSymbol?: string,
   quoteMint?: string
 ): Promise<number> {
-  if (quoteSymbol == null && quoteMint == null) {
-    throw new Error(`Either quoteSymbol or quoteMint must be provided`);
-  }
   if (quoteMint) {
     const quoteMintInfo = await connection.getAccountInfo(new PublicKey(quoteMint));
     const mintAccount = await getMint(
@@ -64,13 +55,7 @@ export async function getQuoteDecimals(
     const decimals = mintAccount.decimals;
     return decimals;
   }
-  if (quoteSymbol.toLowerCase() == 'sol') {
-    return SOL_TOKEN_DECIMALS;
-  } else if (quoteSymbol.toLowerCase() == 'usdc') {
-    return USDC_TOKEN_DECIMALS;
-  } else {
-    throw new Error(`Unsupported quote symbol: ${quoteSymbol}`);
-  }
+  return SOL_TOKEN_DECIMALS;
 }
 
 export function getDecimalizedAmount(amountLamport: BN, decimals: number): BN {

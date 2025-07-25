@@ -1,17 +1,12 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import { Wallet } from '@coral-xyz/anchor';
-import { MeteoraConfig } from '../../utils/types';
+import { DammV2Config } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
-import {
-  createTokenMint,
-  getQuoteMint,
-  parseConfigFromCli,
-  safeParseKeypairFromFile,
-} from '../../helpers';
+import { createTokenMint, parseConfigFromCli, safeParseKeypairFromFile } from '../../helpers';
 import { createDammV2OneSidedTokenAPool } from '../../lib/damm_v2';
 
 async function main() {
-  const config: MeteoraConfig = await parseConfigFromCli();
+  const config: DammV2Config = (await parseConfigFromCli()) as DammV2Config;
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
@@ -25,7 +20,7 @@ async function main() {
   const wallet = new Wallet(keypair);
 
   let baseMint: PublicKey;
-  const quoteMint = getQuoteMint(config.quoteSymbol, config.quoteMint);
+  const quoteMint = new PublicKey(config.quoteMint);
 
   // If we want to create a new token mint
   if (config.createBaseToken) {

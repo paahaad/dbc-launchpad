@@ -4,7 +4,7 @@
     "keypairFilePath": "./keypair.json",
     "computeUnitPriceMicroLamports": 100000,
     "baseMint": "HYiYuRUjKTaUHt5PoN3QK3CxEYDSfQKpRZFaWdf4up2g",
-    "quoteSymbol": "SOL",
+    "quoteMint": "So11111111111111111111111111111111111111112",
     "dlmm": {
         "binStep": 400,
         "feeBps": 200,

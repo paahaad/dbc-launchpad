@@ -1,8 +1,8 @@
 import { Wallet } from '@coral-xyz/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
-import { MeteoraConfig } from '../../utils/types';
+import { DammV1Config } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
-import { safeParseKeypairFromFile, getQuoteMint, parseConfigFromCli } from '../../helpers';
+import { safeParseKeypairFromFile, parseConfigFromCli } from '../../helpers';
 import {
   createProgram,
   deriveCustomizablePermissionlessConstantProductPoolAddress,
@@ -10,7 +10,7 @@ import {
 import { createStake2EarnFarm } from '../../lib/stake2earn';
 
 async function main() {
-  const config: MeteoraConfig = await parseConfigFromCli();
+  const config = (await parseConfigFromCli()) as DammV1Config;
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
@@ -27,7 +27,7 @@ async function main() {
     throw new Error('Missing baseMint in configuration');
   }
   const baseMint = new PublicKey(config.baseMint);
-  const quoteMint = getQuoteMint(config.quoteSymbol, config.quoteMint);
+  const quoteMint = new PublicKey(config.quoteMint);
   const ammProgram = createProgram(connection as any).ammProgram;
   const poolKey = deriveCustomizablePermissionlessConstantProductPoolAddress(
     baseMint,
@@ -47,7 +47,7 @@ async function main() {
   console.log(`- Using quote token mint ${quoteMint.toString()}`);
   console.log(`- Pool key ${poolKey}`);
 
-  if (!config.m3m3) {
+  if (!config.stake2Earn) {
     throw new Error('Missing M3M3 configuration');
   }
 
@@ -57,7 +57,7 @@ async function main() {
     wallet.payer,
     poolKey,
     baseMint,
-    config.m3m3,
+    config.stake2Earn,
     config.dryRun,
     config.computeUnitPriceMicroLamports
   );

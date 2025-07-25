@@ -1,9 +1,9 @@
 {
-    "rpcUrl": "https://api.devnet.solana.com",
+    "rpcUrl": "https://api.mainnet-beta.solana.com",
     "dryRun": false,
     "keypairFilePath": "./keypair.json",
     "computeUnitPriceMicroLamports": 100000,
-    "quoteSymbol": "SOL",
+    "quoteMint": "So11111111111111111111111111111111111111112",
     "dbc": {
        "buildCurveMode": 1,
        "totalTokenSupply": 1000000000,

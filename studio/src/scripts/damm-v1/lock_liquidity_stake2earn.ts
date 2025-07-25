@@ -1,6 +1,5 @@
 import { Connection, PublicKey, sendAndConfirmTransaction } from '@solana/web3.js';
 import {
-  getQuoteMint,
   safeParseKeypairFromFile,
   parseConfigFromCli,
   modifyComputeUnitPriceIx,
@@ -15,15 +14,15 @@ import {
   getAssociatedTokenAccount,
 } from '@meteora-ag/dynamic-amm-sdk/dist/cjs/src/amm/utils';
 import { deriveFeeVault } from '@meteora-ag/m3m3';
-import { AllocationByAmount, LockLiquidityAllocation, MeteoraConfig } from '../../utils/types';
+import { AllocationByAmount, LockLiquidityAllocation, DammV1Config } from '../../utils/types';
 import {
   DEFAULT_COMMITMENT_LEVEL,
   DEFAULT_SEND_TX_MAX_RETRIES,
-  M3M3_PROGRAM_IDS,
+  STAKE2EARN_PROGRAM_IDS,
 } from '../../utils/constants';
 
 async function main() {
-  const config: MeteoraConfig = await parseConfigFromCli();
+  const config = (await parseConfigFromCli()) as DammV1Config;
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
@@ -40,7 +39,7 @@ async function main() {
     throw new Error('Missing baseMint in configuration');
   }
   const baseMint = new PublicKey(config.baseMint);
-  const quoteMint = getQuoteMint(config.quoteSymbol, config.quoteMint);
+  const quoteMint = new PublicKey(config.quoteMint);
 
   console.log(`- Using base token mint ${baseMint.toString()}`);
   console.log(`- Using quote token mint ${quoteMint.toString()}`);
@@ -52,9 +51,9 @@ async function main() {
   );
   console.log(`- Pool address: ${poolKey}`);
 
-  const m3m3ProgramId = new PublicKey(M3M3_PROGRAM_IDS['mainnet-beta']);
-  const m3m3VaultPubkey = deriveFeeVault(poolKey, m3m3ProgramId);
-  console.log(`- M3M3 fee vault ${m3m3VaultPubkey}`);
+  const stake2EarnProgramId = new PublicKey(STAKE2EARN_PROGRAM_IDS['mainnet-beta']);
+  const stake2EarnVaultPubkey = deriveFeeVault(poolKey, stake2EarnProgramId);
+  console.log(`- Stake2Earn fee vault ${stake2EarnVaultPubkey}`);
 
   if (!config.lockLiquidity) {
     throw new Error('Missing lockLiquidity configuration');
@@ -78,12 +77,12 @@ async function main() {
     config.lockLiquidity.allocations
   );
 
-  // validate allocations should contains m3m3 fee farm address
+  // validate allocations should contains stake2earn fee farm address
   const allocationContainsFeeFarmAddress = config.lockLiquidity.allocations.some((allocation) =>
-    new PublicKey(allocation.address).equals(m3m3VaultPubkey)
+    new PublicKey(allocation.address).equals(stake2EarnVaultPubkey)
   );
   if (!allocationContainsFeeFarmAddress) {
-    throw new Error('Lock liquidity allocations does not contain M3M3 fee farm address');
+    throw new Error('Lock liquidity allocations does not contain Stake2Earn fee farm address');
   }
 
   const pool = await AmmImpl.create(connection as any, poolKey);
