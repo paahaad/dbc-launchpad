@@ -17,6 +17,7 @@
     "lock-damm-v1-pool-liquidity": "tsx src/scripts/damm-v1/lock_liquidity.ts",
     "lock-damm-v1-pool-liquidity-stake2earn": "tsx src/scripts/damm-v1/lock_liquidity_stake2earn.ts",
     "create-damm-v2-pool": "tsx src/scripts/damm-v2/create_damm_v2_pool.ts",
+    "create-dbc-pool": "tsx src/scripts/dbc/create-dbc-pool.ts",
     "create-alpha-vault": "tsx src/scripts/alpha-vault/create_alpha_vault.ts"
   },
   "keywords": [
