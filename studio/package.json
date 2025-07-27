@@ -19,6 +19,7 @@
     "create-damm-v2-pool": "tsx src/scripts/damm-v2/create_damm_v2_pool.ts",
     "create-dbc-config": "tsx src/scripts/dbc/create-dbc-config.ts",
     "create-dbc-pool": "tsx src/scripts/dbc/create-dbc-pool.ts",
+    "claim-dbc-trading-fee": "tsx src/scripts/dbc/claim-trading-fee.ts",
     "create-alpha-vault": "tsx src/scripts/alpha-vault/create_alpha_vault.ts"
   },
   "keywords": [

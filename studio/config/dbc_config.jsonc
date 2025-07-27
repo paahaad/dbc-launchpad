@@ -1,10 +1,12 @@
 {
-    "rpcUrl": "https://api.mainnet-beta.solana.com",
+    "rpcUrl": "https://mercuria-fronten-1cd8.mainnet.rpcpool.com/dfacae7d-d474-4d76-abd1-ef8da42a6510 ",
     "dryRun": false,
     "keypairFilePath": "./keypair.json",
     "computeUnitPriceMicroLamports": 100000,
     "quoteMint": "So11111111111111111111111111111111111111112",
+    "baseMint": "ESaAbiHqAQH3uPm3Y7yBbypiri3QyhqxFSLNmHF6rEnc",
     "dbc": {
+       "configKeyAddress": "2kMUAGvfuMnso9LX5k8Xm38bq3AMGKauj3gKZLkS4o7Q",
        "buildCurveMode": 1,
        "totalTokenSupply": 1000000000,
        "initialMarketCap": 30,
@@ -46,7 +48,7 @@
         },
         "leftoverReceiver": "2VuxXtec8Gpcu49y8VZ4yYutbi98WWtRC6Zvvs8APVy1",
         "feeClaimer": "2VuxXtec8Gpcu49y8VZ4yYutbi98WWtRC6Zvvs8APVy1",
-        "createPool": {
+        "pool": {
             "name": "DBC Pool",
             "symbol": "DBC",
             "uri": "https://example.com"

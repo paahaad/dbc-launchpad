@@ -173,10 +173,11 @@ export enum PriceRoundingConfig {
 
 export type DbcConfig = MeteoraConfigBase & {
   dbc:
-    | (BuildCurve & { buildCurveMode: 0 })
-    | (BuildCurveWithMarketCap & { buildCurveMode: 1 })
-    | (BuildCurveWithTwoSegments & { buildCurveMode: 2 })
-    | (BuildCurveWithLiquidityWeights & { buildCurveMode: 3 })
+    | (BuildCurve & { buildCurveMode: 0 } & { pool: CreatePool })
+    | (BuildCurveWithMarketCap & { buildCurveMode: 1 } & { pool: CreatePool })
+    | (BuildCurveWithTwoSegments & { buildCurveMode: 2 } & { pool: CreatePool })
+    | (BuildCurveWithLiquidityWeights & { buildCurveMode: 3 } & { pool: CreatePool })
+    | { configKeyAddress: PublicKey; pool: CreatePool }
     | null;
 };
 
@@ -237,12 +238,6 @@ export type BuildCurveBase = {
   };
   leftoverReceiver: string;
   feeClaimer: string;
-  createPool: {
-    baseMintKeypairFilepath?: string;
-    name: string;
-    symbol: string;
-    uri: string;
-  };
 };
 
 export type BuildCurve = BuildCurveBase & {
@@ -267,11 +262,12 @@ export type BuildCurveWithLiquidityWeights = BuildCurveBase & {
   liquidityWeights: number[];
 };
 
-export interface CloudflareKvProofUploadConfig {
-  kvNamespaceId: string;
-  accountId: string;
-  apiKey: string;
-}
+export type CreatePool = {
+  baseMintKeypairFilepath?: string;
+  name: string;
+  symbol: string;
+  uri: string;
+};
 
 /* Alpha Vault */
 
@@ -340,4 +336,10 @@ export enum WhitelistModeConfig {
   Permissionless = 'permissionless',
   PermissionedWithMerkleProof = 'permissioned_with_merkle_proof',
   PermissionedWithAuthority = 'permissioned_with_authority',
+}
+
+export interface CloudflareKvProofUploadConfig {
+  kvNamespaceId: string;
+  accountId: string;
+  apiKey: string;
 }

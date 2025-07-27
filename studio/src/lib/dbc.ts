@@ -1,4 +1,10 @@
-import { Connection, Keypair, PublicKey, sendAndConfirmTransaction } from '@solana/web3.js';
+import {
+  Connection,
+  Keypair,
+  PublicKey,
+  sendAndConfirmTransaction,
+  Transaction,
+} from '@solana/web3.js';
 import { DbcConfig } from '../utils/types';
 import { Wallet } from '@coral-xyz/anchor';
 import { modifyComputeUnitPriceIx, runSimulateTransaction } from '../helpers';
@@ -18,10 +24,16 @@ export async function createDbcConfig(
   wallet: Wallet,
   quoteMint: PublicKey
 ): Promise<PublicKey> {
-  if (!config) {
+  if (!config.dbc) {
     throw new Error('Missing dbc configuration');
   }
   console.log('\n> Initializing DBC config...');
+
+  // Check if we're using an existing config key address
+  if ('configKeyAddress' in config.dbc) {
+    console.log(`> Using existing config key: ${config.dbc.configKeyAddress.toString()}`);
+    return config.dbc.configKeyAddress;
+  }
 
   let curveConfig: ConfigParameters | null = null;
 
@@ -96,7 +108,7 @@ export async function createDbcPool(
   quoteMint: PublicKey,
   baseMint: Keypair
 ) {
-  if (!config) {
+  if (!config.dbc) {
     throw new Error('Missing dbc configuration');
   }
 
@@ -112,9 +124,9 @@ export async function createDbcPool(
       const createPoolTx = await dbcInstance.pool.createPool({
         baseMint: baseMint.publicKey,
         config: configPublicKey,
-        name: config.dbc.createPool.name,
-        symbol: config.dbc.createPool.symbol,
-        uri: config.dbc.createPool.uri,
+        name: config.dbc.pool.name,
+        symbol: config.dbc.pool.symbol,
+        uri: config.dbc.pool.uri,
         payer: wallet.publicKey,
         poolCreator: wallet.publicKey,
       });
@@ -135,9 +147,9 @@ export async function createDbcPool(
     const createPoolTx = await dbcInstance.pool.createPool({
       baseMint: baseMint.publicKey,
       config: configPublicKey,
-      name: config.dbc.createPool.name,
-      symbol: config.dbc.createPool.symbol,
-      uri: config.dbc.createPool.uri,
+      name: config.dbc.pool.name,
+      symbol: config.dbc.pool.symbol,
+      uri: config.dbc.pool.uri,
       payer: wallet.publicKey,
       poolCreator: wallet.publicKey,
     });
@@ -160,5 +172,103 @@ export async function createDbcPool(
 
     console.log(`>>> Pool created successfully with tx hash: ${createPoolTxHash}`);
     console.log(`>>> Base mint public key: ${baseMint.publicKey.toString()}`);
+  }
+}
+
+export async function claimTradingFee(config: DbcConfig, connection: Connection, wallet: Wallet) {
+  if (!config.baseMint) {
+    throw new Error('Missing baseMint configuration');
+  }
+
+  console.log('\n> Initializing DBC claim trading fee...');
+
+  const baseMint = new PublicKey(config.baseMint);
+  const dbcInstance = new DynamicBondingCurveClient(connection, 'confirmed');
+
+  const poolState = await dbcInstance.state.getPoolByBaseMint(baseMint);
+  if (!poolState) {
+    throw new Error(`DBC Pool not found for ${baseMint.toString()}`);
+  }
+
+  const dbcConfig = poolState.account.config;
+  const poolConfig = await dbcInstance.state.getPoolConfig(dbcConfig);
+  if (!poolConfig) {
+    throw new Error(`DBC Pool config not found for ${dbcConfig.toString()}`);
+  }
+
+  const poolAddress = poolState.publicKey;
+  const creator = poolState.account.creator;
+  const partner = poolConfig.feeClaimer;
+  const feeMetrics = await dbcInstance.state.getPoolFeeMetrics(poolAddress);
+
+  const isCreator = creator.toString() === wallet.publicKey.toString();
+  console.log(`> Is creator: ${isCreator}`);
+  const isPartner = partner.toString() === wallet.publicKey.toString();
+  console.log(`> Is partner: ${isPartner}`);
+
+  if (!isCreator && !isPartner) {
+    console.log('> User is neither the creator nor the launchpad fee claimer');
+    return;
+  }
+
+  const transactions: Transaction[] = [];
+
+  if (isCreator) {
+    const claimCreatorTradingFeeTx = await dbcInstance.creator.claimCreatorTradingFee({
+      creator: wallet.publicKey,
+      pool: poolAddress,
+      maxBaseAmount: feeMetrics.current.creatorBaseFee,
+      maxQuoteAmount: feeMetrics.current.creatorQuoteFee,
+      payer: wallet.publicKey,
+    });
+    modifyComputeUnitPriceIx(claimCreatorTradingFeeTx, config.computeUnitPriceMicroLamports);
+    transactions.push(claimCreatorTradingFeeTx);
+  } else {
+    console.log('> This is not the creator of the pool');
+  }
+
+  if (isPartner) {
+    const claimPartnerTradingFeeTx = await dbcInstance.partner.claimPartnerTradingFee({
+      feeClaimer: wallet.publicKey,
+      pool: poolAddress,
+      maxBaseAmount: feeMetrics.current.partnerBaseFee,
+      maxQuoteAmount: feeMetrics.current.partnerQuoteFee,
+      payer: wallet.publicKey,
+    });
+    modifyComputeUnitPriceIx(claimPartnerTradingFeeTx, config.computeUnitPriceMicroLamports);
+    transactions.push(claimPartnerTradingFeeTx);
+  } else {
+    console.log('> This is not the launchpad fee claimer');
+  }
+
+  if (transactions.length === 0) {
+    console.log('> No trading fees to claim');
+    return;
+  }
+
+  if (config.dryRun) {
+    console.log('> Simulating claim trading fee tx...');
+    await runSimulateTransaction(connection, [wallet.payer], wallet.publicKey, transactions);
+    console.log('> Claim trading fee simulation successful');
+    return;
+  }
+
+  try {
+    for (let i = 0; i < transactions.length; i++) {
+      const transaction = transactions[i];
+      const txType = i === 0 && isCreator ? 'creator' : 'partner';
+
+      console.log(`> Sending ${txType} trading fee claim transaction...`);
+
+      const txHash = await sendAndConfirmTransaction(connection, transaction, [wallet.payer], {
+        commitment: connection.commitment,
+        maxRetries: DEFAULT_SEND_TX_MAX_RETRIES,
+      });
+
+      console.log(`> ${txType} trading fee claimed successfully with tx hash: ${txHash}`);
+    }
+  } catch (error) {
+    console.error('Failed to claim trading fee:', error);
+    throw error;
   }
 }

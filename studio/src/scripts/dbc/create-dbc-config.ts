@@ -14,7 +14,7 @@ async function main() {
   console.log('\n> Initializing with general configuration...');
   console.log(`- Using RPC URL ${config.rpcUrl}`);
   console.log(`- Dry run = ${config.dryRun}`);
-  console.log(`- Using partner wallet ${keypair.publicKey} to deploy config`);
+  console.log(`- Using wallet ${keypair.publicKey} to deploy config`);
 
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
   const partnerWallet = new Wallet(keypair);
