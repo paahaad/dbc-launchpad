@@ -12,13 +12,12 @@ import {
   DynamicBondingCurveClient,
 } from '@meteora-ag/dynamic-bonding-curve-sdk';
 
-export async function createDbcPool(
+export async function createDbcConfig(
   config: DbcConfig,
   connection: Connection,
   wallet: Wallet,
-  quoteMint: PublicKey,
-  baseMint: Keypair
-) {
+  quoteMint: PublicKey
+): Promise<PublicKey> {
   if (!config) {
     throw new Error('Missing dbc configuration');
   }
@@ -47,7 +46,6 @@ export async function createDbcPool(
   const configKeypair = Keypair.generate();
   console.log(`> Generated config keypair: ${configKeypair.publicKey.toString()}`);
 
-  // Create and send the config transaction first
   const createConfigTx = await dbcInstance.partner.createConfig({
     config: configKeypair.publicKey,
     quoteMint,
@@ -65,32 +63,6 @@ export async function createDbcPool(
       createConfigTx,
     ]);
     console.log(`> Config simulation successful`);
-
-    console.log(
-      `> Simulating create pool tx (note: this may fail in dry-run mode due to missing config state)...`
-    );
-    try {
-      const createPoolTx = await dbcInstance.pool.createPool({
-        baseMint: baseMint.publicKey,
-        config: configKeypair.publicKey,
-        name: config.dbc.createPool.name,
-        symbol: config.dbc.createPool.symbol,
-        uri: config.dbc.createPool.uri,
-        payer: wallet.publicKey,
-        poolCreator: wallet.publicKey,
-      });
-
-      modifyComputeUnitPriceIx(createPoolTx as any, config.computeUnitPriceMicroLamports);
-
-      await runSimulateTransaction(connection, [wallet.payer, baseMint], wallet.publicKey, [
-        createPoolTx,
-      ]);
-      console.log(`> Pool simulation successful`);
-    } catch (error) {
-      const errorMessage = error instanceof Error ? error.message : String(error);
-      console.log(`> Pool simulation failed (expected in dry-run mode): ${errorMessage}`);
-      console.log(`> This is normal since the config doesn't exist on-chain during dry-run`);
-    }
   } else {
     console.log(`>> Sending create config transaction...`);
     const createConfigTxHash = await sendAndConfirmTransaction(
@@ -112,11 +84,57 @@ export async function createDbcPool(
     console.log(`> Waiting for config transaction to be finalized...`);
     await connection.confirmTransaction(createConfigTxHash, 'finalized');
     console.log(`>>> Config transaction finalized`);
+  }
 
+  return configKeypair.publicKey;
+}
+
+export async function createDbcPool(
+  config: DbcConfig,
+  connection: Connection,
+  wallet: Wallet,
+  quoteMint: PublicKey,
+  baseMint: Keypair
+) {
+  if (!config) {
+    throw new Error('Missing dbc configuration');
+  }
+
+  const configPublicKey = await createDbcConfig(config, connection, wallet, quoteMint);
+
+  const dbcInstance = new DynamicBondingCurveClient(connection, 'confirmed');
+
+  if (config.dryRun) {
+    console.log(
+      `> Simulating create pool tx (note: this may fail in dry-run mode due to missing config state)...`
+    );
+    try {
+      const createPoolTx = await dbcInstance.pool.createPool({
+        baseMint: baseMint.publicKey,
+        config: configPublicKey,
+        name: config.dbc.createPool.name,
+        symbol: config.dbc.createPool.symbol,
+        uri: config.dbc.createPool.uri,
+        payer: wallet.publicKey,
+        poolCreator: wallet.publicKey,
+      });
+
+      modifyComputeUnitPriceIx(createPoolTx as any, config.computeUnitPriceMicroLamports);
+
+      await runSimulateTransaction(connection, [wallet.payer, baseMint], wallet.publicKey, [
+        createPoolTx,
+      ]);
+      console.log(`> Pool simulation successful`);
+    } catch (error) {
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.log(`> Pool simulation failed (expected in dry-run mode): ${errorMessage}`);
+      console.log(`> This is normal since the config doesn't exist on-chain during dry-run`);
+    }
+  } else {
     console.log(`>> Creating pool transaction...`);
     const createPoolTx = await dbcInstance.pool.createPool({
       baseMint: baseMint.publicKey,
-      config: configKeypair.publicKey,
+      config: configPublicKey,
       name: config.dbc.createPool.name,
       symbol: config.dbc.createPool.symbol,
       uri: config.dbc.createPool.uri,
