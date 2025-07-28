@@ -1,6 +1,6 @@
 {
-    /* rpcUrl is required. You can switch between mainnet, devnet and localnet (https://localhost:8899) or use your own RPC URL. */
-    "rpcUrl": "https://api.devnet.solana.com",
+    /* rpcUrl is required. You can switch between mainnet, devnet and localnet or use your own RPC URL. */
+    "rpcUrl": "https://api.devnet.solana.com", // mainnet: https://api.mainnet-beta.solana.com | devnet: https://api.devnet.solana.com | localnet: http://localhost:8899
 
     /* dryRun is required. If true, transactions will be simulated and not executed. If false, transactions will be executed. */
     "dryRun": false,
@@ -14,7 +14,7 @@
     /* quoteMint is required for the following actions:
      * 1. create-dbc-config
      * 2. create-dbc-pool (if there is no configKeyAddress)
-     * SOL: So11111111111111111111111111111111111111112 | USDC: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v
+     * SOL: So11111111111111111111111111111111111111112 | USDC: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v | any other token address
      */
     "quoteMint": "So11111111111111111111111111111111111111112", 
 
@@ -23,13 +23,13 @@
      * 2. migrate-damm-v1
      * 3. migrate-damm-v2
      */
-    "baseMint": "C1XzEsiQkDW84o7uUWiPVd1YHcMLSpdS4uPkNQUn6N9Y",
+    "baseMint": "YOUR_BASE_MINT_ADDRESS",
 
     /* Either use dbcConfigAddress or dbcConfig, but not both.
      * dbcConfigAddress is only used in the following action:
      * 1. create-dbc-pool (if the dbcConfigAddress is already created)
      */
-    // "dbcConfigAddress": "2kMUAGvfuMnso9LX5k8Xm38bq3AMGKauj3gKZLkS4o7Q",
+    // "dbcConfigAddress": "YOUR_DBC_CONFIG_ADDRESS",
 
     /* Either use dbcConfigAddress or dbcConfig, but not both.
      * dbcConfig is only used in the following actions:
@@ -117,8 +117,8 @@
             "feePercentage": 0, // Percentage of fee taken from migration quote threshold once pool migrates (0% to 50%)
             "creatorFeePercentage": 0 // Percentage of the migrationFee.feePercentage claimable by creator (0% to 100%)
         },
-        "leftoverReceiver": "2VuxXtec8Gpcu49y8VZ4yYutbi98WWtRC6Zvvs8APVy1", // leftover receiver address
-        "feeClaimer": "2VuxXtec8Gpcu49y8VZ4yYutbi98WWtRC6Zvvs8APVy1" // fee claimer address
+        "leftoverReceiver": "YOUR_LEFTOVER_RECEIVER_ADDRESS", // leftover receiver address
+        "feeClaimer": "YOUR_FEE_CLAIMER_ADDRESS" // fee claimer address
     },
 
     /* dbcPool is only used in the following actions:
