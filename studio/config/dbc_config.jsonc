@@ -1,24 +1,24 @@
 {
-    "rpcUrl": "https://api.mainnet-beta.solana.com",
-    "dryRun": true,
+    "rpcUrl": "https://api.devnet.solana.com",
+    "dryRun": false,
     "keypairFilePath": "./keypair.json",
     "computeUnitPriceMicroLamports": 100000,
     "quoteMint": "So11111111111111111111111111111111111111112",
-    "baseMint": "ESaAbiHqAQH3uPm3Y7yBbypiri3QyhqxFSLNmHF6rEnc",
+    "baseMint": "BE5VPuPzDPDurLxLTbfMDx2wwktcnT6uZiwSmM3swCiW",
     "dbcConfig": {
-       "configKeyAddress": "2kMUAGvfuMnso9LX5k8Xm38bq3AMGKauj3gKZLkS4o7Q",
-       "buildCurveMode": 1,
+    //    "configKeyAddress": "2kMUAGvfuMnso9LX5k8Xm38bq3AMGKauj3gKZLkS4o7Q",
+       "buildCurveMode": 0,
        "totalTokenSupply": 1000000000,
-       "initialMarketCap": 30,
-       "migrationMarketCap": 600,
+       "percentageSupplyOnMigration": 20,
+       "migrationQuoteThreshold": 1,
        "migrationOption": 0,
        "tokenBaseDecimal": 6,
        "tokenQuoteDecimal": 9,
        "lockedVestingParam": {
-           "totalLockedVestingAmount": 0,
-           "numberOfVestingPeriod": 0,
-           "cliffUnlockAmount": 0,
-           "totalVestingDuration": 0,
+           "totalLockedVestingAmount": 100000000,
+           "numberOfVestingPeriod": 24,
+           "cliffUnlockAmount": 100000000,
+           "totalVestingDuration":2592000,
            "cliffDurationFromMigrationTime": 0
         },
         "baseFeeParams": {
@@ -35,10 +35,10 @@
         "collectFeeMode": 0,
         "migrationFeeOption": 3,
         "tokenType": 0,
-        "partnerLpPercentage": 0,
-        "creatorLpPercentage": 0,
-        "partnerLockedLpPercentage": 100,
-        "creatorLockedLpPercentage": 0,
+        "partnerLpPercentage": 25,
+        "creatorLpPercentage": 25,
+        "partnerLockedLpPercentage": 25,
+        "creatorLockedLpPercentage": 25,
         "creatorTradingFeePercentage": 0,
         "leftover": 0,
         "tokenUpdateAuthority": 1,
@@ -53,5 +53,11 @@
         "name": "DBC Pool",
         "symbol": "DBC",
         "uri": "https://example.com"
+    },
+    "dbcSwap": {
+        "amountIn": 1.03,
+        "slippageBps": 100,
+        "swapBaseForQuote": false,
+        "referralTokenAccount": null
     }
 }

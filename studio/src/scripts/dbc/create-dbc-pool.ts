@@ -17,7 +17,7 @@ async function main() {
   console.log(`- Using wallet ${keypair.publicKey} to deploy pool`);
 
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
-  const partnerWallet = new Wallet(keypair);
+  const wallet = new Wallet(keypair);
 
   const quoteMint = new PublicKey(config.quoteMint);
   let baseMint: Keypair;
@@ -32,7 +32,7 @@ async function main() {
 
   /// --------------------------------------------------------------------------
   if (config) {
-    await createDbcPool(config, connection, partnerWallet, quoteMint, baseMint);
+    await createDbcPool(config, connection, wallet, quoteMint, baseMint);
   } else {
     throw new Error('Must provide DAMM V1 configuration');
   }

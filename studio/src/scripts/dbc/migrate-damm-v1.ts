@@ -3,7 +3,7 @@ import { safeParseKeypairFromFile, parseConfigFromCli } from '../../helpers';
 import { Wallet } from '@coral-xyz/anchor';
 import { DbcConfig } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
-import { claimTradingFee } from '../../lib/dbc';
+import { migrateDammV1 } from '../../lib/dbc';
 
 async function main() {
   const config = (await parseConfigFromCli()) as DbcConfig;
@@ -14,7 +14,7 @@ async function main() {
   console.log('\n> Initializing with general configuration...');
   console.log(`- Using RPC URL ${config.rpcUrl}`);
   console.log(`- Dry run = ${config.dryRun}`);
-  console.log(`- Using wallet ${keypair.publicKey} to claim trading fee`);
+  console.log(`- Using wallet ${keypair.publicKey} to migrate DBC to DAMM V1`);
 
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
   const wallet = new Wallet(keypair);
@@ -27,9 +27,9 @@ async function main() {
 
   /// --------------------------------------------------------------------------
   if (config) {
-    await claimTradingFee(config, connection, wallet);
+    await migrateDammV1(config, connection, wallet);
   } else {
-    throw new Error('Must provide DAMM V1 configuration');
+    throw new Error('Must provide DBC configuration');
   }
 }
 

@@ -179,7 +179,8 @@ export type DbcConfig = MeteoraConfigBase & {
     | (BuildCurveWithTwoSegments & { buildCurveMode: 2 })
     | (BuildCurveWithLiquidityWeights & { buildCurveMode: 3 })
     | null;
-  dbcPool: DbcPool;
+  dbcPool: DbcPool | null;
+  dbcSwap: DbcSwap | null;
 };
 
 export type BaseFee =
@@ -268,6 +269,13 @@ export type DbcPool = {
   name: string;
   symbol: string;
   uri: string;
+};
+
+export type DbcSwap = {
+  amountIn: number;
+  slippageBps: number;
+  swapBaseForQuote: boolean;
+  referralTokenAccount?: string | null;
 };
 
 /* Alpha Vault */

@@ -17,7 +17,7 @@ async function main() {
   console.log(`- Using wallet ${keypair.publicKey} to deploy config`);
 
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
-  const partnerWallet = new Wallet(keypair);
+  const wallet = new Wallet(keypair);
 
   const quoteMint = new PublicKey(config.quoteMint);
 
@@ -25,7 +25,7 @@ async function main() {
 
   /// --------------------------------------------------------------------------
   if (config) {
-    await createDbcConfig(config, connection, partnerWallet, quoteMint);
+    await createDbcConfig(config, connection, wallet, quoteMint);
   } else {
     throw new Error('Must provide DBC configuration');
   }
