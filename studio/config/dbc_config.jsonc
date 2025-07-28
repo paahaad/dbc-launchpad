@@ -4,14 +4,14 @@
     "keypairFilePath": "./keypair.json",
     "computeUnitPriceMicroLamports": 100000,
     "quoteMint": "So11111111111111111111111111111111111111112",
-    "baseMint": "BE5VPuPzDPDurLxLTbfMDx2wwktcnT6uZiwSmM3swCiW",
+    "baseMint": "C1XzEsiQkDW84o7uUWiPVd1YHcMLSpdS4uPkNQUn6N9Y",
     "dbcConfig": {
     //    "configKeyAddress": "2kMUAGvfuMnso9LX5k8Xm38bq3AMGKauj3gKZLkS4o7Q",
        "buildCurveMode": 0,
        "totalTokenSupply": 1000000000,
        "percentageSupplyOnMigration": 20,
        "migrationQuoteThreshold": 1,
-       "migrationOption": 0,
+       "migrationOption": 1,
        "tokenBaseDecimal": 6,
        "tokenQuoteDecimal": 9,
        "lockedVestingParam": {

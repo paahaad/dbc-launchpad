@@ -21,6 +21,7 @@
     "create-dbc-pool": "tsx src/scripts/dbc/create-dbc-pool.ts",
     "claim-dbc-trading-fee": "tsx src/scripts/dbc/claim-trading-fee.ts",
     "migrate-damm-v1": "tsx src/scripts/dbc/migrate-damm-v1.ts",
+    "migrate-damm-v2": "tsx src/scripts/dbc/migrate-damm-v2.ts",
     "swap-dbc": "tsx src/scripts/dbc/swap.ts",
     "create-alpha-vault": "tsx src/scripts/alpha-vault/create_alpha_vault.ts"
   },
