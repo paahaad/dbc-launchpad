@@ -14,7 +14,7 @@ async function main() {
   console.log('\n> Initializing with general configuration...');
   console.log(`- Using RPC URL ${config.rpcUrl}`);
   console.log(`- Dry run = ${config.dryRun}`);
-  console.log(`- Using wallet ${keypair.publicKey} to migrate DBC to DAMM V2`);
+  console.log(`- Using wallet ${keypair.publicKey} to migrate from DBC to DAMM v2`);
 
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
   const wallet = new Wallet(keypair);

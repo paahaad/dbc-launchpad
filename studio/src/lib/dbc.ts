@@ -31,7 +31,7 @@ import BN from 'bn.js';
  * @param connection - The connection to the network
  * @param wallet - The wallet to use for the transaction
  * @param quoteMint - The quote mint
- * @returns The public key of the config
+ * @returns The public key of the DBC config
  */
 export async function createDbcConfig(
   config: DbcConfig,
@@ -44,7 +44,7 @@ export async function createDbcConfig(
   }
   console.log('\n> Initializing DBC config...');
 
-  // Check if we're using an existing config key address
+  // check if using an existing config key address
   if (config.dbcConfigAddress) {
     console.log(`> Using existing config key: ${config.dbcConfigAddress.toString()}`);
     return config.dbcConfigAddress;
@@ -303,6 +303,12 @@ export async function claimTradingFee(config: DbcConfig, connection: Connection,
   }
 }
 
+/**
+ * Swap on DBC pools (Buy or Sell)
+ * @param config - The DBC config
+ * @param connection - The connection to the network
+ * @param wallet - The wallet to use for the transaction
+ */
 export async function swap(config: DbcConfig, connection: Connection, wallet: Wallet) {
   if (!config.dbcSwap) {
     throw new Error('Missing dbc swap parameters');
@@ -383,6 +389,12 @@ export async function swap(config: DbcConfig, connection: Connection, wallet: Wa
   }
 }
 
+/**
+ * Migrate DBC pool to DAMM V1 pool
+ * @param config - The DBC config
+ * @param connection - The connection to the network
+ * @param wallet - The wallet to use for the transaction
+ */
 export async function migrateDammV1(config: DbcConfig, connection: Connection, wallet: Wallet) {
   if (!config.baseMint) {
     throw new Error('Missing baseMint configuration');
@@ -714,6 +726,12 @@ export async function migrateDammV1(config: DbcConfig, connection: Connection, w
   }
 }
 
+/**
+ * Migrate DBC pool to DAMM V2 pool
+ * @param config - The DBC config
+ * @param connection - The connection to the network
+ * @param wallet - The wallet to use for the transaction
+ */
 export async function migrateDammV2(config: DbcConfig, connection: Connection, wallet: Wallet) {
   if (!config.baseMint) {
     throw new Error('Missing baseMint configuration');
