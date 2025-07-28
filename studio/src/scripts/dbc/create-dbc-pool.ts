@@ -21,8 +21,8 @@ async function main() {
 
   const quoteMint = new PublicKey(config.quoteMint);
   let baseMint: Keypair;
-  if (config.dbc.pool.baseMintKeypairFilepath) {
-    baseMint = await safeParseKeypairFromFile(config.dbc.pool.baseMintKeypairFilepath);
+  if (config.dbcPool.baseMintKeypairFilepath) {
+    baseMint = await safeParseKeypairFromFile(config.dbcPool.baseMintKeypairFilepath);
   } else {
     baseMint = Keypair.generate();
   }

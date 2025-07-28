@@ -24,29 +24,31 @@ export async function createDbcConfig(
   wallet: Wallet,
   quoteMint: PublicKey
 ): Promise<PublicKey> {
-  if (!config.dbc) {
+  if (!config.dbcConfig) {
     throw new Error('Missing dbc configuration');
   }
   console.log('\n> Initializing DBC config...');
 
   // Check if we're using an existing config key address
-  if ('configKeyAddress' in config.dbc) {
-    console.log(`> Using existing config key: ${config.dbc.configKeyAddress.toString()}`);
-    return config.dbc.configKeyAddress;
+  if ('configKeyAddress' in config.dbcConfig) {
+    console.log(`> Using existing config key: ${config.dbcConfig.configKeyAddress.toString()}`);
+    return config.dbcConfig.configKeyAddress;
   }
 
   let curveConfig: ConfigParameters | null = null;
 
-  if (config.dbc.buildCurveMode === 0) {
-    curveConfig = buildCurve(config.dbc);
-  } else if (config.dbc.buildCurveMode === 1) {
-    curveConfig = buildCurveWithMarketCap(config.dbc);
-  } else if (config.dbc.buildCurveMode === 2) {
-    curveConfig = buildCurveWithTwoSegments(config.dbc);
-  } else if (config.dbc.buildCurveMode === 3) {
-    curveConfig = buildCurveWithLiquidityWeights(config.dbc);
+  if (config.dbcConfig.buildCurveMode === 0) {
+    curveConfig = buildCurve(config.dbcConfig);
+  } else if (config.dbcConfig.buildCurveMode === 1) {
+    curveConfig = buildCurveWithMarketCap(config.dbcConfig);
+  } else if (config.dbcConfig.buildCurveMode === 2) {
+    curveConfig = buildCurveWithTwoSegments(config.dbcConfig);
+  } else if (config.dbcConfig.buildCurveMode === 3) {
+    curveConfig = buildCurveWithLiquidityWeights(config.dbcConfig);
   } else {
-    throw new Error(`Unsupported DBC build curve mode: ${(config.dbc as any).buildCurveMode}`);
+    throw new Error(
+      `Unsupported DBC build curve mode: ${(config.dbcConfig as any).buildCurveMode}`
+    );
   }
 
   if (!curveConfig) {
@@ -61,8 +63,8 @@ export async function createDbcConfig(
   const createConfigTx = await dbcInstance.partner.createConfig({
     config: configKeypair.publicKey,
     quoteMint,
-    feeClaimer: new PublicKey(config.dbc.feeClaimer),
-    leftoverReceiver: new PublicKey(config.dbc.leftoverReceiver),
+    feeClaimer: new PublicKey(config.dbcConfig.feeClaimer),
+    leftoverReceiver: new PublicKey(config.dbcConfig.leftoverReceiver),
     payer: wallet.publicKey,
     ...curveConfig,
   });
@@ -108,7 +110,7 @@ export async function createDbcPool(
   quoteMint: PublicKey,
   baseMint: Keypair
 ) {
-  if (!config.dbc) {
+  if (!config.dbcConfig) {
     throw new Error('Missing dbc configuration');
   }
 
@@ -124,9 +126,9 @@ export async function createDbcPool(
       const createPoolTx = await dbcInstance.pool.createPool({
         baseMint: baseMint.publicKey,
         config: configPublicKey,
-        name: config.dbc.pool.name,
-        symbol: config.dbc.pool.symbol,
-        uri: config.dbc.pool.uri,
+        name: config.dbcPool.name,
+        symbol: config.dbcPool.symbol,
+        uri: config.dbcPool.uri,
         payer: wallet.publicKey,
         poolCreator: wallet.publicKey,
       });
@@ -147,9 +149,9 @@ export async function createDbcPool(
     const createPoolTx = await dbcInstance.pool.createPool({
       baseMint: baseMint.publicKey,
       config: configPublicKey,
-      name: config.dbc.pool.name,
-      symbol: config.dbc.pool.symbol,
-      uri: config.dbc.pool.uri,
+      name: config.dbcPool.name,
+      symbol: config.dbcPool.symbol,
+      uri: config.dbcPool.uri,
       payer: wallet.publicKey,
       poolCreator: wallet.publicKey,
     });

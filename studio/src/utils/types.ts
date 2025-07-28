@@ -172,13 +172,14 @@ export enum PriceRoundingConfig {
 /* DBC */
 
 export type DbcConfig = MeteoraConfigBase & {
-  dbc:
-    | (BuildCurve & { buildCurveMode: 0 } & { pool: CreatePool })
-    | (BuildCurveWithMarketCap & { buildCurveMode: 1 } & { pool: CreatePool })
-    | (BuildCurveWithTwoSegments & { buildCurveMode: 2 } & { pool: CreatePool })
-    | (BuildCurveWithLiquidityWeights & { buildCurveMode: 3 } & { pool: CreatePool })
-    | { configKeyAddress: PublicKey; pool: CreatePool }
+  dbcConfig:
+    | { configKeyAddress: PublicKey }
+    | (BuildCurve & { buildCurveMode: 0 })
+    | (BuildCurveWithMarketCap & { buildCurveMode: 1 })
+    | (BuildCurveWithTwoSegments & { buildCurveMode: 2 })
+    | (BuildCurveWithLiquidityWeights & { buildCurveMode: 3 })
     | null;
+  dbcPool: DbcPool;
 };
 
 export type BaseFee =
@@ -262,7 +263,7 @@ export type BuildCurveWithLiquidityWeights = BuildCurveBase & {
   liquidityWeights: number[];
 };
 
-export type CreatePool = {
+export type DbcPool = {
   baseMintKeypairFilepath?: string;
   name: string;
   symbol: string;
