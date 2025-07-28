@@ -172,15 +172,15 @@ export enum PriceRoundingConfig {
 /* DBC */
 
 export type DbcConfig = MeteoraConfigBase & {
-  dbcConfig:
-    | { configKeyAddress: PublicKey }
+  dbcConfig?:
     | (BuildCurve & { buildCurveMode: 0 })
     | (BuildCurveWithMarketCap & { buildCurveMode: 1 })
     | (BuildCurveWithTwoSegments & { buildCurveMode: 2 })
     | (BuildCurveWithLiquidityWeights & { buildCurveMode: 3 })
     | null;
-  dbcPool: DbcPool | null;
-  dbcSwap: DbcSwap | null;
+  dbcConfigAddress?: PublicKey | null;
+  dbcPool?: DbcPool | null;
+  dbcSwap?: DbcSwap | null;
 };
 
 export type BaseFee =

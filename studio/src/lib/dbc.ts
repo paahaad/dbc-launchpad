@@ -45,9 +45,9 @@ export async function createDbcConfig(
   console.log('\n> Initializing DBC config...');
 
   // Check if we're using an existing config key address
-  if ('configKeyAddress' in config.dbcConfig) {
-    console.log(`> Using existing config key: ${config.dbcConfig.configKeyAddress.toString()}`);
-    return config.dbcConfig.configKeyAddress;
+  if (config.dbcConfigAddress) {
+    console.log(`> Using existing config key: ${config.dbcConfigAddress.toString()}`);
+    return config.dbcConfigAddress;
   }
 
   let curveConfig: ConfigParameters | null = null;
@@ -384,10 +384,6 @@ export async function swap(config: DbcConfig, connection: Connection, wallet: Wa
 }
 
 export async function migrateDammV1(config: DbcConfig, connection: Connection, wallet: Wallet) {
-  if (!config.dbcConfig) {
-    throw new Error('Missing dbc configuration');
-  }
-
   if (!config.baseMint) {
     throw new Error('Missing baseMint configuration');
   }
@@ -719,10 +715,6 @@ export async function migrateDammV1(config: DbcConfig, connection: Connection, w
 }
 
 export async function migrateDammV2(config: DbcConfig, connection: Connection, wallet: Wallet) {
-  if (!config.dbcConfig) {
-    throw new Error('Missing dbc configuration');
-  }
-
   if (!config.baseMint) {
     throw new Error('Missing baseMint configuration');
   }
