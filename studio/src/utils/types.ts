@@ -36,26 +36,21 @@ export type AllocationByAmount = {
   percentage: number;
 };
 
-export enum ActivationTypeConfig {
-  Slot = 'slot',
-  Timestamp = 'timestamp',
-}
-
 /* DAMM v1 */
 
 export type DammV1Config = MeteoraConfigBase & {
   createBaseToken: CreateBaseMintConfig | null;
-  dynamicAmm: DynamicAmmConfig | null;
-  alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
+  dammV1Config: DynamicAmmV1Config | null;
+  dammV1LockLiquidity: LockLiquidityConfig | null;
   stake2Earn: Stake2EarnConfig | null;
-  lockLiquidity: LockLiquidityConfig | null;
+  alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
 };
 
-export interface DynamicAmmConfig {
+export interface DynamicAmmV1Config {
   baseAmount: number | string;
   quoteAmount: number | string;
   tradeFeeNumerator: number;
-  activationType: ActivationTypeConfig;
+  activationType: number;
   activationPoint: number | null;
   hasAlphaVault: boolean;
 }
@@ -67,6 +62,73 @@ export interface LockLiquidityConfig {
 export interface LockLiquidityAllocation {
   percentage: number;
   address: string;
+}
+
+export interface Stake2EarnConfig {
+  topListLength: number;
+  unstakeLockDurationSecs: number;
+  secondsToFullUnlock: number;
+  startFeeDistributeTimestamp: number;
+}
+
+/* DAMM v2 */
+
+export type DammV2Config = MeteoraConfigBase & {
+  createBaseToken: CreateBaseMintConfig | null;
+  dammV2Config: DynamicAmmV2Config | null;
+  alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
+};
+
+export interface DynamicAmmV2Config {
+  creator: string;
+  baseAmount: number | string;
+  quoteAmount: number | string | null;
+  initPrice: number | string;
+  maxPrice: number | string | null;
+  poolFees: {
+    maxBaseFeeBps: number;
+    minBaseFeeBps: number;
+    numberOfPeriod: number;
+    totalDuration: number;
+    feeSchedulerMode: number;
+    useDynamicFee: boolean;
+    dynamicFeeConfig: DynamicFee | null;
+  };
+  collectFeeMode: number;
+  activationType: number;
+  activationPoint: number | null;
+  hasAlphaVault: boolean;
+}
+
+export interface DynamicFee {
+  filterPeriod: number;
+  decayPeriod: number;
+  reductionFactor: number;
+  variableFeeControl: number;
+  maxVolatilityAccumulator: number;
+}
+
+/* DLMM */
+
+export type DlmmConfig = MeteoraConfigBase & {
+  createBaseToken: CreateBaseMintConfig | null;
+  dlmmConfig: DynamicLmmConfig | null;
+  alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
+  lfgSeedLiquidity: LfgSeedLiquidityConfig | null;
+  singleBinSeedLiquidity: SingleBinSeedLiquidityConfig | null;
+  setDlmmPoolStatus: SetDlmmPoolStatusConfig | null;
+};
+
+export interface DynamicLmmConfig {
+  binStep: number;
+  feeBps: number;
+  initialPrice: number;
+  activationType: number;
+  activationPoint: number | null;
+  priceRounding: PriceRoundingConfig;
+  hasAlphaVault: boolean;
+  // Allow creator to turn on/off the pool
+  creatorPoolOnOffControl: boolean;
 }
 
 export interface LfgSeedLiquidityConfig {
@@ -90,73 +152,6 @@ export interface SingleBinSeedLiquidityConfig {
   feeOwner: string;
   lockReleasePoint: number;
   seedTokenXToPositionOwner: boolean;
-}
-
-export interface Stake2EarnConfig {
-  topListLength: number;
-  unstakeLockDurationSecs: number;
-  secondsToFullUnlock: number;
-  startFeeDistributeTimestamp: number;
-}
-
-/* DAMM v2 */
-
-export type DammV2Config = MeteoraConfigBase & {
-  createBaseToken: CreateBaseMintConfig | null;
-  dynamicAmmV2: DynamicAmmV2Config | null;
-  alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
-};
-
-export interface DynamicAmmV2Config {
-  creator: string;
-  baseAmount: number | string;
-  quoteAmount: number | string | null;
-  initPrice: number | string;
-  maxPrice: number | string | null;
-  poolFees: {
-    maxBaseFeeBps: number;
-    minBaseFeeBps: number;
-    numberOfPeriod: number;
-    totalDuration: number;
-    feeSchedulerMode: number;
-    useDynamicFee: boolean;
-    dynamicFeeConfig: DynamicFee | null;
-  };
-  collectFeeMode: number;
-  activationType: ActivationTypeConfig;
-  activationPoint: number | null;
-  hasAlphaVault: boolean;
-}
-
-export interface DynamicFee {
-  filterPeriod: number;
-  decayPeriod: number;
-  reductionFactor: number;
-  variableFeeControl: number;
-  maxVolatilityAccumulator: number;
-}
-
-/* DLMM */
-
-export type DlmmConfig = MeteoraConfigBase & {
-  createBaseToken: CreateBaseMintConfig | null;
-  dlmm: DynamicLmmConfig | null;
-  alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
-  lfgSeedLiquidity: LfgSeedLiquidityConfig | null;
-  singleBinSeedLiquidity: SingleBinSeedLiquidityConfig | null;
-  setDlmmPoolStatus: SetDlmmPoolStatusConfig | null;
-};
-
-export interface DynamicLmmConfig {
-  binStep: number;
-  feeBps: number;
-  initialPrice: number;
-  activationType: ActivationTypeConfig;
-  activationPoint: number | null;
-  priceRounding: PriceRoundingConfig;
-  hasAlphaVault: boolean;
-  // Allow creator to turn on/off the pool
-  creatorPoolOnOffControl: boolean;
 }
 
 export interface SetDlmmPoolStatusConfig {

@@ -7,9 +7,9 @@ import {
   sendAndConfirmTransaction,
   Transaction,
 } from '@solana/web3.js';
-import { ActivationTypeConfig, DlmmConfig } from '../utils/types';
+import { DlmmConfig } from '../utils/types';
 import { Wallet } from '@coral-xyz/anchor';
-import DLMM, { ActivationType, deriveCustomizablePermissionlessLbPair } from '@meteora-ag/dlmm';
+import DLMM, { deriveCustomizablePermissionlessLbPair } from '@meteora-ag/dlmm';
 import BN from 'bn.js';
 import {
   getQuoteDecimals,
@@ -19,16 +19,6 @@ import {
 } from '../helpers';
 import { getMint } from '@solana/spl-token';
 import { DEFAULT_SEND_TX_MAX_RETRIES, DLMM_PROGRAM_IDS } from '../utils/constants';
-
-export function getDlmmActivationType(activationType: ActivationTypeConfig): ActivationType {
-  if (activationType == ActivationTypeConfig.Slot) {
-    return ActivationType.Slot;
-  } else if (activationType == ActivationTypeConfig.Timestamp) {
-    return ActivationType.Timestamp;
-  } else {
-    throw new Error(`Unsupported DLMM activation type: ${activationType}`);
-  }
-}
 
 export async function createPermissionlessDlmmPool(
   config: DlmmConfig,
@@ -41,22 +31,23 @@ export async function createPermissionlessDlmmPool(
     programId?: PublicKey;
   }
 ) {
-  if (!config.dlmm) {
+  if (!config.dlmmConfig) {
     throw new Error('Missing DLMM configuration');
   }
   console.log('\n> Initializing Permissionless DLMM pool...');
 
-  const binStep = config.dlmm.binStep;
-  const feeBps = config.dlmm.feeBps;
-  const hasAlphaVault = config.dlmm.hasAlphaVault;
-  const activationPoint = config.dlmm.activationPoint ? new BN(config.dlmm.activationPoint) : null;
+  const binStep = config.dlmmConfig.binStep;
+  const feeBps = config.dlmmConfig.feeBps;
+  const hasAlphaVault = config.dlmmConfig.hasAlphaVault;
+  const activationPoint = config.dlmmConfig.activationPoint
+    ? new BN(config.dlmmConfig.activationPoint)
+    : null;
 
-  const activationType = getDlmmActivationType(config.dlmm.activationType);
-  const creatorPoolOnOffControl = config.dlmm.creatorPoolOnOffControl;
+  const creatorPoolOnOffControl = config.dlmmConfig.creatorPoolOnOffControl;
   console.log(`- Using binStep = ${binStep}`);
   console.log(`- Using feeBps = ${feeBps}`);
-  console.log(`- Using initialPrice = ${config.dlmm.initialPrice}`);
-  console.log(`- Using activationType = ${config.dlmm.activationType}`);
+  console.log(`- Using initialPrice = ${config.dlmmConfig.initialPrice}`);
+  console.log(`- Using activationType = ${config.dlmmConfig.activationType}`);
   console.log(`- Using activationPoint = ${activationPoint}`);
   console.log(`- Using hasAlphaVault = ${hasAlphaVault}`);
   console.log(`- Using creatorPoolOnOffControl = ${creatorPoolOnOffControl}`);
@@ -71,12 +62,16 @@ export async function createPermissionlessDlmmPool(
   );
   const baseDecimals = baseMintAccount.decimals;
 
-  const initPrice = DLMM.getPricePerLamport(baseDecimals, quoteDecimals, config.dlmm.initialPrice);
+  const initPrice = DLMM.getPricePerLamport(
+    baseDecimals,
+    quoteDecimals,
+    config.dlmmConfig.initialPrice
+  );
 
   const activateBinId = DLMM.getBinIdFromPrice(
     initPrice,
     binStep,
-    !isPriceRoundingUp(config.dlmm.priceRounding)
+    !isPriceRoundingUp(config.dlmmConfig.priceRounding)
   );
 
   const cluster = opts?.cluster || 'mainnet-beta';
@@ -89,7 +84,7 @@ export async function createPermissionlessDlmmPool(
     quoteMint,
     new BN(activateBinId.toString()),
     new BN(feeBps),
-    activationType,
+    config.dlmmConfig.activationType,
     hasAlphaVault,
     wallet.publicKey,
     activationPoint,

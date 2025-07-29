@@ -1,6 +1,5 @@
 import { BN, Wallet } from '@coral-xyz/anchor';
 import {
-  ActivationType,
   BaseFee,
   BIN_STEP_BPS_DEFAULT,
   BIN_STEP_BPS_U128_DEFAULT,
@@ -17,7 +16,7 @@ import {
 } from '@meteora-ag/cp-amm-sdk';
 import { TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID, unpackMint } from '@solana/spl-token';
 import { Connection, Keypair, PublicKey, sendAndConfirmTransaction } from '@solana/web3.js';
-import { ActivationTypeConfig, DammV2Config } from '../utils/types';
+import { DammV2Config } from '../utils/types';
 import {
   getAmountInLamports,
   getDecimalizedAmount,
@@ -27,16 +26,6 @@ import {
 } from '../helpers';
 import { DEFAULT_SEND_TX_MAX_RETRIES } from '../utils/constants';
 
-export function getDammV2ActivationType(activationType: ActivationTypeConfig): ActivationType {
-  if (activationType == ActivationTypeConfig.Slot) {
-    return ActivationType.Slot;
-  } else if (activationType == ActivationTypeConfig.Timestamp) {
-    return ActivationType.Timestamp;
-  } else {
-    throw new Error(`Unsupported Dynamic AMM activation type: ${activationType}`);
-  }
-}
-
 export async function createDammV2OneSidedTokenAPool(
   config: DammV2Config,
   connection: Connection,
@@ -44,7 +33,7 @@ export async function createDammV2OneSidedTokenAPool(
   baseTokenMint: PublicKey,
   quoteTokenMint: PublicKey
 ) {
-  if (!config.dynamicAmmV2) {
+  if (!config.dammV2Config) {
     throw new Error('Missing dynamic amm v2 configuration');
   }
   console.log('\n> Initializing one-sided Dynamic AMM V2 pool...');
@@ -84,7 +73,7 @@ export async function createDammV2OneSidedTokenAPool(
     activationPoint,
     activationType,
     collectFeeMode,
-  } = config.dynamicAmmV2;
+  } = config.dammV2Config;
 
   const {
     maxBaseFeeBps,
@@ -134,11 +123,9 @@ export async function createDammV2OneSidedTokenAPool(
     `- Price range [${getPriceFromSqrtPrice(minSqrtPrice, baseDecimals, quoteDecimals)}, ${getPriceFromSqrtPrice(maxSqrtPrice, baseDecimals, quoteDecimals)}]`
   );
 
-  const activationTypeValue = getDammV2ActivationType(activationType);
-
   let dynamicFee = null;
   if (useDynamicFee) {
-    const dynamicFeeConfig = config.dynamicAmmV2.poolFees.dynamicFeeConfig;
+    const dynamicFeeConfig = config.dammV2Config.poolFees.dynamicFeeConfig;
     if (dynamicFeeConfig) {
       dynamicFee = {
         binStep: BIN_STEP_BPS_DEFAULT,
@@ -150,7 +137,7 @@ export async function createDammV2OneSidedTokenAPool(
         maxVolatilityAccumulator: dynamicFeeConfig.maxVolatilityAccumulator,
       };
     } else {
-      dynamicFee = getDynamicFeeParams(config.dynamicAmmV2.poolFees.minBaseFeeBps);
+      dynamicFee = getDynamicFeeParams(config.dammV2Config.poolFees.minBaseFeeBps);
     }
   }
 
@@ -177,7 +164,7 @@ export async function createDammV2OneSidedTokenAPool(
     position,
   } = await cpAmmInstance.createCustomPool({
     payer: wallet.publicKey,
-    creator: new PublicKey(config.dynamicAmmV2.creator),
+    creator: new PublicKey(config.dammV2Config.creator),
     positionNft: positionNft.publicKey,
     tokenAMint: baseTokenMint,
     tokenBMint: quoteTokenMint,
@@ -189,7 +176,7 @@ export async function createDammV2OneSidedTokenAPool(
     initSqrtPrice,
     poolFees: poolFeesParams,
     hasAlphaVault: hasAlphaVault,
-    activationType: activationTypeValue,
+    activationType,
     collectFeeMode: collectFeeMode,
     activationPoint: activationPoint ? new BN(activationPoint) : null,
     tokenAProgram: baseTokenProgram,
@@ -231,7 +218,7 @@ export async function createDammV2BalancedPool(
   baseTokenMint: PublicKey,
   quoteTokenMint: PublicKey
 ) {
-  if (!config.dynamicAmmV2) {
+  if (!config.dammV2Config) {
     throw new Error('Missing dynamic amm v2 configuration');
   }
   console.log('\n> Initializing balanced Dynamic AMM V2 pool...');
@@ -288,7 +275,7 @@ export async function createDammV2BalancedPool(
     activationPoint,
     activationType,
     collectFeeMode,
-  } = config.dynamicAmmV2;
+  } = config.dammV2Config;
 
   const {
     maxBaseFeeBps,
@@ -351,11 +338,9 @@ export async function createDammV2BalancedPool(
     `- Price range [${getPriceFromSqrtPrice(minSqrtPrice, baseDecimals, quoteDecimals)}, ${getPriceFromSqrtPrice(maxSqrtPrice, baseDecimals, quoteDecimals)}]`
   );
 
-  const activationTypeValue = getDammV2ActivationType(activationType);
-
   let dynamicFee = null;
   if (useDynamicFee) {
-    const dynamicFeeConfig = config.dynamicAmmV2.poolFees.dynamicFeeConfig;
+    const dynamicFeeConfig = config.dammV2Config.poolFees.dynamicFeeConfig;
     if (dynamicFeeConfig) {
       dynamicFee = {
         binStep: BIN_STEP_BPS_DEFAULT,
@@ -367,7 +352,7 @@ export async function createDammV2BalancedPool(
         maxVolatilityAccumulator: dynamicFeeConfig.maxVolatilityAccumulator,
       };
     } else {
-      dynamicFee = getDynamicFeeParams(config.dynamicAmmV2.poolFees.minBaseFeeBps);
+      dynamicFee = getDynamicFeeParams(config.dammV2Config.poolFees.minBaseFeeBps);
     }
   }
 
@@ -394,7 +379,7 @@ export async function createDammV2BalancedPool(
     position,
   } = await cpAmmInstance.createCustomPool({
     payer: wallet.publicKey,
-    creator: new PublicKey(config.dynamicAmmV2.creator),
+    creator: new PublicKey(config.dammV2Config.creator),
     positionNft: positionNft.publicKey,
     tokenAMint: baseTokenMint,
     tokenBMint: quoteTokenMint,
@@ -406,7 +391,7 @@ export async function createDammV2BalancedPool(
     initSqrtPrice,
     poolFees: poolFeesParams,
     hasAlphaVault: hasAlphaVault,
-    activationType: activationTypeValue,
+    activationType,
     collectFeeMode: collectFeeMode,
     activationPoint: activationPoint ? new BN(activationPoint) : null,
     tokenAProgram: baseTokenProgram,

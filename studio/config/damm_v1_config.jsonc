@@ -9,7 +9,7 @@
     //     "baseDecimals": 6
     // },
     "quoteMint": "So11111111111111111111111111111111111111112",
-    "dynamicAmm": {
+    "dammV1Config": {
         "baseAmount": 100,
         "quoteAmount": 0.001,
         "tradeFeeNumerator": 2500,
@@ -36,13 +36,13 @@
 		// 	"apiKey": ""
 		// }
     },
-    "m3m3": {
+    "stake2Earn": {
         "topListLength": 100,
         "unstakeLockDurationSecs": 25200,
         "secondsToFullUnlock": 86400,
         "startFeeDistributeTimestamp": 1753441790
     },
-    "lockLiquidity": {
+    "dammV1LockLiquidity": {
       "allocations": [
         {
           "percentage": 80,

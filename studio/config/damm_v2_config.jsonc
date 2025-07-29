@@ -5,7 +5,7 @@
     "computeUnitPriceMicroLamports": 100000,
     "baseMint": "G7p5aNEWd1gVa4vAzmXEoxkgFt6XMGvRjjMFgjMHJ2Am",
     "quoteMint": "So11111111111111111111111111111111111111112",
-    "dynamicAmmV2": {
+    "dammV2Config": {
         "creator": "2VuxXtec8Gpcu49y8VZ4yYutbi98WWtRC6Zvvs8APVy1",
         "baseAmount": 1000,
         "quoteAmount": null,

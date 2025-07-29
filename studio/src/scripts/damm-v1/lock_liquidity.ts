@@ -47,10 +47,10 @@ async function main() {
 
   console.log(`\n> Pool address: ${poolKey}`);
 
-  if (!config.lockLiquidity) {
+  if (!config.dammV1LockLiquidity) {
     throw new Error('Missing lockLiquidity configuration');
   }
-  if (config.lockLiquidity.allocations.length == 0) {
+  if (config.dammV1LockLiquidity.allocations.length == 0) {
     throw new Error('Missing allocations in lockLiquidity configuration');
   }
 
@@ -66,7 +66,7 @@ async function main() {
 
   const allocationByAmounts = fromAllocationsToAmount(
     new BN(payerPoolLpBalance),
-    config.lockLiquidity.allocations
+    config.dammV1LockLiquidity.allocations
   );
   const pool = await AmmImpl.create(connection as any, poolKey);
 

@@ -41,7 +41,7 @@ async function main() {
   console.log(`- Using quote token mint ${quoteMint.toString()}`);
 
   /// --------------------------------------------------------------------------
-  if (config.dynamicAmmV2) {
+  if (config.dammV2Config) {
     await createDammV2OneSidedTokenAPool(config, connection, wallet, baseMint, quoteMint);
   } else {
     throw new Error('Must provide Dynamic V2 configuration');

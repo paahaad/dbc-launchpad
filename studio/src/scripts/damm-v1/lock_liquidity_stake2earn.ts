@@ -55,10 +55,10 @@ async function main() {
   const stake2EarnVaultPubkey = deriveFeeVault(poolKey, stake2EarnProgramId);
   console.log(`- Stake2Earn fee vault ${stake2EarnVaultPubkey}`);
 
-  if (!config.lockLiquidity) {
+  if (!config.dammV1LockLiquidity) {
     throw new Error('Missing lockLiquidity configuration');
   }
-  if (config.lockLiquidity.allocations.length == 0) {
+  if (config.dammV1LockLiquidity.allocations.length == 0) {
     throw new Error('Missing allocations in lockLiquidity configuration');
   }
 
@@ -74,12 +74,12 @@ async function main() {
 
   const allocationByAmounts = fromAllocationsToAmount(
     new BN(payerPoolLpBalance),
-    config.lockLiquidity.allocations
+    config.dammV1LockLiquidity.allocations
   );
 
   // validate allocations should contains stake2earn fee farm address
-  const allocationContainsFeeFarmAddress = config.lockLiquidity.allocations.some((allocation) =>
-    new PublicKey(allocation.address).equals(stake2EarnVaultPubkey)
+  const allocationContainsFeeFarmAddress = config.dammV1LockLiquidity.allocations.some(
+    (allocation) => new PublicKey(allocation.address).equals(stake2EarnVaultPubkey)
   );
   if (!allocationContainsFeeFarmAddress) {
     throw new Error('Lock liquidity allocations does not contain Stake2Earn fee farm address');

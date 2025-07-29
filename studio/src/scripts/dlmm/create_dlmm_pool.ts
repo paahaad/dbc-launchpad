@@ -57,12 +57,12 @@ async function main() {
   console.log(`- Using quote token mint ${quoteMint.toString()}`);
 
   /// --------------------------------------------------------------------------
-  if (config.dlmm) {
+  if (config.dlmmConfig) {
     // Create the DLMM pool first
     await createPermissionlessDlmmPool(config, connection, wallet, baseMint, quoteMint);
 
     // If alpha vault is enabled and config is provided, create the alpha vault automatically
-    if (config.dlmm.hasAlphaVault && config.alphaVault) {
+    if (config.dlmmConfig.hasAlphaVault && config.alphaVault) {
       console.log('\n> Alpha vault is enabled, creating alpha vault automatically...');
 
       // Derive the pool address

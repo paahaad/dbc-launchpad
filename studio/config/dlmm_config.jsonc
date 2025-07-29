@@ -5,7 +5,7 @@
     "computeUnitPriceMicroLamports": 100000,
     "baseMint": "HYiYuRUjKTaUHt5PoN3QK3CxEYDSfQKpRZFaWdf4up2g",
     "quoteMint": "So11111111111111111111111111111111111111112",
-    "dlmm": {
+    "dlmmConfig": {
         "binStep": 400,
         "feeBps": 200,
         "initialPrice": 0.0000017,

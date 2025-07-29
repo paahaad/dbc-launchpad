@@ -1,5 +1,5 @@
 import { Cluster, Connection, PublicKey, sendAndConfirmTransaction } from '@solana/web3.js';
-import { ActivationTypeConfig, DammV1Config } from '../utils/types';
+import { DammV1Config } from '../utils/types';
 import { Wallet } from '@coral-xyz/anchor';
 import {
   getAmountInLamports,
@@ -8,10 +8,7 @@ import {
   runSimulateTransaction,
 } from '../helpers';
 import { getMint } from '@solana/spl-token';
-import {
-  ActivationType,
-  CustomizableParams,
-} from '@meteora-ag/dynamic-amm-sdk/dist/cjs/src/amm/types';
+import { CustomizableParams } from '@meteora-ag/dynamic-amm-sdk/dist/cjs/src/amm/types';
 import AmmImpl from '@meteora-ag/dynamic-amm-sdk';
 import BN from 'bn.js';
 import {
@@ -19,16 +16,6 @@ import {
   deriveCustomizablePermissionlessConstantProductPoolAddress,
 } from '@meteora-ag/dynamic-amm-sdk/dist/cjs/src/amm/utils';
 import { DEFAULT_SEND_TX_MAX_RETRIES } from '../utils/constants';
-
-export function getDynamicAmmActivationType(activationType: ActivationTypeConfig): ActivationType {
-  if (activationType == ActivationTypeConfig.Slot) {
-    return ActivationType.Slot;
-  } else if (activationType == ActivationTypeConfig.Timestamp) {
-    return ActivationType.Timestamp;
-  } else {
-    throw new Error(`Unsupported Dynamic AMM activation type: ${activationType}`);
-  }
-}
 
 export async function createPermissionlessDammV1Pool(
   config: DammV1Config,
@@ -50,29 +37,27 @@ export async function createPermissionlessDammV1Pool(
   const baseMintAccount = await getMint(connection, baseMint, connection.commitment);
   const baseDecimals = baseMintAccount.decimals;
 
-  const baseAmount = getAmountInLamports(config.dynamicAmm.baseAmount, baseDecimals);
-  const quoteAmount = getAmountInLamports(config.dynamicAmm.quoteAmount, quoteDecimals);
+  const baseAmount = getAmountInLamports(config.dammV1Config.baseAmount, baseDecimals);
+  const quoteAmount = getAmountInLamports(config.dammV1Config.quoteAmount, quoteDecimals);
 
   console.log(
-    `- Using token A amount ${config.dynamicAmm.baseAmount}, in lamports = ${baseAmount}`
+    `- Using token A amount ${config.dammV1Config.baseAmount}, in lamports = ${baseAmount}`
   );
   console.log(
-    `- Using token B amount ${config.dynamicAmm.quoteAmount}, in lamports = ${quoteAmount}`
+    `- Using token B amount ${config.dammV1Config.quoteAmount}, in lamports = ${quoteAmount}`
   );
-
-  const activationType = getDynamicAmmActivationType(config.dynamicAmm.activationType);
 
   const customizeParam: CustomizableParams = {
-    tradeFeeNumerator: config.dynamicAmm.tradeFeeNumerator,
-    activationType: activationType,
-    activationPoint: config.dynamicAmm.activationPoint
-      ? new BN(config.dynamicAmm.activationPoint)
+    tradeFeeNumerator: config.dammV1Config.tradeFeeNumerator,
+    activationType: config.dammV1Config.activationType,
+    activationPoint: config.dammV1Config.activationPoint
+      ? new BN(config.dammV1Config.activationPoint)
       : null,
-    hasAlphaVault: config.dynamicAmm.hasAlphaVault,
+    hasAlphaVault: config.dammV1Config.hasAlphaVault,
     padding: Array(90).fill(0),
   };
   console.log(`- Using tradeFeeNumerator = ${customizeParam.tradeFeeNumerator}`);
-  console.log(`- Using activationType = ${config.dynamicAmm.activationType}`);
+  console.log(`- Using activationType = ${config.dammV1Config.activationType}`);
   console.log(`- Using activationPoint = ${customizeParam.activationPoint}`);
   console.log(`- Using hasAlphaVault = ${customizeParam.hasAlphaVault}`);
 
