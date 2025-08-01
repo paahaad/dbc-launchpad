@@ -3,7 +3,7 @@ import { Wallet } from '@coral-xyz/anchor';
 import { DammV2Config } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 import { createTokenMint, parseConfigFromCli, safeParseKeypairFromFile } from '../../helpers';
-import { createDammV2OneSidedTokenAPool } from '../../lib/damm_v2';
+import { createDammV2OneSidedPool } from '../../lib/damm_v2';
 
 async function main() {
   const config: DammV2Config = (await parseConfigFromCli()) as DammV2Config;
@@ -42,7 +42,7 @@ async function main() {
 
   /// --------------------------------------------------------------------------
   if (config.dammV2Config) {
-    await createDammV2OneSidedTokenAPool(config, connection, wallet, baseMint, quoteMint);
+    await createDammV2OneSidedPool(config, connection, wallet, baseMint, quoteMint);
   } else {
     throw new Error('Must provide Dynamic V2 configuration');
   }

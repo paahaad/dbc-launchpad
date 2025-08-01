@@ -26,7 +26,7 @@ import {
 } from '../helpers';
 import { DEFAULT_SEND_TX_MAX_RETRIES } from '../utils/constants';
 
-export async function createDammV2OneSidedTokenAPool(
+export async function createDammV2OneSidedPool(
   config: DammV2Config,
   connection: Connection,
   wallet: Wallet,
@@ -151,9 +151,7 @@ export async function createDammV2OneSidedTokenAPool(
 
   const poolFeesParams: PoolFeesParams = {
     baseFee,
-    protocolFeePercent: 20,
-    partnerFeePercent: 0,
-    referralFeePercent: 20,
+    padding: [],
     dynamicFee,
   };
   const positionNft = Keypair.generate();
@@ -366,9 +364,7 @@ export async function createDammV2BalancedPool(
 
   const poolFeesParams: PoolFeesParams = {
     baseFee,
-    protocolFeePercent: 20,
-    partnerFeePercent: 0,
-    referralFeePercent: 20,
+    padding: [],
     dynamicFee,
   };
   const positionNft = Keypair.generate();

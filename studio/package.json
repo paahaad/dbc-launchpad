@@ -16,7 +16,8 @@
     "create-damm-v1-stake2earn-pool": "tsx src/scripts/damm-v1/create_damm_v1_stake2earn_pool.ts",
     "lock-damm-v1-pool-liquidity": "tsx src/scripts/damm-v1/lock_liquidity.ts",
     "lock-damm-v1-pool-liquidity-stake2earn": "tsx src/scripts/damm-v1/lock_liquidity_stake2earn.ts",
-    "create-damm-v2-pool": "tsx src/scripts/damm-v2/create_damm_v2_pool.ts",
+    "create-damm-v2-balanced-pool": "tsx src/scripts/damm-v2/create_damm_v2_balanced_pool.ts",
+    "create-damm-v2-one-sided-pool": "tsx src/scripts/damm-v2/create_damm_v2_one_sided_pool.ts",
     "create-dbc-config": "tsx src/scripts/dbc/create-dbc-config.ts",
     "create-dbc-pool": "tsx src/scripts/dbc/create-dbc-pool.ts",
     "claim-dbc-trading-fee": "tsx src/scripts/dbc/claim-trading-fee.ts",
@@ -30,7 +31,7 @@
     "create",
     "build"
   ],
-  "author": "@dannweeeee",
+  "author": "Dann Wee <dann@raccoons.dev>",
   "license": "ISC",
   "description": "Meteora Invent is a toolkit consisting of everything you need to invent innovative token launches. Powered by Meteora, the most secure, sustainable and composable liquidity layer on Solana.",
   "dependencies": {
