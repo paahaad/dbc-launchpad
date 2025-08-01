@@ -123,8 +123,8 @@ importers:
         specifier: ^0.2.3
         version: 0.2.3(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@emotion/styled@11.14.1(@emotion/react@11.14.0(@types/react@19.1.8)(react@19.1.0))(@types/react@19.1.8)(react@19.1.0))(@jup-ag/jup-mobile-adapter@0.0.2(@reown/appkit-adapter-solana@1.7.12(@react-native-async-storage/async-storage@1.24.0(react-native@0.80.1(@babel/core@7.28.0)(@types/react@19.1.8)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@types/react@19.1.8)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.74))(@reown/appkit-wallet-button@1.7.12(@react-native-async-storage/async-storage@1.24.0(react-native@0.80.1(@babel/core@7.28.0)(@types/react@19.1.8)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@types/react@19.1.8)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.74))(@reown/appkit@1.7.12(@react-native-async-storage/async-storage@1.24.0(react-native@0.80.1(@babel/core@7.28.0)(@types/react@19.1.8)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@types/react@19.1.8)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.74))(@solana/wallet-adapter-base@0.9.27(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)))(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(react@19.1.0))(@reown/appkit-adapter-solana@1.7.12(@react-native-async-storage/async-storage@1.24.0(react-native@0.80.1(@babel/core@7.28.0)(@types/react@19.1.8)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@types/react@19.1.8)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.74))(@reown/appkit-wallet-button@1.7.12(@react-native-async-storage/async-storage@1.24.0(react-native@0.80.1(@babel/core@7.28.0)(@types/react@19.1.8)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@types/react@19.1.8)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.74))(@reown/appkit@1.7.12(@react-native-async-storage/async-storage@1.24.0(react-native@0.80.1(@babel/core@7.28.0)(@types/react@19.1.8)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10)))(@types/react@19.1.8)(bufferutil@4.0.9)(react@19.1.0)(typescript@5.8.3)(utf-8-validate@5.0.10)(zod@3.25.74))(@solana/spl-token@0.4.13(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10))(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(bs58@6.0.0)(decimal.js@10.6.0)(react-dom@19.1.0(react@19.1.0))(react-native@0.80.1(@babel/core@7.28.0)(@types/react@19.1.8)(bufferutil@4.0.9)(react@19.1.0)(utf-8-validate@5.0.10))(react@19.1.0)(styled-components@6.1.19(react-dom@19.1.0(react@19.1.0))(react@19.1.0))
       '@meteora-ag/dynamic-bonding-curve-sdk':
-        specifier: ^1.2.4
-        version: 1.3.1(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
+        specifier: ^1.3.5
+        version: 1.3.5(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@solana/spl-token':
         specifier: ^0.4.13
         version: 0.4.13(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
@@ -268,8 +268,8 @@ importers:
         specifier: ^1.1.14
         version: 1.1.14(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(jiti@2.4.2)(postcss@8.5.6)(tsx@4.20.3)(typescript@5.8.3)(utf-8-validate@5.0.10)(yaml@2.8.0)
       '@meteora-ag/cp-amm-sdk':
-        specifier: ^1.0.10
-        version: 1.0.10(@types/node@20.19.4)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(jiti@2.4.2)(postcss@8.5.6)(tsx@4.20.3)(typescript@5.8.3)(utf-8-validate@5.0.10)(yaml@2.8.0)
+        specifier: ^1.1.0
+        version: 1.1.0(@types/node@20.19.4)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(jiti@2.4.2)(postcss@8.5.6)(tsx@4.20.3)(typescript@5.8.3)(utf-8-validate@5.0.10)(yaml@2.8.0)
       '@meteora-ag/dlmm':
         specifier: ^1.5.4
         version: 1.5.4(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
@@ -277,8 +277,8 @@ importers:
         specifier: ^1.3.8
         version: 1.3.8(@solana/buffer-layout@4.0.1)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@meteora-ag/dynamic-bonding-curve-sdk':
-        specifier: ^1.3.4
-        version: 1.3.4(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
+        specifier: ^1.3.5
+        version: 1.3.5(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@meteora-ag/dynamic-fee-sharing-sdk':
         specifier: ^1.0.0
         version: 1.0.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
@@ -1274,8 +1274,8 @@ packages:
   '@meteora-ag/alpha-vault@1.1.14':
     resolution: {integrity: sha512-UZfRFczNmYER3BDNqTGWkh5gC+oanQYaBudloTzKeF0oki3mktutLe3oP/G26p9IRhDuzfvbJxC+6YlpWw3dIA==}
 
-  '@meteora-ag/cp-amm-sdk@1.0.10':
-    resolution: {integrity: sha512-8VZL/ut+kzDuSdyDdgeFTSBebwwVL0zvwCdCQHJk3sJ2cf1ktL1WP/9E882/bIVXMfwhEM+PWO91UXLYg6nN1A==}
+  '@meteora-ag/cp-amm-sdk@1.1.0':
+    resolution: {integrity: sha512-CFYSGLgSSTL5oDSrL5bx+oCi51rkvfuFXdMVDEZmnljlnyt2vxbrzRCkCTzxN7ABCYjuCvkLoVrT1JiBh39k2A==}
 
   '@meteora-ag/dlmm@1.5.0':
     resolution: {integrity: sha512-d8DwhSrSSuIPfw6+9LLu2aXylKc7tS6FTnQzZcQYlGhrKIlABn97muasizBAcgMp80AR/bKEa6qtFCoQt4pqwA==}
@@ -1288,13 +1288,8 @@ packages:
     peerDependencies:
       '@solana/buffer-layout': ^3 || ^4
 
-  '@meteora-ag/dynamic-bonding-curve-sdk@1.3.1':
-    resolution: {integrity: sha512-qVr4P891xLKgI9pMSv7YqMD6Vg/BuCQd5sDyvuQSokM0zhC+a9WnL9+haxLpnw4IAVXp7fgCB5Nkgvz+ZAKrjw==}
-    peerDependencies:
-      typescript: ^5
-
-  '@meteora-ag/dynamic-bonding-curve-sdk@1.3.4':
-    resolution: {integrity: sha512-sOj5opR5ntMpgWXtGmcCNLGsxOjBGaAo94rMRgC4tVtAi1h4m+6Q4/EVRhpcV7axcX4vG2UWI2t8+35N3rEEnA==}
+  '@meteora-ag/dynamic-bonding-curve-sdk@1.3.5':
+    resolution: {integrity: sha512-A6gTgPRAzTjzsuNb68/cGOn97fOF+0xZDJk5gHvfZzlyzgPRdF6taVgJk6ay/gzoJMFIuLuAInAIieOuxmWTOQ==}
     peerDependencies:
       typescript: ^5
 
@@ -7879,6 +7874,7 @@ packages:
   source-map@0.8.0-beta.0:
     resolution: {integrity: sha512-2ymg6oRBpebeZi9UUNsgQ89bhx01TcTkmNTGnNO88imTmbSgy4nfujrgVEFKWpMTEGA11EDkTt7mqObTPdigIA==}
     engines: {node: '>= 8'}
+    deprecated: The work that was done in this beta branch won't be included in future versions
 
   split-on-first@1.1.0:
     resolution: {integrity: sha512-43ZssAJaMusuKWL8sKUBQXHWOpq8d6CfN/u1p4gUzfJkM05C8rxTmYrkIPTXapZpORA6LkkzcUulJ8FqA7Uudw==}
@@ -10041,7 +10037,7 @@ snapshots:
     dependencies:
       '@cora-xyz/anchor-0.28.0': '@coral-xyz/anchor@0.28.0(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)'
       '@coral-xyz/anchor': 0.31.1(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      '@meteora-ag/cp-amm-sdk': 1.0.10(@types/node@22.16.4)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(jiti@2.4.2)(postcss@8.5.6)(tsx@4.20.3)(typescript@5.8.3)(utf-8-validate@5.0.10)(yaml@2.8.0)
+      '@meteora-ag/cp-amm-sdk': 1.1.0(@types/node@22.16.4)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(jiti@2.4.2)(postcss@8.5.6)(tsx@4.20.3)(typescript@5.8.3)(utf-8-validate@5.0.10)(yaml@2.8.0)
       '@meteora-ag/dlmm': 1.5.0(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@meteora-ag/dynamic-amm-sdk': 1.3.8(@solana/buffer-layout@4.0.1)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@solana/buffer-layout': 4.0.1
@@ -10067,7 +10063,7 @@ snapshots:
       - utf-8-validate
       - yaml
 
-  '@meteora-ag/cp-amm-sdk@1.0.10(@types/node@20.19.4)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(jiti@2.4.2)(postcss@8.5.6)(tsx@4.20.3)(typescript@5.8.3)(utf-8-validate@5.0.10)(yaml@2.8.0)':
+  '@meteora-ag/cp-amm-sdk@1.1.0(@types/node@20.19.4)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(jiti@2.4.2)(postcss@8.5.6)(tsx@4.20.3)(typescript@5.8.3)(utf-8-validate@5.0.10)(yaml@2.8.0)':
     dependencies:
       '@coral-xyz/anchor': 0.31.1(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@solana/spl-token': 0.4.13(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
@@ -10100,7 +10096,7 @@ snapshots:
       - utf-8-validate
       - yaml
 
-  '@meteora-ag/cp-amm-sdk@1.0.10(@types/node@22.16.4)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(jiti@2.4.2)(postcss@8.5.6)(tsx@4.20.3)(typescript@5.8.3)(utf-8-validate@5.0.10)(yaml@2.8.0)':
+  '@meteora-ag/cp-amm-sdk@1.1.0(@types/node@22.16.4)(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(jiti@2.4.2)(postcss@8.5.6)(tsx@4.20.3)(typescript@5.8.3)(utf-8-validate@5.0.10)(yaml@2.8.0)':
     dependencies:
       '@coral-xyz/anchor': 0.31.1(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@solana/spl-token': 0.4.13(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
@@ -10197,21 +10193,7 @@ snapshots:
       - typescript
       - utf-8-validate
 
-  '@meteora-ag/dynamic-bonding-curve-sdk@1.3.1(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)':
-    dependencies:
-      '@coral-xyz/anchor': 0.31.1(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      '@solana/spl-token': 0.4.13(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      '@solana/web3.js': 1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
-      bn.js: 5.2.2
-      decimal.js: 10.6.0
-      typescript: 5.8.3
-    transitivePeerDependencies:
-      - bufferutil
-      - encoding
-      - fastestsmallesttextencoderdecoder
-      - utf-8-validate
-
-  '@meteora-ag/dynamic-bonding-curve-sdk@1.3.4(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)':
+  '@meteora-ag/dynamic-bonding-curve-sdk@1.3.5(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)':
     dependencies:
       '@coral-xyz/anchor': 0.31.1(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10)
       '@solana/spl-token': 0.4.13(@solana/web3.js@1.98.2(bufferutil@4.0.9)(typescript@5.8.3)(utf-8-validate@5.0.10))(bufferutil@4.0.9)(fastestsmallesttextencoderdecoder@1.0.22)(typescript@5.8.3)(utf-8-validate@5.0.10)
