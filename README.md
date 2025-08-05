@@ -4,7 +4,7 @@ A toolkit consisting of everything you need to invent innovative token launches 
 
 ---
 
-### Meet Metsumi, Your Launch Assistant
+### Meet Metsumi, Your Token Launch Assistant 👉🏼😚👈🏼
 *Your intelligent companion for seamless token launches*
 
 ![Metsumi](/assets/mascot/metsumi-banner.png)
