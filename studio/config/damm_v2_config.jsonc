@@ -74,11 +74,22 @@
     "alphaVault": {
         "poolType": "dammv2", // DLMM = dlmm | DAMM v1 = dammv1 | DAMM v2 = dammv2
         "alphaVaultType": "fcfs", // FCFS = fcfs | Prorata = prorata
+        
+        /* Only use the following parameters for alphaVaultType: fcfs
+        * 1. maxDepositCap
+        * 2. individualDepositingCap
+        */
+        "maxDepositCap": 10000, // Maximum total amount (in quote token) that can be deposited across all users in the vault
+        "individualDepositingCap": 1, // Maximum amount (in quote token) that each individual user can deposit
+
+        /* Only use the following parameters for alphaVaultType: prorata
+        * 1. maxBuyingCap
+        */
+        // "maxBuyingCap": 10000, // Maximum total amount (in quote token) that can be bought across all users in the vault
+
         "depositingPoint": 1733626299, // When users can start depositing depending on pool's activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
         "startVestingPoint": 1746808201, // When token vesting begins and users can start claiming their vested tokens depending on pool's activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
         "endVestingPoint": 1746808201, // When token vesting ends and all tokens become fully claimable depending on pool's activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
-        "maxDepositCap": 10000, // Maximum total amount (in quote token) that can be deposited across all users in the vault
-        "individualDepositingCap": 1, // Maximum amount (in quote token) that each individual user can deposit
         "escrowFee": 0, // Fee amount (in quote token) charged when creating a stake escrow account
         "whitelistMode": "permissionless", // Whitelist mode: permissionless | permission_with_merkle_proof | permission_with_authority
 
