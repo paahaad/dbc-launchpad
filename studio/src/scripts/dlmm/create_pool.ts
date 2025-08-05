@@ -58,24 +58,17 @@ async function main() {
 
   /// --------------------------------------------------------------------------
   if (config.dlmmConfig) {
-    // Create the DLMM pool first
     await createPermissionlessDlmmPool(config, connection, wallet, baseMint, quoteMint);
 
-    // If alpha vault is enabled and config is provided, create the alpha vault automatically
     if (config.dlmmConfig.hasAlphaVault && config.alphaVault) {
       console.log('\n> Alpha vault is enabled, creating alpha vault automatically...');
 
-      // Derive the pool address
-      const cluster = 'devnet'; // You can make this configurable if needed
-      const dlmmProgramId = new PublicKey(
-        DLMM_PROGRAM_IDS[cluster as keyof typeof DLMM_PROGRAM_IDS]
-      );
+      const dlmmProgramId = new PublicKey(DLMM_PROGRAM_IDS['mainnet-beta']);
       const [poolKey] = deriveCustomizablePermissionlessLbPair(baseMint, quoteMint, dlmmProgramId);
 
       const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
       const poolType = toAlphaVaulSdkPoolType(config.alphaVault.poolType);
 
-      // Create the appropriate type of alpha vault
       if (config.alphaVault.alphaVaultType === AlphaVaultTypeConfig.Fcfs) {
         await createFcfsAlphaVault(
           connection,

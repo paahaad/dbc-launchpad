@@ -44,9 +44,7 @@ async function main() {
     throw new Error(`Missing DLMM LFG seed liquidity in configuration`);
   }
 
-  const pair = await DLMM.create(connection, poolKey, {
-    cluster: 'mainnet-beta',
-  });
+  const pair = await DLMM.create(connection, poolKey);
   await pair.refetchStates();
 
   const seedAmount = getAmountInLamports(config.lfgSeedLiquidity.seedAmount, baseDecimals);
