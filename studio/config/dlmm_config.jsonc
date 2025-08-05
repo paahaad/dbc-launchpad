@@ -57,8 +57,8 @@
         "curvature": 0.6, // Distribution curvature factor (1/k) controlling liquidity concentration (0-1, lower = more concentrated)
         "seedAmount": "200000", // Total amount of liquidity to seed into the pool (in token units)
         "operatorKeypairFilepath": "./keypair.json", // File path to operator's private key for signing seeding transactions
-        "positionOwner": "2vqFyczcehkR7hTeZjEkiN5jvYnFXuFRinovqR2gakSb", // Public key of the position owner who controls the liquidity
-        "feeOwner": "2vqFyczcehkR7hTeZjEkiN5jvYnFXuFRinovqR2gakSb", // Public key entitled to claim trading fees from this position
+        "positionOwner": "YOUR_POSITION_OWNER_ADDRESS", // Public key of the position owner who controls the liquidity
+        "feeOwner": "YOUR_FEE_OWNER_ADDRESS", // Public key entitled to claim trading fees from this position
         "lockReleasePoint": 0, // Timestamp/slot when position becomes withdrawable (0 = immediately unlocked)
         "seedTokenXToPositionOwner": true // Whether to send 1 lamport of token X to position owner as ownership proof
     },
@@ -71,8 +71,8 @@
         "priceRounding": "up", // Price calculation rounding direction for bin ID conversion
         "seedAmount": "100000", // Amount of token X (base token) to seed into the single bin (in token units)
         "operatorKeypairFilepath": "./keypair.json", // File path to operator's private key for signing seeding transactions
-        "positionOwner": "2VuxXtec8Gpcu49y8VZ4yYutbi98WWtRC6Zvvs8APVy1", // Public key of the position owner who controls the liquidity
-        "feeOwner": "2VuxXtec8Gpcu49y8VZ4yYutbi98WWtRC6Zvvs8APVy1", // Public key entitled to claim trading fees from this position
+        "positionOwner": "YOUR_POSITION_OWNER_ADDRESS", // Public key of the position owner who controls the liquidity
+        "feeOwner": "YOUR_FEE_OWNER_ADDRESS", // Public key entitled to claim trading fees from this position
         "lockReleasePoint": 0, // Timestamp/slot when position becomes withdrawable (0 = immediately unlocked)
         "seedTokenXToPositionOwner": true // Whether to send 1 lamport of token X to position owner as ownership proof
     },
@@ -81,7 +81,7 @@
      * 1. dlmm-set-pool-status
      */
     "setDlmmPoolStatus": {
-        "poolAddress": "9d9mb8kooFfaD3SctgZtkxQypkshx6ezhbKio89ixyy2", // pool address of the dlmm pool
+        "poolAddress": "YOUR_POOL_ADDRESS", // pool address of the dlmm pool
         "enabled": true // true = enable trading | false = disable trading
     },
 
@@ -90,7 +90,7 @@
      * There are 2 types of alpha vault: First Come First Serve (FCFS) and Prorata.
      */
      "alphaVault": {
-        "poolType": "dammv2", // DLMM = dlmm | DAMM v1 = dammv1 | DAMM v2 = dammv2
+        "poolType": "dlmm", // DLMM = dlmm | DAMM v1 = dammv1 | DAMM v2 = dammv2
         "alphaVaultType": "fcfs", // FCFS = fcfs | Prorata = prorata
         
         /* Only use the following parameters for alphaVaultType: fcfs

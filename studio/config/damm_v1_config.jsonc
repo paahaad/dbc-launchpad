@@ -49,11 +49,11 @@
       "allocations": [
         {
           "percentage": 80, // percentage of the LP tokens that will be allocated to address 1
-          "address": "2VuxXtec8Gpcu49y8VZ4yYutbi98WWtRC6Zvvs8APVy1" // address 1
+          "address": "YOUR_ADDRESS_1" // address 1
         },
         {
           "percentage": 20, // percentage of the LP tokens that will be allocated to address 2
-          "address": "DVqZW2vC26hBmikPixfdw3hQ7kTTepkPQtBZRn4Bm1Cd" // address 2
+          "address": "YOUR_ADDRESS_2" // address 2
         }
       ]
     },
@@ -73,7 +73,7 @@
      * There are 2 types of alpha vault: First Come First Serve (FCFS) and Prorata.
      */
      "alphaVault": {
-      "poolType": "dammv2", // DLMM = dlmm | DAMM v1 = dammv1 | DAMM v2 = dammv2
+      "poolType": "dammv1", // DLMM = dlmm | DAMM v1 = dammv1 | DAMM v2 = dammv2
       "alphaVaultType": "fcfs", // FCFS = fcfs | Prorata = prorata
       
       /* Only use the following parameters for alphaVaultType: fcfs
