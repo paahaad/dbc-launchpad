@@ -1,9 +1,15 @@
 # Meteora Invent
 
-A toolkit consisting of everything you need to invent innovative token launches. Powered by
-**Meteora**, the most secure, sustainable and composable liquidity layer on Solana.
+A toolkit consisting of everything you need to invent innovative token launches on Meteora.
+
+---
+
+### Meet Metsumi, Your Launch Assistant
+*Your intelligent companion for seamless token launches*
 
 ![Metsumi](/assets/mascot/metsumi-banner.png)
+
+---
 
 ## 🏗️ Structure
 
