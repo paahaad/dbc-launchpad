@@ -1,5 +1,5 @@
 import { Wallet } from '@coral-xyz/anchor';
-import AlphaVault, { PoolType, WalletDepositCap, WhitelistMode } from '@meteora-ag/alpha-vault';
+import AlphaVault, { PoolType, WalletDepositCap } from '@meteora-ag/alpha-vault';
 import {
   Cluster,
   Connection,
@@ -15,14 +15,14 @@ import {
   DEFAULT_NODES_PER_TREE,
   DEFAULT_SEND_TX_MAX_RETRIES,
   MAX_INSTRUCTIONS_PER_STAKE_ESCROW_ACCOUNTS_CREATED,
-} from '../utils/constants';
+} from '../../utils/constants';
 import {
   AlphaVaultTypeConfig,
   FcfsAlphaVaultConfig,
   PoolTypeConfig,
   ProrataAlphaVaultConfig,
   WhitelistModeConfig,
-} from '../utils/types';
+} from '../../utils/types';
 import {
   getAmountInLamports,
   handleSendTxs,
@@ -30,38 +30,8 @@ import {
   runSimulateTransaction,
   deriveAlphaVault,
   deriveMerkleRootConfig,
-} from '../helpers';
-
-export function getAlphaVaultWhitelistMode(mode: WhitelistModeConfig): WhitelistMode {
-  if (mode == WhitelistModeConfig.Permissionless) {
-    return WhitelistMode.Permissionless;
-  } else if (mode == WhitelistModeConfig.PermissionedWithAuthority) {
-    return WhitelistMode.PermissionWithAuthority;
-  } else if (mode == WhitelistModeConfig.PermissionedWithMerkleProof) {
-    return WhitelistMode.PermissionWithMerkleProof;
-  } else {
-    throw new Error(`Unsupported alpha vault whitelist mode: ${mode}`);
-  }
-}
-
-export function getClusterFromProgramId(alphaVaultProgramId: PublicKey): string {
-  let cluster = 'mainnet-beta';
-  switch (alphaVaultProgramId.toString()) {
-    case ALPHA_VAULT_PROGRAM_IDS['mainnet-beta']:
-      cluster = 'mainnet-beta';
-      break;
-    case ALPHA_VAULT_PROGRAM_IDS['devnet']:
-      cluster = 'devnet';
-      break;
-    case ALPHA_VAULT_PROGRAM_IDS['localhost']:
-      cluster = 'localhost';
-      break;
-    default:
-      throw new Error(`Invalid alpha vault program id ${alphaVaultProgramId}`);
-  }
-
-  return cluster;
-}
+} from '../../helpers';
+import { getAlphaVaultWhitelistMode, getClusterFromProgramId } from './utils';
 
 export async function createFcfsAlphaVault(
   connection: Connection,

@@ -83,7 +83,7 @@ function validateDammV2Config(config: DammV2Config) {
 }
 
 function validateDlmmConfig(config: DlmmConfig) {
-  if (config.dlmm && config.dlmm.hasAlphaVault) {
+  if (config.dlmmConfig && config.dlmmConfig.hasAlphaVault) {
     if (config.quoteMint == null) {
       throw new Error('quoteMint must be provided for DLMM');
     }
@@ -95,15 +95,15 @@ function validateDlmmConfig(config: DlmmConfig) {
 }
 
 function validateDbcConfig(config: DbcConfig) {
-  if (!config.dbc) {
+  if (!config.dbcConfig) {
     throw new Error('DBC configuration is required but not provided.');
   }
 
   if (
-    config.dbc.buildCurveMode !== 0 &&
-    config.dbc.buildCurveMode !== 1 &&
-    config.dbc.buildCurveMode !== 2 &&
-    config.dbc.buildCurveMode !== 3
+    config.dbcConfig.buildCurveMode !== 0 &&
+    config.dbcConfig.buildCurveMode !== 1 &&
+    config.dbcConfig.buildCurveMode !== 2 &&
+    config.dbcConfig.buildCurveMode !== 3
   ) {
     throw new Error(`Build curve mode isn't supported.`);
   }

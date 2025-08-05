@@ -62,7 +62,7 @@ async function main() {
   const poolType = config.alphaVault.poolType;
 
   let poolKey: PublicKey;
-  if (poolType == PoolTypeConfig.Dynamic) {
+  if (poolType == PoolTypeConfig.DammV1) {
     poolKey = deriveCustomizablePermissionlessConstantProductPoolAddress(
       baseMint,
       quoteMint,

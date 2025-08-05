@@ -5,7 +5,7 @@ import {
   PublicKey,
   sendAndConfirmTransaction,
 } from '@solana/web3.js';
-import { DammV1Config, LockLiquidityAllocation } from '../utils/types';
+import { DammV1Config, LockLiquidityAllocation } from '../../utils/types';
 import { Wallet } from '@coral-xyz/anchor';
 import {
   fromAllocationsToAmount,
@@ -13,7 +13,7 @@ import {
   getQuoteDecimals,
   modifyComputeUnitPriceIx,
   runSimulateTransaction,
-} from '../helpers';
+} from '../../helpers';
 import { getMint } from '@solana/spl-token';
 import { CustomizableParams } from '@meteora-ag/dynamic-amm-sdk/dist/cjs/src/amm/types';
 import AmmImpl from '@meteora-ag/dynamic-amm-sdk';
@@ -24,8 +24,18 @@ import {
   getAssociatedTokenAccount,
 } from '@meteora-ag/dynamic-amm-sdk/dist/cjs/src/amm/utils';
 import { SEEDS } from '@meteora-ag/dynamic-amm-sdk/dist/cjs/src/amm/constants';
-import { DEFAULT_SEND_TX_MAX_RETRIES } from '../utils/constants';
+import { DEFAULT_SEND_TX_MAX_RETRIES } from '../../utils/constants';
 
+/**
+ * Create a DammV1 pool permissionlessly
+ * @param config - The configuration for the pool
+ * @param connection - The connection to the cluster
+ * @param wallet - The wallet to use for the transaction
+ * @param baseMint - The mint for the base token
+ * @param quoteMint - The mint for the quote token
+ * @param opts - The options for the pool
+ * @returns The pool address
+ */
 export async function createDammV1Pool(
   config: DammV1Config,
   connection: Connection,
@@ -114,6 +124,17 @@ export async function createDammV1Pool(
   }
 }
 
+/**
+ * Lock liquidity for a DammV1 pool
+ * @param connection - The connection to the cluster
+ * @param payer - The payer for the transaction
+ * @param baseMint - The mint for the base token
+ * @param quoteMint - The mint for the quote token
+ * @param allocations - The allocations for the liquidity
+ * @param dryRun - Whether to simulate the transaction
+ * @param computeUnitPriceMicroLamports - The compute unit price for the transaction
+ * @returns The pool address
+ */
 export async function lockLiquidity(
   connection: Connection,
   payer: Keypair,

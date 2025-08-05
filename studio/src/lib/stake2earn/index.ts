@@ -1,13 +1,13 @@
 import { Connection, Keypair, PublicKey, sendAndConfirmTransaction } from '@solana/web3.js';
-import { LockLiquidityAllocation, Stake2EarnConfig } from '../utils/types';
-import { DEFAULT_SEND_TX_MAX_RETRIES, STAKE2EARN_PROGRAM_IDS } from '../utils/constants';
+import { LockLiquidityAllocation, Stake2EarnConfig } from '../../utils/types';
+import { DEFAULT_SEND_TX_MAX_RETRIES, STAKE2EARN_PROGRAM_IDS } from '../../utils/constants';
 import StakeForFee, { deriveFeeVault } from '@meteora-ag/m3m3';
 import BN from 'bn.js';
 import {
   fromAllocationsToAmount,
   modifyComputeUnitPriceIx,
   runSimulateTransaction,
-} from '../helpers';
+} from '../../helpers';
 import AmmImpl from '@meteora-ag/dynamic-amm-sdk';
 import { SEEDS } from '@meteora-ag/dynamic-amm-sdk/dist/cjs/src/amm/constants';
 import {
@@ -16,6 +16,18 @@ import {
   getAssociatedTokenAccount,
 } from '@meteora-ag/dynamic-amm-sdk/dist/cjs/src/amm/utils';
 
+/**
+ * Create a DammV1 pool with Stake2Earn
+ * @param connection - The connection to the cluster
+ * @param payer - The payer for the transaction
+ * @param poolKey - The key of the pool
+ * @param stakeMint
+ * @param config
+ * @param dryRun
+ * @param computeUnitPriceMicroLamports
+ * @param opts
+ * @returns
+ */
 export async function createDammV1Stake2EarnPool(
   connection: Connection,
   payer: Keypair,
@@ -85,6 +97,18 @@ export async function createDammV1Stake2EarnPool(
   }
 }
 
+/**
+ * Lock liquidity for a DammV1 pool with Stake2Earn
+ * @param connection - The connection to the cluster
+ * @param payer - The payer for the transaction
+ * @param baseMint - The mint for the base token
+ * @param quoteMint - The mint for the quote token
+ * @param allocations - The allocations for the liquidity
+ * @param dryRun - Whether to simulate the transaction
+ * @param computeUnitPriceMicroLamports - The compute unit price for the transaction
+ * @param opts - The options for the transaction
+ * @returns The pool address
+ */
 export async function lockLiquidityStake2Earn(
   connection: Connection,
   payer: Keypair,
