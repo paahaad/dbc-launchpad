@@ -7,7 +7,7 @@ import {
   sendAndConfirmTransaction,
   Transaction,
 } from '@solana/web3.js';
-import { DlmmConfig } from '../utils/types';
+import { DlmmConfig } from '../../utils/types';
 import { Wallet } from '@coral-xyz/anchor';
 import DLMM, { deriveCustomizablePermissionlessLbPair } from '@meteora-ag/dlmm';
 import BN from 'bn.js';
@@ -16,9 +16,9 @@ import {
   isPriceRoundingUp,
   modifyComputeUnitPriceIx,
   runSimulateTransaction,
-} from '../helpers';
+} from '../../helpers';
 import { getMint } from '@solana/spl-token';
-import { DEFAULT_SEND_TX_MAX_RETRIES, DLMM_PROGRAM_IDS } from '../utils/constants';
+import { DEFAULT_SEND_TX_MAX_RETRIES, DLMM_PROGRAM_IDS } from '../../utils/constants';
 
 export async function createPermissionlessDlmmPool(
   config: DlmmConfig,

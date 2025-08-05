@@ -5,10 +5,10 @@ import {
   sendAndConfirmTransaction,
   Transaction,
 } from '@solana/web3.js';
-import { DbcConfig } from '../utils/types';
+import { DbcConfig } from '../../utils/types';
 import { Wallet } from '@coral-xyz/anchor';
-import { getQuoteDecimals, modifyComputeUnitPriceIx, runSimulateTransaction } from '../helpers';
-import { DEFAULT_SEND_TX_MAX_RETRIES } from '../utils/constants';
+import { getQuoteDecimals, modifyComputeUnitPriceIx, runSimulateTransaction } from '../../helpers';
+import { DEFAULT_SEND_TX_MAX_RETRIES } from '../../utils/constants';
 import {
   buildCurve,
   buildCurveWithLiquidityWeights,

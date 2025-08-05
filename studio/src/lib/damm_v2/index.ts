@@ -16,15 +16,15 @@ import {
 } from '@meteora-ag/cp-amm-sdk';
 import { TOKEN_2022_PROGRAM_ID, TOKEN_PROGRAM_ID, unpackMint } from '@solana/spl-token';
 import { Connection, Keypair, PublicKey, sendAndConfirmTransaction } from '@solana/web3.js';
-import { DammV2Config } from '../utils/types';
+import { DammV2Config } from '../../utils/types';
 import {
   getAmountInLamports,
   getDecimalizedAmount,
   getQuoteDecimals,
   modifyComputeUnitPriceIx,
   runSimulateTransaction,
-} from '../helpers';
-import { DEFAULT_SEND_TX_MAX_RETRIES } from '../utils/constants';
+} from '../../helpers';
+import { DEFAULT_SEND_TX_MAX_RETRIES } from '../../utils/constants';
 
 /**
  * Create a one-sided DAMM V2 pool

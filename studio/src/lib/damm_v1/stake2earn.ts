@@ -1,5 +1,5 @@
 import { Connection, Keypair, PublicKey, sendAndConfirmTransaction } from '@solana/web3.js';
-import { DammV1StakeToEarnConfig, LockLiquidityAllocation } from '../../utils/types';
+import { Stake2EarnFarmConfig, LockLiquidityAllocation } from '../../utils/types';
 import { DEFAULT_SEND_TX_MAX_RETRIES, STAKE2EARN_PROGRAM_IDS } from '../../utils/constants';
 import StakeForFee, { deriveFeeVault } from '@meteora-ag/m3m3';
 import BN from 'bn.js';
@@ -33,7 +33,7 @@ export async function createDammV1Stake2EarnPool(
   payer: Keypair,
   poolKey: PublicKey,
   stakeMint: PublicKey,
-  config: DammV1StakeToEarnConfig,
+  config: Stake2EarnFarmConfig,
   dryRun: boolean,
   computeUnitPriceMicroLamports: number,
   opts?: {
