@@ -3,7 +3,7 @@
 A toolkit consisting of everything you need to invent innovative token launches. Powered by
 **Meteora**, the most secure, sustainable and composable liquidity layer on Solana.
 
-![Mikasa](/assets/mascot/mikasa.png)
+![Metsumi](/assets/mascot/metsumi-banner.png)
 
 ## 🏗️ Structure
 
@@ -117,9 +117,6 @@ npm install -g pnpm
 
 # Install all dependencies
 pnpm install
-
-# Build all packages
-pnpm build
 ```
 
 ## 📦 Workspaces
@@ -130,68 +127,132 @@ The studio workspace contains all the scripts for interacting with Meteora's pro
 
 #### Getting Started
 
-Copy the `.env.example` file to `.env` and configure the environment variables.
+1. Copy the `.env.example` file to `.env` and configure the environment variables.
 
 ```bash
 cp studio/.env.example studio/.env
 ```
 
-#### Install Dependencies
+2. Generate a keypair from your private key to launch pools.
 
 ```bash
-pnpm install
+pnpm studio generate-keypair
 ```
 
-#### Studio Scripts
+3. Configure the config files in the `studio/config` directory.
 
-**DAMM v1 Scripts:**
+- Configure [DLMM](./studio/config/dlmm_config.jsonc)
+- Configure [DAMM v2](./studio/config/damm_v2_config.jsonc)
+- Configure [DAMM v1](./studio/config/damm_v1_config.jsonc)
+- Configure [DBC](./studio/config/dbc_config.jsonc)
+
+**Note:** You can use the provided example configurations as a starting point. Make sure to replace
+the placeholders with your actual values.
+
+4. Run the studio scripts.
+
+#### DLMM Scripts
+
+**Create a Customizable Permissionless DLMM Pool**
 
 ```bash
-pnpm studio damm-v1-create-constant-product-pool
-pnpm studio damm-v1-create-memecoin-pool
-pnpm studio damm-v1-create-stable-pool
-pnpm studio damm-v1-get-configs
-pnpm studio damm-v1-create-position
-pnpm studio damm-v1-withdraw-liquidity
-pnpm studio damm-v1-claim-locked-fees
-pnpm studio damm-v1-get-locked-fees
+pnpm studio dlmm-create-pool --config ./studio/config/dlmm_config.jsonc
 ```
 
-**DAMM v2 Scripts:**
+**Seed Liquidity (LFG)**
 
 ```bash
-pnpm studio damm-v2-create-pool
-pnpm studio damm-v2-get-configs
-pnpm studio damm-v2-create-position
-pnpm studio damm-v2-get-positions
-pnpm studio damm-v2-lock-position
-pnpm studio damm-v2-withdraw-liquidity
-pnpm studio damm-v2-get-position-fees
-pnpm studio damm-v2-claim-position-fees
+pnpm studio dlmm-seed-liquidity-lfg --config ./studio/config/dlmm_config.jsonc
 ```
 
-**DLMM Scripts:**
+**Seed Liquidity (Single Bin)**
 
 ```bash
-pnpm studio dlmm-create-balanced-position
-pnpm studio dlmm-create-imbalanced-position
-pnpm studio dlmm-get-active-bin
-pnpm studio dlmm-get-positions-list
-pnpm studio dlmm-add-balanced-liquidity
-pnpm studio dlmm-add-imbalanced-liquidity
+pnpm studio dlmm-seed-liquidity-single-bin --config ./studio/config/dlmm_config.jsonc
 ```
 
-**DBC Scripts:**
+**Set DLMM Pool Status**
 
 ```bash
-pnpm studio dbc-quick-launch
-pnpm studio dbc-create-config
-pnpm studio dbc-create-partner-metadata
-pnpm studio dbc-simulate-curve
-pnpm studio dbc-migrate-to-damm-v1
-pnpm studio dbc-migrate-to-damm-v2
-pnpm studio dbc-swap-buy
-pnpm studio dbc-swap-quote
+pnpm studio dlmm-set-pool-status --config ./studio/config/dlmm_config.jsonc
+```
+
+#### DAMM v2 Scripts
+
+**Create a Balanced Constant Product Pool**
+
+```bash
+pnpm studio damm-v2-create-balanced-pool --config ./studio/config/damm_v2_config.jsonc
+```
+
+**Create a One-Sided Pool**
+
+```bash
+pnpm studio damm-v2-create-one-sided-pool --config ./studio/config/damm_v2_config.jsonc
+```
+
+#### DAMM v1 Scripts
+
+**Create a Constant Product Pool**
+
+```bash
+pnpm studio damm-v1-create-pool --config ./studio/config/damm_v1_config.jsonc
+```
+
+**Lock Liquidity**
+
+```bash
+pnpm studio damm-v1-lock-liquidity --config ./studio/config/damm_v1_config.jsonc
+```
+
+**Create a Stake2Earn Farm**
+
+```bash
+pnpm studio damm-v1-create-stake2earn-farm --config ./studio/config/damm_v1_config.jsonc
+```
+
+**Lock Liquidity (Stake2Earn)**
+
+```bash
+pnpm studio damm-v1-lock-liquidity-stake2earn --config ./studio/config/damm_v1_config.jsonc
+```
+
+#### DBC Scripts
+
+**Create a DBC Config**
+
+```bash
+pnpm studio dbc-create-config --config ./studio/config/dbc_config.jsonc
+```
+
+**Create a DBC Pool**
+
+```bash
+pnpm studio dbc-create-pool --config ./studio/config/dbc_config.jsonc
+```
+
+**Claim Trading Fees**
+
+```bash
+pnpm studio dbc-claim-trading-fee --config ./studio/config/dbc_config.jsonc
+```
+
+**Migrate to DAMM v1**
+
+```bash
+pnpm studio dbc-migrate-to-damm-v1 --config ./studio/config/dbc_config.jsonc
+```
+
+**Migrate to DAMM v2**
+
+```bash
+pnpm studio dbc-migrate-to-damm-v2 --config ./studio/config/dbc_config.jsonc
+```
+
+**Swap (Buy/Sell)**
+
+```bash
+pnpm studio dbc-swap --config ./studio/config/dbc_config.jsonc
 ```
 
 ### Scaffolds
@@ -234,5 +295,3 @@ pnpm --filter @meteora-invent/scaffold/fun-launch build
 ## 📄 License
 
 ISC
-
----
