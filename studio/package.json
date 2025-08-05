@@ -16,6 +16,8 @@
     "dlmm-set-pool-status": "tsx src/scripts/dlmm/set_pool_status.ts",
     "damm-v1-create-pool": "tsx src/scripts/damm_v1/create_pool.ts",
     "damm-v1-lock-liquidity": "tsx src/scripts/damm_v1/lock_liquidity.ts",
+    "damm-v1-create-stake2earn-farm": "tsx src/scripts/damm_v1/create_stake2earn_farm.ts",
+    "damm-v1-lock-liquidity-stake2earn": "tsx src/scripts/damm_v1/lock_liquidity_stake2earn.ts",
     "damm-v2-create-balanced-pool": "tsx src/scripts/damm_v2/create_balanced_pool.ts",
     "damm-v2-create-one-sided-pool": "tsx src/scripts/damm_v2/create_one_sided_pool.ts",
     "dbc-create-config": "tsx src/scripts/dbc/create_config.ts",
@@ -24,8 +26,6 @@
     "dbc-migrate-damm-v1": "tsx src/scripts/dbc/migrate_damm_v1.ts",
     "dbc-migrate-damm-v2": "tsx src/scripts/dbc/migrate_damm_v2.ts",
     "dbc-swap": "tsx src/scripts/dbc/swap.ts",
-    "stake2earn-damm-v1-create-pool": "tsx src/scripts/stake2earn/damm_v1/create_stake2earn_pool.ts",
-    "stake2earn-damm-v1-lock-liquidity": "tsx src/scripts/stake2earn/damm_v1/lock_liquidity_stake2earn.ts",
     "alpha-vault-create": "tsx src/scripts/alpha_vault/create_alpha_vault.ts"
   },
   "keywords": [
@@ -48,6 +48,7 @@
     "@meteora-ag/m3m3": "^1.0.10",
     "@meteora-ag/met-lock-sdk": "^1.0.1",
     "@meteora-ag/vault-sdk": "^2.3.1",
+    "@meteora-ag/zap-sdk": "^1.0.1",
     "@solana/spl-token": "^0.4.13",
     "@solana/web3.js": "^1.98.2",
     "ajv": "^8.17.1",

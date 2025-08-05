@@ -1,13 +1,13 @@
 import { Wallet } from '@coral-xyz/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
-import { DammV1Config } from '../../../utils/types';
-import { DEFAULT_COMMITMENT_LEVEL } from '../../../utils/constants';
-import { safeParseKeypairFromFile, parseConfigFromCli } from '../../../helpers';
+import { DammV1Config } from '../../utils/types';
+import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
+import { safeParseKeypairFromFile, parseConfigFromCli } from '../../helpers';
 import {
   createProgram,
   deriveCustomizablePermissionlessConstantProductPoolAddress,
 } from '@meteora-ag/dynamic-amm-sdk/dist/cjs/src/amm/utils';
-import { createDammV1Stake2EarnPool } from '../../../lib/stake2earn';
+import { createDammV1Stake2EarnPool } from '../../lib/damm_v1/stake2earn';
 
 async function main() {
   const config = (await parseConfigFromCli()) as DammV1Config;
@@ -47,7 +47,7 @@ async function main() {
   console.log(`- Using quote token mint ${quoteMint.toString()}`);
   console.log(`- Pool key ${poolKey}`);
 
-  if (!config.stake2Earn) {
+  if (!config.stake2EarnFarm) {
     throw new Error('Missing M3M3 configuration');
   }
 
@@ -56,7 +56,7 @@ async function main() {
     wallet.payer,
     poolKey,
     baseMint,
-    config.stake2Earn,
+    config.stake2EarnFarm,
     config.dryRun,
     config.computeUnitPriceMicroLamports
   );

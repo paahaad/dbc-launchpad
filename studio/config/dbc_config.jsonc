@@ -12,27 +12,27 @@
     "computeUnitPriceMicroLamports": 100000,
 
     /* quoteMint is required for the following actions:
-     * 1. create-dbc-config
-     * 2. create-dbc-pool (if there is no configKeyAddress)
+     * 1. dbc-create-config
+     * 2. dbc-create-pool (if there is no configKeyAddress)
      * SOL: So11111111111111111111111111111111111111112 | USDC: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v | any other token address
      */
     "quoteMint": "So11111111111111111111111111111111111111112", 
 
     /* baseMint is required for the following actions:
-     * 1. swap-dbc (Buy or Sell)
-     * 2. migrate-damm-v1
-     * 3. migrate-damm-v2
+     * 1. dbc-swap (Buy or Sell)
+     * 2. dbc-migrate-damm-v1
+     * 3. dbc-migrate-damm-v2
      */
     "baseMint": "YOUR_BASE_MINT_ADDRESS",
 
     /* Either use dbcConfigAddress or dbcConfig, but not both.
      *
      * dbcConfigAddress is only used in the following action:
-     * 1. create-dbc-pool (if the dbcConfigAddress is already created)
+     * 1. dbc-create-pool (if the dbcConfigAddress is already created)
      *
      * dbcConfig is only used in the following actions:
-     * 1. create-dbc-config
-     * 2. create-dbc-pool (if there is no dbcConfigAddress)
+     * 1. dbc-create-config
+     * 2. dbc-create-pool (if there is no dbcConfigAddress)
      */
     // "dbcConfigAddress": "YOUR_DBC_CONFIG_ADDRESS",
     "dbcConfig": {
@@ -121,7 +121,7 @@
     },
 
     /* dbcPool is only used in the following actions:
-     * 1. create-dbc-pool
+     * 1. dbc-create-pool
      */
     "dbcPool": {
         "name": "DBC Pool", // token name
@@ -130,7 +130,7 @@
     },
 
     /* dbcSwap is only used in the following actions:
-     * 1. swap-dbc (Buy or Sell)
+     * 1. dbc-swap (Buy or Sell)
      */
     "dbcSwap": {
         "amountIn": 1.03, // the amount of quoteMint or baseMint to be swapped

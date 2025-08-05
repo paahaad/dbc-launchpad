@@ -12,16 +12,16 @@
     "computeUnitPriceMicroLamports": 100000,
 
     /* quoteMint is required for the following actions:
-     * 1. create-damm-v2-balanced-pool
-     * 2. create-damm-v2-one-sided-pool
+     * 1. damm-v2-create-balanced-pool
+     * 2. damm-v2-create-one-sided-pool
      * SOL: So11111111111111111111111111111111111111112 | USDC: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v | any other token address
      */
      "quoteMint": "So11111111111111111111111111111111111111112", 
 
     /* Either use baseMint or createBaseToken, but not both.
      * baseMint is required for the following actions:
-     * 1. create-damm-v2-balanced-pool
-     * 2. create-damm-v2-one-sided-pool
+     * 1. damm-v2-create-balanced-pool
+     * 2. damm-v2-create-one-sided-pool
      */
     "baseMint": "YOUR_BASE_MINT_ADDRESS",
     // "createBaseToken": {
@@ -30,8 +30,8 @@
     // },
 
     /* dammV2Config is only used in the following actions:
-     * 1. create-damm-v2-balanced-pool
-     * 2. create-damm-v2-one-sided-pool
+     * 1. damm-v2-create-balanced-pool
+     * 2. damm-v2-create-one-sided-pool
      */
     "dammV2Config": {
         "creator": "YOUR_WALLET_ADDRESS", // creator address
@@ -67,8 +67,8 @@
     },
 
     /* alphaVault is only used in the following actions:
-     * 1. create-damm-v2-balanced-pool
-     * 2. create-damm-v2-one-sided-pool
+     * 1. damm-v2-create-balanced-pool
+     * 2. damm-v2-create-one-sided-pool
      * There are 2 types of alpha vault: First Come First Serve (FCFS) and Prorata.
      */
     "alphaVault": {

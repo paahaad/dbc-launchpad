@@ -42,7 +42,7 @@ export type DammV1Config = MeteoraConfigBase & {
   createBaseToken: CreateBaseMintConfig | null;
   dammV1Config: DynamicAmmV1Config | null;
   dammV1LockLiquidity: LockLiquidityConfig | null;
-  stake2Earn: Stake2EarnConfig | null;
+  stake2EarnFarm: Stake2EarnFarmConfig | null;
   alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
 };
 
@@ -64,7 +64,7 @@ export interface LockLiquidityAllocation {
   address: string;
 }
 
-export interface Stake2EarnConfig {
+export interface Stake2EarnFarmConfig {
   topListLength: number;
   unstakeLockDurationSecs: number;
   secondsToFullUnlock: number;
@@ -347,3 +347,11 @@ export interface CloudflareKvProofUploadConfig {
   accountId: string;
   apiKey: string;
 }
+
+/* Stake2Earn */
+
+export type Stake2EarnConfig = MeteoraConfigBase & {
+  createBaseToken: CreateBaseMintConfig | null;
+  dammV1LockLiquidity: LockLiquidityConfig | null;
+  alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
+};
