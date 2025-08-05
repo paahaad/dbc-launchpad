@@ -23,7 +23,7 @@
      * 1. create-damm-v2-balanced-pool
      * 2. create-damm-v2-one-sided-pool
      */
-    "baseMint": "G7p5aNEWd1gVa4vAzmXEoxkgFt6XMGvRjjMFgjMHJ2Am",
+    "baseMint": "YOUR_BASE_MINT_ADDRESS",
     // "createBaseToken": {
     //     "mintBaseTokenAmount": 1000000000, // total amount of base token to be minted
     //     "baseDecimals": 6 // decimals of the base token
@@ -34,7 +34,7 @@
      * 2. create-damm-v2-one-sided-pool
      */
     "dammV2Config": {
-        "creator": "2VuxXtec8Gpcu49y8VZ4yYutbi98WWtRC6Zvvs8APVy1", // creator address
+        "creator": "YOUR_WALLET_ADDRESS", // creator address
         "baseAmount": 1000, // base token amount
         "quoteAmount": null, // quote token amount
         "initPrice": 10, // initial price (in terms of quote/base price)
