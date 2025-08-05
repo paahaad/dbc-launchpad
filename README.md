@@ -3,22 +3,103 @@
 A toolkit consisting of everything you need to invent innovative token launches. Powered by
 **Meteora**, the most secure, sustainable and composable liquidity layer on Solana.
 
+![Mikasa](/assets/mascot/mikasa.png)
+
 ## 🏗️ Structure
 
 ```
 meteora-invent/
 ├── packages/          # Shared packages
-│   └── config/        # Shared configurations
-│       ├── eslint/    # ESLint configurations
-│       ├── prettier/  # Prettier configuration
-│       └── typescript/# TypeScript configurations
+│   └── config/
+│       ├── eslint/
+│       ├── prettier/
+│       └── typescript/
 ├── scaffolds/         # Scaffolds - production-ready frontend application templates
-│   └── fun-launch/    # Launchpad scaffold template
+│   └── fun-launch/
 └── studio/            # Studio - a collection of scripts for you to innovate and create
-    ├── damm-v1/       # Dynamic AMM v1 scripts
-    ├── damm-v2/       # Dynamic AMM v2 scripts
-    ├── dbc/           # Dynamic Bonding Curve scripts
-    └── dlmm/          # Dynamic Liquidity Market Maker scripts
+    ├── config
+    │   ├── damm_v1_config.jsonc
+    │   ├── damm_v2_config.jsonc
+    │   ├── dbc_config.jsonc
+    │   └── dlmm_config.jsonc
+    ├── data
+    │   ├── kv_proof.json
+    │   └── whitelist_wallet.csv
+    ├── LLM.txt
+    ├── package.json
+    ├── README.md
+    ├── src
+    │   ├── helpers
+    │   │   ├── accounts.ts
+    │   │   ├── cli.ts
+    │   │   ├── common.ts
+    │   │   ├── config.ts
+    │   │   ├── index.ts
+    │   │   ├── token.ts
+    │   │   ├── transaction.ts
+    │   │   ├── utils.ts
+    │   │   └── validation.ts
+    │   ├── lib
+    │   │   ├── alpha_vault
+    │   │   │   ├── index.ts
+    │   │   │   ├── merkle_tree
+    │   │   │   │   ├── balance_tree.ts
+    │   │   │   │   ├── index.ts
+    │   │   │   │   └── merkle_tree.ts
+    │   │   │   └── utils.ts
+    │   │   ├── damm_v1
+    │   │   │   ├── index.ts
+    │   │   │   └── stake2earn.ts
+    │   │   ├── damm_v2
+    │   │   │   └── index.ts
+    │   │   ├── dbc
+    │   │   │   └── index.ts
+    │   │   └── dlmm
+    │   │       └── index.ts
+    │   ├── scripts
+    │   │   ├── alpha_vault
+    │   │   │   └── create_alpha_vault.ts
+    │   │   ├── damm_v1
+    │   │   │   ├── create_pool.ts
+    │   │   │   ├── create_stake2earn_farm.ts
+    │   │   │   ├── lock_liquidity_stake2earn.ts
+    │   │   │   └── lock_liquidity.ts
+    │   │   ├── damm-v2
+    │   │   │   ├── create_balanced_pool.ts
+    │   │   │   └── create_one_sided_pool.ts
+    │   │   ├── dbc
+    │   │   │   ├── claim_trading_fee.ts
+    │   │   │   ├── create_config.ts
+    │   │   │   ├── create_pool.ts
+    │   │   │   ├── migrate_damm_v1.ts
+    │   │   │   ├── migrate_damm_v2.ts
+    │   │   │   └── swap.ts
+    │   │   ├── dlmm
+    │   │   │   ├── create_pool.ts
+    │   │   │   ├── seed_liquidity_lfg.ts
+    │   │   │   ├── seed_liquidity_single_bin.ts
+    │   │   │   └── set_pool_status.ts
+    │   │   └── settings
+    │   │       └── generate_keypair.ts
+    │   ├── tests
+    │   │   ├── artifacts
+    │   │   │   ├── accounts
+    │   │   │   │   └── 3ifhD4Ywaa8aBZAaQSqYgN4Q1kaFArioLU8uumJMaqkE.json
+    │   │   │   ├── alpha_vault.so
+    │   │   │   ├── cp_amm.so
+    │   │   │   ├── dynamic_amm.so
+    │   │   │   ├── dynamic_bonding_curve.so
+    │   │   │   ├── dynamic_fee_sharing.so
+    │   │   │   ├── dynamic_vault.so
+    │   │   │   ├── lb_clmm.so
+    │   │   │   ├── locker.so
+    │   │   │   └── metaplex.so
+    │   │   └── keys
+    │   │       └── localnet
+    │   │           └── admin-bossj3JvwiNK7pvjr149DqdtJxf2gdygbcmEPTkb2F1.json
+    │   └── utils
+    │       ├── constants.ts
+    │       └── types.ts
 ```
 
 ## 🚀 Getting Started
@@ -45,7 +126,7 @@ pnpm build
 
 ### Studio (`@meteora-invent/studio`)
 
-The studio workspace contains all the scripts for interacting with Meteora's protocols.
+The studio workspace contains all the scripts for interacting with Meteora's programs.
 
 #### Getting Started
 
