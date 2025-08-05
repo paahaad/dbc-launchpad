@@ -21,6 +21,13 @@ module.exports = {
       }
     },
     {
+      files: '*.jsonc',
+      options: {
+        printWidth: 80,
+        trailingComma: 'none'
+      }
+    },
+    {
       files: '*.md',
       options: {
         proseWrap: 'always'

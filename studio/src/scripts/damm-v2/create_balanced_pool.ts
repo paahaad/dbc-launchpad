@@ -1,0 +1,110 @@
+import { Connection, PublicKey } from '@solana/web3.js';
+import { Wallet } from '@coral-xyz/anchor';
+import {
+  AlphaVaultTypeConfig,
+  DammV2Config,
+  FcfsAlphaVaultConfig,
+  ProrataAlphaVaultConfig,
+} from '../../utils/types';
+import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
+import {
+  createTokenMint,
+  getQuoteDecimals,
+  parseConfigFromCli,
+  safeParseKeypairFromFile,
+} from '../../helpers';
+import { createDammV2BalancedPool } from '../../lib/damm_v2';
+import {
+  createFcfsAlphaVault,
+  createProrataAlphaVault,
+  toAlphaVaulSdkPoolType,
+} from '../../lib/alpha_vault';
+import { deriveCustomizablePoolAddress } from '@meteora-ag/cp-amm-sdk';
+
+async function main() {
+  const config: DammV2Config = (await parseConfigFromCli()) as DammV2Config;
+
+  console.log(`> Using keypair file path ${config.keypairFilePath}`);
+  const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
+
+  console.log('\n> Initializing with general configuration...');
+  console.log(`- Using RPC URL ${config.rpcUrl}`);
+  console.log(`- Dry run = ${config.dryRun}`);
+  console.log(`- Using payer ${keypair.publicKey} to execute commands`);
+
+  const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
+  const wallet = new Wallet(keypair);
+
+  let baseMint: PublicKey;
+  if (!config.quoteMint) {
+    throw new Error('Missing quoteMint in configuration');
+  }
+  const quoteMint = new PublicKey(config.quoteMint);
+
+  if (config.createBaseToken) {
+    baseMint = await createTokenMint(connection, wallet, {
+      dryRun: config.dryRun,
+      mintTokenAmount: config.createBaseToken.mintBaseTokenAmount,
+      decimals: config.createBaseToken.baseDecimals,
+      computeUnitPriceMicroLamports: config.computeUnitPriceMicroLamports,
+    });
+  } else {
+    if (!config.baseMint) {
+      throw new Error('Missing baseMint in configuration');
+    }
+    baseMint = new PublicKey(config.baseMint);
+  }
+
+  console.log(`- Using base token mint ${baseMint.toString()}`);
+  console.log(`- Using quote token mint ${quoteMint.toString()}`);
+
+  /// --------------------------------------------------------------------------
+  if (config.dammV2Config) {
+    await createDammV2BalancedPool(config, connection, wallet, baseMint, quoteMint);
+
+    if (config.dammV2Config.hasAlphaVault && config.alphaVault) {
+      console.log('\n> Alpha vault is enabled, creating alpha vault automatically...');
+
+      const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
+      const poolType = toAlphaVaulSdkPoolType(config.alphaVault.poolType);
+
+      const poolAddress = deriveCustomizablePoolAddress(baseMint, quoteMint);
+
+      if (config.alphaVault.alphaVaultType === AlphaVaultTypeConfig.Fcfs) {
+        await createFcfsAlphaVault(
+          connection,
+          wallet,
+          poolType,
+          poolAddress,
+          baseMint,
+          quoteMint,
+          quoteDecimals,
+          config.alphaVault as FcfsAlphaVaultConfig,
+          config.dryRun,
+          config.computeUnitPriceMicroLamports
+        );
+      } else if (config.alphaVault.alphaVaultType === AlphaVaultTypeConfig.Prorata) {
+        await createProrataAlphaVault(
+          connection,
+          wallet,
+          poolType,
+          poolAddress,
+          baseMint,
+          quoteMint,
+          quoteDecimals,
+          config.alphaVault as ProrataAlphaVaultConfig,
+          config.dryRun,
+          config.computeUnitPriceMicroLamports
+        );
+      } else {
+        throw new Error(`Unsupported alpha vault type: ${config.alphaVault.alphaVaultType}`);
+      }
+
+      console.log('\n>>> DLMM pool and alpha vault created successfully! 🎉');
+    }
+  } else {
+    throw new Error('Must provide Dynamic V2 configuration');
+  }
+}
+
+main();
