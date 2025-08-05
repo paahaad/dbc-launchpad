@@ -22,7 +22,6 @@ async function main() {
   let baseMint: PublicKey;
   const quoteMint = new PublicKey(config.quoteMint);
 
-  // If we want to create a new token mint
   if (config.createBaseToken) {
     baseMint = await createTokenMint(connection, wallet, {
       dryRun: config.dryRun,

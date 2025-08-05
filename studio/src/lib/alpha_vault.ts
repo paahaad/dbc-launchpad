@@ -536,10 +536,10 @@ export function createMerkleTree(walletDepositCap: WalletDepositCap[]): BalanceT
 
 export function toAlphaVaulSdkPoolType(poolType: PoolTypeConfig): PoolType {
   switch (poolType) {
-    case PoolTypeConfig.Dynamic:
-      return PoolType.DAMM;
     case PoolTypeConfig.Dlmm:
       return PoolType.DLMM;
+    case PoolTypeConfig.DammV1:
+      return PoolType.DAMM;
     case PoolTypeConfig.DammV2:
       return PoolType.DAMMV2;
     default:

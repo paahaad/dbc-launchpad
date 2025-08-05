@@ -26,6 +26,14 @@ import {
 } from '../helpers';
 import { DEFAULT_SEND_TX_MAX_RETRIES } from '../utils/constants';
 
+/**
+ * Create a one-sided DAMM V2 pool
+ * @param config - The DAMM V2 config
+ * @param connection - The connection to the network
+ * @param wallet - The wallet to use for the transaction
+ * @param baseTokenMint - The base token mint
+ * @param quoteTokenMint - The quote token mint
+ */
 export async function createDammV2OneSidedPool(
   config: DammV2Config,
   connection: Connection,
@@ -34,9 +42,9 @@ export async function createDammV2OneSidedPool(
   quoteTokenMint: PublicKey
 ) {
   if (!config.dammV2Config) {
-    throw new Error('Missing dynamic amm v2 configuration');
+    throw new Error('Missing DAMM V2 configuration');
   }
-  console.log('\n> Initializing one-sided Dynamic AMM V2 pool...');
+  console.log('\n> Initializing one-sided DAMM V2 pool...');
 
   const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
 
@@ -61,8 +69,8 @@ export async function createDammV2OneSidedPool(
 
   const baseDecimals = baseMint.decimals;
 
-  // create cp amm instance
   const cpAmmInstance = new CpAmm(connection);
+
   const {
     initPrice,
     maxPrice,
@@ -83,10 +91,10 @@ export async function createDammV2OneSidedPool(
     numberOfPeriod,
     useDynamicFee,
   } = poolFees;
-  // setup pool params
 
   let tokenAAmount = getAmountInLamports(baseAmount, baseDecimals);
   let tokenBAmount = new BN(0);
+
   // transfer fee if token2022
   if (baseTokenInfo) {
     tokenAAmount = tokenAAmount.sub(
@@ -117,6 +125,7 @@ export async function createDammV2OneSidedPool(
   console.log(
     `- Using base token with amount = ${getDecimalizedAmount(tokenAAmount, baseDecimals)}`
   );
+
   console.log(`- Init price ${getPriceFromSqrtPrice(initSqrtPrice, baseDecimals, quoteDecimals)}`);
 
   console.log(
@@ -209,6 +218,14 @@ export async function createDammV2OneSidedPool(
   }
 }
 
+/**
+ * Create a balanced DAMM V2 pool
+ * @param config - The DAMM V2 config
+ * @param connection - The connection to the network
+ * @param wallet - The wallet to use for the transaction
+ * @param baseTokenMint - The base token mint
+ * @param quoteTokenMint - The quote token mint
+ */
 export async function createDammV2BalancedPool(
   config: DammV2Config,
   connection: Connection,
@@ -217,16 +234,14 @@ export async function createDammV2BalancedPool(
   quoteTokenMint: PublicKey
 ) {
   if (!config.dammV2Config) {
-    throw new Error('Missing dynamic amm v2 configuration');
+    throw new Error('Missing DAMM V2 configuration');
   }
-  console.log('\n> Initializing balanced Dynamic AMM V2 pool...');
+  console.log('\n> Initializing balanced DAMM V2 pool...');
 
   const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
 
   let baseTokenInfo = null;
   let baseTokenProgram = TOKEN_PROGRAM_ID;
-  let quoteTokenInfo = null;
-  let quoteTokenProgram = TOKEN_PROGRAM_ID;
 
   const baseMintAccountInfo = await connection.getAccountInfo(
     new PublicKey(baseTokenMint),
@@ -243,6 +258,9 @@ export async function createDammV2BalancedPool(
     };
     baseTokenProgram = TOKEN_2022_PROGRAM_ID;
   }
+
+  let quoteTokenInfo = null;
+  let quoteTokenProgram = TOKEN_PROGRAM_ID;
 
   const quoteMintAccountInfo = await connection.getAccountInfo(
     new PublicKey(quoteTokenMint),
@@ -265,10 +283,10 @@ export async function createDammV2BalancedPool(
   // create cp amm instance
   const cpAmmInstance = new CpAmm(connection);
   const {
-    initPrice,
-    poolFees,
     baseAmount,
     quoteAmount,
+    initPrice,
+    poolFees,
     hasAlphaVault,
     activationPoint,
     activationType,
@@ -278,9 +296,9 @@ export async function createDammV2BalancedPool(
   const {
     maxBaseFeeBps,
     minBaseFeeBps,
-    feeSchedulerMode,
-    totalDuration,
     numberOfPeriod,
+    totalDuration,
+    feeSchedulerMode,
     useDynamicFee,
   } = poolFees;
 
@@ -324,12 +342,14 @@ export async function createDammV2BalancedPool(
     sqrtMaxPrice: maxSqrtPrice,
     tokenAInfo: baseTokenInfo,
   });
+
   console.log(
     `- Using base token with amount = ${getDecimalizedAmount(tokenAAmount, baseDecimals)}`
   );
   console.log(
     `- Using quote token with amount = ${getDecimalizedAmount(tokenBAmount, quoteDecimals)}`
   );
+
   console.log(`- Init price ${getPriceFromSqrtPrice(initSqrtPrice, baseDecimals, quoteDecimals)}`);
 
   console.log(
@@ -367,6 +387,7 @@ export async function createDammV2BalancedPool(
     padding: [],
     dynamicFee,
   };
+
   const positionNft = Keypair.generate();
 
   const {

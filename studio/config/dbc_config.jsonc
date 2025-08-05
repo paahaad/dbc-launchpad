@@ -26,16 +26,15 @@
     "baseMint": "YOUR_BASE_MINT_ADDRESS",
 
     /* Either use dbcConfigAddress or dbcConfig, but not both.
+     *
      * dbcConfigAddress is only used in the following action:
      * 1. create-dbc-pool (if the dbcConfigAddress is already created)
-     */
-    // "dbcConfigAddress": "YOUR_DBC_CONFIG_ADDRESS",
-
-    /* Either use dbcConfigAddress or dbcConfig, but not both.
+     *
      * dbcConfig is only used in the following actions:
      * 1. create-dbc-config
      * 2. create-dbc-pool (if there is no dbcConfigAddress)
      */
+    // "dbcConfigAddress": "YOUR_DBC_CONFIG_ADDRESS",
     "dbcConfig": {
        "buildCurveMode": 0, // 0 - buildCurve | 1 - buildCurveWithMarketCap | 2 - buildCurveWithTwoSegments | 3 - buildCurveWithLiquidityWeights
 
@@ -89,7 +88,7 @@
                 "startingFeeBps": 200, // starting fee (max 99% fee === 9900 bps)
                 "endingFeeBps": 200, // ending fee (minimum 0.01% fee === 1 bps)
                 "numberOfPeriod": 0, // number of period
-                "totalDuration": 0 // total duration (If activationType is 0, totalDuration = duration / 0.4, If activationType is 1, totalDuration = duration)
+                "totalDuration": 0 // total duration (If activationType is 0 (slots), totalDuration = duration / 0.4 | If activationType is 1 (timestamp), totalDuration = duration)
             }
             /*
             "baseFeeMode": 2, // 2 - Rate Limiter
@@ -97,7 +96,7 @@
                 "baseFeeBps": 200, // base fee (max 99% base fee === 9900 bps)
                 "feeIncrementBps": 200, // fee increment (max fee increment = 9900 bps - baseFeeBps)
                 "referenceAmount": 0, // reference amount (not in lamports)
-                "maxLimiterDuration": 0 // if activationType is 0, maxLimiterDuration = duration / 0.4, if activationType is 1, maxLimiterDuration = duration)
+                "maxLimiterDuration": 0 // if activationType is 0 (slots), maxLimiterDuration = duration / 0.4, if activationType is 1 (timestamp), maxLimiterDuration = duration)
             }
             */
         },
