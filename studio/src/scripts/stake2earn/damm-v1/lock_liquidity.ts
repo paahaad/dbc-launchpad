@@ -1,8 +1,8 @@
 import { Connection, PublicKey } from '@solana/web3.js';
-import { safeParseKeypairFromFile, parseConfigFromCli } from '../../helpers';
-import { DammV1Config } from '../../utils/types';
-import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
-import { lockLiquidity } from '../../lib/damm_v1';
+import { safeParseKeypairFromFile, parseConfigFromCli } from '../../../helpers';
+import { DammV1Config } from '../../../utils/types';
+import { DEFAULT_COMMITMENT_LEVEL } from '../../../utils/constants';
+import { lockLiquidityStake2Earn } from '../../../lib/stake2earn';
 
 async function main() {
   const config = (await parseConfigFromCli()) as DammV1Config;
@@ -30,7 +30,7 @@ async function main() {
     throw new Error('Missing lockLiquidity configuration');
   }
 
-  await lockLiquidity(
+  await lockLiquidityStake2Earn(
     connection,
     keypair,
     baseMint,

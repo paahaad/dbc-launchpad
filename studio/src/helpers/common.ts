@@ -3,6 +3,7 @@ import Decimal from 'decimal.js';
 import BN from 'bn.js';
 import { Signer, PublicKey, Connection } from '@solana/web3.js';
 import { getMint } from '@solana/spl-token';
+import { AllocationByAmount, LockLiquidityAllocation } from '../utils/types';
 
 export function getQuoteMint(quoteSymbol?: string, quoteMint?: string): PublicKey {
   if (quoteSymbol == null && quoteMint == null) {
@@ -60,4 +61,35 @@ export async function getQuoteDecimals(
 
 export function getDecimalizedAmount(amountLamport: BN, decimals: number): BN {
   return amountLamport.div(new BN(10 ** decimals));
+}
+
+export function fromAllocationsToAmount(
+  lpAmount: BN,
+  allocations: LockLiquidityAllocation[]
+): AllocationByAmount[] {
+  const sumPercentage = allocations.reduce((partialSum, a) => partialSum + a.percentage, 0);
+  if (sumPercentage === 0) {
+    throw Error('sumPercentage is zero');
+  } else if (sumPercentage > 100) {
+    throw Error('sumPercentage is greater than 100');
+  }
+
+  const amounts: AllocationByAmount[] = [];
+  let sum = new BN(0);
+  for (let i = 0; i < allocations.length - 1; i++) {
+    const amount = lpAmount.mul(new BN(allocations[i].percentage)).div(new BN(sumPercentage));
+    sum = sum.add(amount);
+    amounts.push({
+      address: new PublicKey(allocations[i].address),
+      amount,
+      percentage: allocations[i].percentage,
+    });
+  }
+  // the last wallet get remaining amount
+  amounts.push({
+    address: new PublicKey(allocations[allocations.length - 1].address),
+    amount: lpAmount.sub(sum),
+    percentage: allocations[allocations.length - 1].percentage,
+  });
+  return amounts;
 }

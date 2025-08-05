@@ -1,7 +1,7 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import { safeParseKeypairFromFile, parseConfigFromCli, createTokenMint } from '../../helpers';
 import { Wallet } from '@coral-xyz/anchor';
-import { createPermissionlessDammV1Pool } from '../../lib/damm_v1';
+import { createDammV1Pool } from '../../lib/damm_v1';
 import { DammV1Config } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 
@@ -41,7 +41,7 @@ async function main() {
 
   /// --------------------------------------------------------------------------
   if (config) {
-    await createPermissionlessDammV1Pool(config, connection, wallet, baseMint, quoteMint);
+    await createDammV1Pool(config, connection, wallet, baseMint, quoteMint);
   } else {
     throw new Error('Must provide DAMM V1 configuration');
   }

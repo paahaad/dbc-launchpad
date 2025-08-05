@@ -1,11 +1,22 @@
 import { Connection, Keypair, PublicKey, sendAndConfirmTransaction } from '@solana/web3.js';
-import { Stake2EarnConfig } from '../utils/types';
+import { LockLiquidityAllocation, Stake2EarnConfig } from '../utils/types';
 import { DEFAULT_SEND_TX_MAX_RETRIES, STAKE2EARN_PROGRAM_IDS } from '../utils/constants';
 import StakeForFee, { deriveFeeVault } from '@meteora-ag/m3m3';
 import BN from 'bn.js';
-import { modifyComputeUnitPriceIx, runSimulateTransaction } from '../helpers';
+import {
+  fromAllocationsToAmount,
+  modifyComputeUnitPriceIx,
+  runSimulateTransaction,
+} from '../helpers';
+import AmmImpl from '@meteora-ag/dynamic-amm-sdk';
+import { SEEDS } from '@meteora-ag/dynamic-amm-sdk/dist/cjs/src/amm/constants';
+import {
+  deriveCustomizablePermissionlessConstantProductPoolAddress,
+  createProgram,
+  getAssociatedTokenAccount,
+} from '@meteora-ag/dynamic-amm-sdk/dist/cjs/src/amm/utils';
 
-export async function createStake2EarnFarm(
+export async function createDammV1Stake2EarnPool(
   connection: Connection,
   payer: Keypair,
   poolKey: PublicKey,
@@ -22,7 +33,7 @@ export async function createStake2EarnFarm(
   const m3m3VaultPubkey = deriveFeeVault(poolKey, m3m3ProgramId);
   console.log(`- M3M3 fee vault ${m3m3VaultPubkey}`);
 
-  // 1. Create m3m3 farm
+  // Check if the stake2earn vault already exists
   const m3m3VaultAccount = await connection.getAccountInfo(m3m3VaultPubkey, connection.commitment);
 
   if (m3m3VaultAccount) {
@@ -41,7 +52,7 @@ export async function createStake2EarnFarm(
   console.log(`- Using secondsToFullUnlock ${secondsToFullUnlock}`);
   console.log(`- Using startFeeDistributeTimestamp ${startFeeDistributeTimestamp}`);
 
-  // m3m3 farm didn't exist
+  // stake2earn farm didn't exist
   const createTx = await StakeForFee.createFeeVault(
     connection,
     poolKey,
@@ -71,5 +82,81 @@ export async function createStake2EarnFarm(
       throw err;
     });
     console.log(`>>> M3M3 farm initialized successfully with tx hash: ${txHash}`);
+  }
+}
+
+export async function lockLiquidityStake2Earn(
+  connection: Connection,
+  payer: Keypair,
+  baseMint: PublicKey,
+  quoteMint: PublicKey,
+  allocations: LockLiquidityAllocation[],
+  dryRun: boolean,
+  computeUnitPriceMicroLamports: number,
+  opts?: {
+    m3m3ProgramId: PublicKey;
+  }
+): Promise<void> {
+  const m3m3ProgramId =
+    opts?.m3m3ProgramId ?? new PublicKey(STAKE2EARN_PROGRAM_IDS['mainnet-beta']);
+
+  const poolKey = deriveCustomizablePermissionlessConstantProductPoolAddress(
+    baseMint,
+    quoteMint,
+    createProgram(connection as any).ammProgram.programId
+  );
+  console.log(`- Pool address: ${poolKey}`);
+
+  const stake2EarnVaultPubkey = deriveFeeVault(poolKey, m3m3ProgramId);
+  console.log(`- Stake2Earn fee vault ${stake2EarnVaultPubkey}`);
+
+  if (allocations.length === 0) {
+    throw new Error('Missing allocations in lockLiquidity configuration');
+  }
+
+  const allocationContainsFeeFarmAddress = allocations.some((allocation) =>
+    new PublicKey(allocation.address).equals(stake2EarnVaultPubkey)
+  );
+  if (!allocationContainsFeeFarmAddress) {
+    throw new Error('Lock liquidity allocations does not contain Stake2Earn fee farm address');
+  }
+
+  const [lpMint] = PublicKey.findProgramAddressSync(
+    [Buffer.from(SEEDS.LP_MINT), poolKey.toBuffer()],
+    createProgram(connection as any).ammProgram.programId
+  );
+  const payerPoolLp = getAssociatedTokenAccount(lpMint, payer.publicKey);
+  const payerPoolLpBalance = (
+    await connection.getTokenAccountBalance(payerPoolLp, connection.commitment)
+  ).value.amount;
+  console.log('- payerPoolLpBalance %s', payerPoolLpBalance.toString());
+
+  const allocationByAmounts = fromAllocationsToAmount(new BN(payerPoolLpBalance), allocations);
+
+  const pool = await AmmImpl.create(connection as any, poolKey);
+
+  for (const allocation of allocationByAmounts) {
+    console.log('\n> Lock liquidity %s', allocation.address.toString());
+    const tx = await pool.lockLiquidity(allocation.address, allocation.amount, payer.publicKey);
+    modifyComputeUnitPriceIx(tx as any, computeUnitPriceMicroLamports);
+
+    if (dryRun) {
+      console.log(
+        `\n> Simulating lock liquidity tx for address ${allocation.address} with amount = ${allocation.amount}... / percentage = ${allocation.percentage}`
+      );
+      await runSimulateTransaction(connection, [payer], payer.publicKey, [tx as any]);
+    } else {
+      const txHash = await sendAndConfirmTransaction(connection, tx as any, [payer], {
+        commitment: connection.commitment,
+        maxRetries: DEFAULT_SEND_TX_MAX_RETRIES,
+      }).catch((err) => {
+        console.error(err);
+        throw err;
+      });
+
+      console.log(
+        `>>> Lock liquidity successfully with tx hash: ${txHash} for address ${allocation.address} with amount ${allocation.amount}`
+      );
+    }
   }
 }
