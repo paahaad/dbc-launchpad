@@ -1,131 +1,131 @@
 {
-    /* rpcUrl is required. You can switch between mainnet, devnet and localnet or use your own RPC URL. */
-    "rpcUrl": "https://api.devnet.solana.com", // mainnet: https://api.mainnet-beta.solana.com | devnet: https://api.devnet.solana.com | localnet: http://localhost:8899
+  /* rpcUrl is required. You can switch between mainnet, devnet and localnet or use your own RPC URL. */
+  "rpcUrl": "https://api.devnet.solana.com", // mainnet: https://api.mainnet-beta.solana.com | devnet: https://api.devnet.solana.com | localnet: http://localhost:8899
 
-    /* dryRun is required. If true, transactions will be simulated and not executed. If false, transactions will be executed. */
-    "dryRun": false,
+  /* dryRun is required. If true, transactions will be simulated and not executed. If false, transactions will be executed. */
+  "dryRun": false,
 
-    /* keypairFilePath is required and will be the payer + signer for all transactions */
-    "keypairFilePath": "./keypair.json",
+  /* keypairFilePath is required and will be the payer + signer for all transactions */
+  "keypairFilePath": "./keypair.json",
 
-    /* computeUnitPriceMicroLamports is required and can be adjusted to fit your needs */
-    "computeUnitPriceMicroLamports": 100000,
+  /* computeUnitPriceMicroLamports is required and can be adjusted to fit your needs */
+  "computeUnitPriceMicroLamports": 100000,
 
-    /* quoteMint is required for the following actions:
-     * 1. dlmm-create-pool
-     * 2. dlmm-seed-liquidity-lfg
-     * 3. dlmm-seed-liquidity-single-bin
-     * 4. dlmm-set-pool-status
-     * SOL: So11111111111111111111111111111111111111112 | USDC: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v | any other token address
+  /* quoteMint is required for the following actions:
+   * 1. dlmm-create-pool
+   * 2. dlmm-seed-liquidity-lfg
+   * 3. dlmm-seed-liquidity-single-bin
+   * 4. dlmm-set-pool-status
+   * SOL: So11111111111111111111111111111111111111112 | USDC: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v | any other token address
+   */
+  "quoteMint": "So11111111111111111111111111111111111111112",
+
+  /* Either use baseMint or createBaseToken, but not both.
+   * baseMint is required for the following actions:
+   * 1. dlmm-create-pool
+   * 2. dlmm-seed-liquidity-lfg
+   * 3. dlmm-seed-liquidity-single-bin
+   * 4. dlmm-set-pool-status
+   */
+  "baseMint": "YOUR_BASE_MINT_ADDRESS",
+  // "createBaseToken": {
+  //     "mintBaseTokenAmount": 1000000000, // total amount of base token to be minted
+  //     "baseDecimals": 6 // decimals of the base token
+  // },
+
+  /* dlmmConfig is only used in the following actions:
+   * 1. dlmm-create-pool
+   */
+  "dlmmConfig": {
+    "binStep": 400, // Price increment/decrement percentage in basis points (400 = 4% price step between bins)
+    "feeBps": 200, // Trading fee in basis points (200 = 2% fee per swap)
+    "initialPrice": 0.0000017, // Initial price(in terms of quote/base price)
+    "activationType": 1, // 0 - Slot | 1 - Timestamp
+    "activationPoint": 1753328078, // Activation time of the pool depending on activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
+    "priceRounding": "up", // Price calculation rounding direction for bin ID conversion
+    "creatorPoolOnOffControl": false, // Pool creator permission to enable/disable trading for permissionless pools
+    "hasAlphaVault": false // If true, the alpha vault will be created after the pool is created
+  },
+
+  /* lfgSeedLiquidity is only used in the following actions:
+   * 1. dlmm-seed-liquidity-lfg
+   * https://ilm.jup.ag/
+   */
+  "lfgSeedLiquidity": {
+    "minPrice": 0.003393, // Minimum price boundary for liquidity distribution range
+    "maxPrice": 0.004393, // Maximum price boundary for liquidity distribution range
+    "curvature": 0.6, // Distribution curvature factor (1/k) controlling liquidity concentration (0-1, lower = more concentrated)
+    "seedAmount": "200000", // Total amount of liquidity to seed into the pool (in token units)
+    "operatorKeypairFilepath": "./keypair.json", // File path to operator's private key for signing seeding transactions
+    "positionOwner": "YOUR_POSITION_OWNER_ADDRESS", // Public key of the position owner who controls the liquidity
+    "feeOwner": "YOUR_FEE_OWNER_ADDRESS", // Public key entitled to claim trading fees from this position
+    "lockReleasePoint": 0, // Timestamp/slot when position becomes withdrawable (0 = immediately unlocked)
+    "seedTokenXToPositionOwner": true // Whether to send 1 lamport of token X to position owner as ownership proof
+  },
+
+  /* singleBinSeedLiquidity is only used in the following actions:
+   * 1. dlmm-seed-liquidity-single-bin
+   */
+  "singleBinSeedLiquidity": {
+    "price": 0.0000017, // Exact price where liquidity will be concentrated in a single bin
+    "priceRounding": "up", // Price calculation rounding direction for bin ID conversion
+    "seedAmount": "100000", // Amount of token X (base token) to seed into the single bin (in token units)
+    "operatorKeypairFilepath": "./keypair.json", // File path to operator's private key for signing seeding transactions
+    "positionOwner": "YOUR_POSITION_OWNER_ADDRESS", // Public key of the position owner who controls the liquidity
+    "feeOwner": "YOUR_FEE_OWNER_ADDRESS", // Public key entitled to claim trading fees from this position
+    "lockReleasePoint": 0, // Timestamp/slot when position becomes withdrawable (0 = immediately unlocked)
+    "seedTokenXToPositionOwner": true // Whether to send 1 lamport of token X to position owner as ownership proof
+  },
+
+  /* setDlmmPoolStatus is only used in the following actions:
+   * 1. dlmm-set-pool-status
+   */
+  "setDlmmPoolStatus": {
+    "poolAddress": "YOUR_POOL_ADDRESS", // pool address of the dlmm pool
+    "enabled": true // true = enable trading | false = disable trading
+  },
+
+  /* alphaVault is only used in the following actions:
+   * 1. dlmm-create-pool
+   * There are 2 types of alpha vault: First Come First Serve (FCFS) and Prorata.
+   */
+  "alphaVault": {
+    "poolType": "dlmm", // DLMM = dlmm | DAMM v1 = dammv1 | DAMM v2 = dammv2
+    "alphaVaultType": "fcfs", // FCFS = fcfs | Prorata = prorata
+
+    /* Only use the following parameters for alphaVaultType: fcfs
+     * 1. maxDepositCap
+     * 2. individualDepositingCap
      */
-     "quoteMint": "So11111111111111111111111111111111111111112", 
+    "maxDepositCap": 10000, // Maximum total amount (in quote token) that can be deposited across all users in the vault
+    "individualDepositingCap": 1, // Maximum amount (in quote token) that each individual user can deposit
 
-    /* Either use baseMint or createBaseToken, but not both.
-     * baseMint is required for the following actions:
-     * 1. dlmm-create-pool
-     * 2. dlmm-seed-liquidity-lfg
-     * 3. dlmm-seed-liquidity-single-bin
-     * 4. dlmm-set-pool-status
+    /* Only use the following parameters for alphaVaultType: prorata
+     * 1. maxBuyingCap
      */
-    "baseMint": "YOUR_BASE_MINT_ADDRESS",
-    // "createBaseToken": {
-    //     "mintBaseTokenAmount": 1000000000, // total amount of base token to be minted
-    //     "baseDecimals": 6 // decimals of the base token
-    // },
+    // "maxBuyingCap": 10000, // Maximum total amount (in quote token) that can be bought across all users in the vault
 
-    /* dlmmConfig is only used in the following actions:
-     * 1. dlmm-create-pool
+    "depositingPoint": 1733626299, // When users can start depositing depending on pool's activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
+    "startVestingPoint": 1746808201, // When token vesting begins and users can start claiming their vested tokens depending on pool's activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
+    "endVestingPoint": 1746808201, // When token vesting ends and all tokens become fully claimable depending on pool's activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
+    "escrowFee": 0, // Fee amount (in quote token) charged when creating a stake escrow account
+    "whitelistMode": "permissionless", // Whitelist mode: permissionless | permission_with_merkle_proof | permission_with_authority
+
+    /* Optional Configuration: whitelistFilePath
+     * Only use when whitelistMode is permission_with_merkle_proof or permission_with_authority
      */
-    "dlmmConfig": {
-        "binStep": 400, // Price increment/decrement percentage in basis points (400 = 4% price step between bins)
-        "feeBps": 200, // Trading fee in basis points (200 = 2% fee per swap)
-        "initialPrice": 0.0000017, // Initial price(in terms of quote/base price)
-        "activationType": 1, // 0 - Slot | 1 - Timestamp
-        "activationPoint": 1753328078,  // Activation time of the pool depending on activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
-        "priceRounding": "up", // Price calculation rounding direction for bin ID conversion
-        "creatorPoolOnOffControl": false, // Pool creator permission to enable/disable trading for permissionless pools
-        "hasAlphaVault": false // If true, the alpha vault will be created after the pool is created
-    },
+    "whitelistFilepath": "./data/whitelist_wallet.csv", // Optional path to CSV file containing whitelisted wallet addresses and their deposit caps (format: wallet,deposit_cap)
 
-    /* lfgSeedLiquidity is only used in the following actions:
-     * 1. dlmm-seed-liquidity-lfg
-     * https://ilm.jup.ag/
+    /* Optional Configuration: merkleProofBaseUrl, chunkSize, kvProofFilepath, cloudflareKvProofUpload
+     * Only use when whitelistMode is permission_with_merkle_proof
      */
-    "lfgSeedLiquidity": {
-        "minPrice": 0.003393, // Minimum price boundary for liquidity distribution range
-        "maxPrice": 0.004393, // Maximum price boundary for liquidity distribution range  
-        "curvature": 0.6, // Distribution curvature factor (1/k) controlling liquidity concentration (0-1, lower = more concentrated)
-        "seedAmount": "200000", // Total amount of liquidity to seed into the pool (in token units)
-        "operatorKeypairFilepath": "./keypair.json", // File path to operator's private key for signing seeding transactions
-        "positionOwner": "YOUR_POSITION_OWNER_ADDRESS", // Public key of the position owner who controls the liquidity
-        "feeOwner": "YOUR_FEE_OWNER_ADDRESS", // Public key entitled to claim trading fees from this position
-        "lockReleasePoint": 0, // Timestamp/slot when position becomes withdrawable (0 = immediately unlocked)
-        "seedTokenXToPositionOwner": true // Whether to send 1 lamport of token X to position owner as ownership proof
-    },
-
-    /* singleBinSeedLiquidity is only used in the following actions:
-     * 1. dlmm-seed-liquidity-single-bin
-     */
-    "singleBinSeedLiquidity": {
-        "price": 0.0000017, // Exact price where liquidity will be concentrated in a single bin
-        "priceRounding": "up", // Price calculation rounding direction for bin ID conversion
-        "seedAmount": "100000", // Amount of token X (base token) to seed into the single bin (in token units)
-        "operatorKeypairFilepath": "./keypair.json", // File path to operator's private key for signing seeding transactions
-        "positionOwner": "YOUR_POSITION_OWNER_ADDRESS", // Public key of the position owner who controls the liquidity
-        "feeOwner": "YOUR_FEE_OWNER_ADDRESS", // Public key entitled to claim trading fees from this position
-        "lockReleasePoint": 0, // Timestamp/slot when position becomes withdrawable (0 = immediately unlocked)
-        "seedTokenXToPositionOwner": true // Whether to send 1 lamport of token X to position owner as ownership proof
-    },
-
-    /* setDlmmPoolStatus is only used in the following actions:
-     * 1. dlmm-set-pool-status
-     */
-    "setDlmmPoolStatus": {
-        "poolAddress": "YOUR_POOL_ADDRESS", // pool address of the dlmm pool
-        "enabled": true // true = enable trading | false = disable trading
-    },
-
-    /* alphaVault is only used in the following actions:
-     * 1. dlmm-create-pool
-     * There are 2 types of alpha vault: First Come First Serve (FCFS) and Prorata.
-     */
-     "alphaVault": {
-        "poolType": "dlmm", // DLMM = dlmm | DAMM v1 = dammv1 | DAMM v2 = dammv2
-        "alphaVaultType": "fcfs", // FCFS = fcfs | Prorata = prorata
-        
-        /* Only use the following parameters for alphaVaultType: fcfs
-        * 1. maxDepositCap
-        * 2. individualDepositingCap
-        */
-        "maxDepositCap": 10000, // Maximum total amount (in quote token) that can be deposited across all users in the vault
-        "individualDepositingCap": 1, // Maximum amount (in quote token) that each individual user can deposit
-
-        /* Only use the following parameters for alphaVaultType: prorata
-        * 1. maxBuyingCap
-        */
-        // "maxBuyingCap": 10000, // Maximum total amount (in quote token) that can be bought across all users in the vault
-
-        "depositingPoint": 1733626299, // When users can start depositing depending on pool's activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
-        "startVestingPoint": 1746808201, // When token vesting begins and users can start claiming their vested tokens depending on pool's activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
-        "endVestingPoint": 1746808201, // When token vesting ends and all tokens become fully claimable depending on pool's activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
-        "escrowFee": 0, // Fee amount (in quote token) charged when creating a stake escrow account
-        "whitelistMode": "permissionless", // Whitelist mode: permissionless | permission_with_merkle_proof | permission_with_authority
-
-        /* Optional Configuration: whitelistFilePath
-         * Only use when whitelistMode is permission_with_merkle_proof or permission_with_authority
-        */
-        "whitelistFilepath": "./data/whitelist_wallet.csv", // Optional path to CSV file containing whitelisted wallet addresses and their deposit caps (format: wallet,deposit_cap)
-
-        /* Optional Configuration: merkleProofBaseUrl, chunkSize, kvProofFilepath, cloudflareKvProofUpload
-         * Only use when whitelistMode is permission_with_merkle_proof
-        */
-        "merkleProofBaseUrl": "https://example.workers.dev/", // Base URL endpoint where merkle proofs are stored and can be retrieved for whitelisted wallet verification
-        "chunkSize": 1000, // Optional batch size for processing large whitelist files or merkle tree operations to avoid memory/performance issues
-        "kvProofFilepath": "./data/kv_proof.json", // Optional path to key-value file storing pre-computed merkle proofs for whitelisted addresses
-        "cloudflareKvProofUpload": {
-            "kvNamespaceId": "YOUR_KV_NAMESPACE_ID",
-            "accountId": "YOUR_ACCOUNT_ID",
-            "apiKey": "YOUR_API_KEY"
-        }
+    "merkleProofBaseUrl": "https://example.workers.dev/", // Base URL endpoint where merkle proofs are stored and can be retrieved for whitelisted wallet verification
+    "chunkSize": 1000, // Optional batch size for processing large whitelist files or merkle tree operations to avoid memory/performance issues
+    "kvProofFilepath": "./data/kv_proof.json", // Optional path to key-value file storing pre-computed merkle proofs for whitelisted addresses
+    "cloudflareKvProofUpload": {
+      "kvNamespaceId": "YOUR_KV_NAMESPACE_ID",
+      "accountId": "YOUR_ACCOUNT_ID",
+      "apiKey": "YOUR_API_KEY"
     }
+  }
 }
