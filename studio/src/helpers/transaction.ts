@@ -136,7 +136,8 @@ export async function handleSendTxs(
     const lowerIndex = i * instructionsPerTx;
     const upperIndex = (i + 1) * instructionsPerTx;
     for (let j = lowerIndex; j < upperIndex; j++) {
-      if (instructions[j]) tx.add(instructions[j]);
+      const instruction = instructions[j];
+      if (instruction) tx.add(instruction);
     }
 
     const txSize = tx.serialize({

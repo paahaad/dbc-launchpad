@@ -19,8 +19,14 @@ async function main() {
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
   const wallet = new Wallet(keypair);
 
+  if (!config.quoteMint) {
+    throw new Error('Missing quoteMint in configuration');
+  }
   const quoteMint = new PublicKey(config.quoteMint);
   let baseMint: Keypair;
+  if (!config.dbcPool) {
+    throw new Error('Missing dbcPool in configuration');
+  }
   if (config.dbcPool.baseMintKeypairFilepath) {
     baseMint = await safeParseKeypairFromFile(config.dbcPool.baseMintKeypairFilepath);
   } else {

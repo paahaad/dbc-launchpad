@@ -46,6 +46,10 @@ export async function createDammV2OneSidedPool(
   }
   console.log('\n> Initializing one-sided DAMM V2 pool...');
 
+  if (!config.quoteMint) {
+    throw new Error('Quote mint is required');
+  }
+
   const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
 
   let baseTokenInfo = null;
@@ -55,6 +59,10 @@ export async function createDammV2OneSidedPool(
     new PublicKey(baseTokenMint),
     connection.commitment
   );
+
+  if (!baseMintAccountInfo) {
+    throw new Error(`Base mint account not found: ${baseTokenMint}`);
+  }
 
   const baseMint = unpackMint(baseTokenMint, baseMintAccountInfo, baseMintAccountInfo.owner);
 
@@ -238,6 +246,10 @@ export async function createDammV2BalancedPool(
   }
   console.log('\n> Initializing balanced DAMM V2 pool...');
 
+  if (!config.quoteMint) {
+    throw new Error('Quote mint is required');
+  }
+
   const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
 
   let baseTokenInfo = null;
@@ -247,6 +259,10 @@ export async function createDammV2BalancedPool(
     new PublicKey(baseTokenMint),
     connection.commitment
   );
+
+  if (!baseMintAccountInfo) {
+    throw new Error(`Base mint account not found: ${baseTokenMint}`);
+  }
 
   const baseMint = unpackMint(baseTokenMint, baseMintAccountInfo, baseMintAccountInfo.owner);
 
@@ -266,6 +282,10 @@ export async function createDammV2BalancedPool(
     new PublicKey(quoteTokenMint),
     connection.commitment
   );
+
+  if (!quoteMintAccountInfo) {
+    throw new Error(`Quote mint account not found: ${quoteTokenMint}`);
+  }
 
   const quoteMint = unpackMint(quoteTokenMint, quoteMintAccountInfo, quoteMintAccountInfo.owner);
 
@@ -340,7 +360,7 @@ export async function createDammV2BalancedPool(
     sqrtPrice: initSqrtPrice,
     sqrtMinPrice: minSqrtPrice,
     sqrtMaxPrice: maxSqrtPrice,
-    tokenAInfo: baseTokenInfo,
+    tokenAInfo: baseTokenInfo || undefined,
   });
 
   console.log(

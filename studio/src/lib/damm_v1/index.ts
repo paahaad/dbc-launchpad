@@ -52,6 +52,13 @@ export async function createDammV1Pool(
   }
   console.log('\n> Initializing Permissionless Dynamic AMM pool...');
 
+  if (!config.quoteMint) {
+    throw new Error('Quote mint is required');
+  }
+  if (!config.dammV1Config) {
+    throw new Error('DAMM V1 configuration is required');
+  }
+
   const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
   const baseMintAccount = await getMint(connection, baseMint, connection.commitment);
   const baseDecimals = baseMintAccount.decimals;
@@ -91,7 +98,7 @@ export async function createDammV1Pool(
     customizeParam,
     {
       cluster: opts?.cluster,
-      programId: opts?.programId.toString(),
+      programId: opts?.programId?.toString(),
     }
   );
   modifyComputeUnitPriceIx(initPoolTx as any, config.computeUnitPriceMicroLamports);

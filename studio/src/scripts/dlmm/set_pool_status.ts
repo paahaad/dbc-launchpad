@@ -24,6 +24,9 @@ async function main() {
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
   const wallet = new Wallet(keypair);
 
+  if (!config.setDlmmPoolStatus) {
+    throw new Error('Missing setDlmmPoolStatus in configuration');
+  }
   const poolAddress = new PublicKey(config.setDlmmPoolStatus.poolAddress);
   const enabled = config.setDlmmPoolStatus.enabled;
 

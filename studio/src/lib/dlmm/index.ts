@@ -52,8 +52,15 @@ export async function createPermissionlessDlmmPool(
   console.log(`- Using hasAlphaVault = ${hasAlphaVault}`);
   console.log(`- Using creatorPoolOnOffControl = ${creatorPoolOnOffControl}`);
 
+  if (!config.quoteMint) {
+    throw new Error('Quote mint is required');
+  }
+
   const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
   const baseMintInfo = await connection.getAccountInfo(baseMint, connection.commitment);
+  if (!baseMintInfo) {
+    throw new Error(`Base mint account not found: ${baseMint}`);
+  }
   const baseMintAccount = await getMint(
     connection,
     baseMint,
@@ -87,7 +94,7 @@ export async function createPermissionlessDlmmPool(
     config.dlmmConfig.activationType,
     hasAlphaVault,
     wallet.publicKey,
-    activationPoint,
+    activationPoint || undefined,
     creatorPoolOnOffControl,
     {
       cluster,

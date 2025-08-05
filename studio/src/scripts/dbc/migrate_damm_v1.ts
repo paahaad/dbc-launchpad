@@ -19,7 +19,13 @@ async function main() {
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
   const wallet = new Wallet(keypair);
 
+  if (!config.quoteMint) {
+    throw new Error('Missing quoteMint in configuration');
+  }
   const quoteMint = new PublicKey(config.quoteMint);
+  if (!config.baseMint) {
+    throw new Error('Missing baseMint in configuration');
+  }
   const baseMint = new PublicKey(config.baseMint);
 
   console.log(`- Using quote token mint ${quoteMint.toString()}`);

@@ -20,6 +20,9 @@ async function main() {
   const wallet = new Wallet(keypair);
 
   let baseMint: PublicKey;
+  if (!config.quoteMint) {
+    throw new Error('Missing quoteMint in configuration');
+  }
   const quoteMint = new PublicKey(config.quoteMint);
 
   if (config.createBaseToken) {

@@ -136,6 +136,9 @@ export async function createDbcPool(
   if (!config.dbcConfig) {
     throw new Error('Missing dbc configuration');
   }
+  if (!config.dbcPool) {
+    throw new Error('Missing dbc pool configuration');
+  }
 
   const configPublicKey = await createDbcConfig(config, connection, wallet, quoteMint);
 
@@ -286,6 +289,9 @@ export async function claimTradingFee(config: DbcConfig, connection: Connection,
   try {
     for (let i = 0; i < transactions.length; i++) {
       const transaction = transactions[i];
+      if (!transaction) {
+        throw new Error(`Transaction at index ${i} is undefined`);
+      }
       const txType = i === 0 && isCreator ? 'creator' : 'partner';
 
       console.log(`> Sending ${txType} trading fee claim transaction...`);
@@ -345,6 +351,10 @@ export async function swap(config: DbcConfig, connection: Connection, wallet: Wa
   } else {
     const currentSlot = await connection.getSlot();
     currentPoint = await connection.getBlockTime(currentSlot);
+  }
+
+  if (currentPoint === null) {
+    throw new Error('Failed to get current point (block time)');
   }
 
   const quote = await dbcInstance.pool.swapQuote({
@@ -427,6 +437,9 @@ export async function migrateDammV1(config: DbcConfig, connection: Connection, w
 
   const migrationFeeOption = poolConfig.migrationFeeOption;
   const dammConfigAddress = DAMM_V1_MIGRATION_FEE_ADDRESS[migrationFeeOption];
+  if (!dammConfigAddress) {
+    throw new Error(`No DAMM config address found for migration fee option: ${migrationFeeOption}`);
+  }
 
   const poolAddress = poolState.publicKey;
 
@@ -492,6 +505,9 @@ export async function migrateDammV1(config: DbcConfig, connection: Connection, w
       console.log('> Simulating migration transactions...');
       for (let i = 0; i < transactions.length; i++) {
         const transaction = transactions[i];
+        if (!transaction) {
+          throw new Error(`Transaction at index ${i} is undefined`);
+        }
         console.log(`> Simulating transaction [${i + 1}/${transactions.length}]...`);
         await runSimulateTransaction(connection, [wallet.payer], wallet.publicKey, [transaction]);
       }
@@ -500,6 +516,9 @@ export async function migrateDammV1(config: DbcConfig, connection: Connection, w
       try {
         for (let i = 0; i < transactions.length; i++) {
           const transaction = transactions[i];
+          if (!transaction) {
+            throw new Error(`Transaction at index ${i} is undefined`);
+          }
 
           console.log(`> Sending migration transaction [${i + 1}/${transactions.length}]...`);
 
@@ -698,6 +717,9 @@ export async function migrateDammV1(config: DbcConfig, connection: Connection, w
     console.log('> Simulating LP claim/lock transactions...');
     for (let i = 0; i < transactions.length; i++) {
       const transaction = transactions[i];
+      if (!transaction) {
+        throw new Error(`Transaction at index ${i} is undefined`);
+      }
       const label = transactionLabels[i] || `Transaction ${i + 1}`;
       console.log(`> Simulating ${label}...`);
       await runSimulateTransaction(connection, [wallet.payer], wallet.publicKey, [transaction]);
@@ -709,6 +731,9 @@ export async function migrateDammV1(config: DbcConfig, connection: Connection, w
   try {
     for (let i = 0; i < transactions.length; i++) {
       const transaction = transactions[i];
+      if (!transaction) {
+        throw new Error(`Transaction at index ${i} is undefined`);
+      }
       const label = transactionLabels[i] || `Transaction ${i + 1}`;
 
       console.log(`> Sending ${label}...`);
@@ -764,6 +789,9 @@ export async function migrateDammV2(config: DbcConfig, connection: Connection, w
 
   const migrationFeeOption = poolConfig.migrationFeeOption;
   const dammConfigAddress = DAMM_V2_MIGRATION_FEE_ADDRESS[migrationFeeOption];
+  if (!dammConfigAddress) {
+    throw new Error(`No DAMM config address found for migration fee option: ${migrationFeeOption}`);
+  }
 
   const poolAddress = poolState.publicKey;
 
@@ -816,6 +844,9 @@ export async function migrateDammV2(config: DbcConfig, connection: Connection, w
       console.log('> Simulating migration transactions...');
       for (let i = 0; i < transactions.length; i++) {
         const transaction = transactions[i];
+        if (!transaction) {
+          throw new Error(`Transaction at index ${i} is undefined`);
+        }
         console.log(`> Simulating transaction [${i + 1}/${transactions.length}]...`);
         await runSimulateTransaction(connection, [wallet.payer], wallet.publicKey, [transaction]);
       }
@@ -824,6 +855,9 @@ export async function migrateDammV2(config: DbcConfig, connection: Connection, w
       try {
         for (let i = 0; i < transactions.length; i++) {
           const transaction = transactions[i];
+          if (!transaction) {
+            throw new Error(`Transaction at index ${i} is undefined`);
+          }
 
           console.log(`> Sending migration transaction [${i + 1}/${transactions.length}]...`);
 

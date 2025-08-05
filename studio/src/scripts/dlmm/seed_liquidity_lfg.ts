@@ -25,9 +25,15 @@ async function main() {
   }
   const baseMint = new PublicKey(config.baseMint);
   const baseMintAccount = await connection.getAccountInfo(baseMint, connection.commitment);
+  if (!baseMintAccount) {
+    throw new Error(`Base mint account not found: ${baseMint}`);
+  }
   const baseMintState = unpackMint(baseMint, baseMintAccount, baseMintAccount.owner);
   const baseDecimals = baseMintState.decimals;
 
+  if (!config.quoteMint) {
+    throw new Error('Missing quoteMint in configuration');
+  }
   const quoteMint = new PublicKey(config.quoteMint);
 
   console.log(`- Using base token mint ${baseMint.toString()}`);

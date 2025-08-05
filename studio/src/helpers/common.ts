@@ -1,30 +1,9 @@
-import { SOL_TOKEN_DECIMALS, SOL_TOKEN_MINT, USDC_TOKEN_MINT } from '../utils/constants';
+import { SOL_TOKEN_DECIMALS } from '../utils/constants';
 import Decimal from 'decimal.js';
 import BN from 'bn.js';
 import { Signer, PublicKey, Connection } from '@solana/web3.js';
 import { getMint } from '@solana/spl-token';
 import { AllocationByAmount, LockLiquidityAllocation } from '../utils/types';
-
-export function getQuoteMint(quoteSymbol?: string, quoteMint?: string): PublicKey {
-  if (quoteSymbol == null && quoteMint == null) {
-    throw new Error(`Either quoteSymbol or quoteMint must be provided`);
-  }
-  if (quoteSymbol && quoteMint) {
-    throw new Error(`Cannot provide quoteSymbol and quoteMint at the same time`);
-  }
-
-  if (quoteMint) {
-    return new PublicKey(quoteMint);
-  }
-
-  if (quoteSymbol.toLowerCase() == 'sol') {
-    return new PublicKey(SOL_TOKEN_MINT);
-  } else if (quoteSymbol.toLowerCase() == 'usdc') {
-    return new PublicKey(USDC_TOKEN_MINT);
-  } else {
-    throw new Error(`Unsupported quote symbol: ${quoteSymbol}`);
-  }
-}
 
 export function getAmountInLamports(amount: number | string, decimals: number): BN {
   const amountD = new Decimal(amount);
@@ -47,6 +26,9 @@ export async function getQuoteDecimals(
 ): Promise<number> {
   if (quoteMint) {
     const quoteMintInfo = await connection.getAccountInfo(new PublicKey(quoteMint));
+    if (!quoteMintInfo) {
+      throw new Error(`Quote mint account not found: ${quoteMint}`);
+    }
     const mintAccount = await getMint(
       connection,
       new PublicKey(quoteMint),
@@ -77,19 +59,27 @@ export function fromAllocationsToAmount(
   const amounts: AllocationByAmount[] = [];
   let sum = new BN(0);
   for (let i = 0; i < allocations.length - 1; i++) {
-    const amount = lpAmount.mul(new BN(allocations[i].percentage)).div(new BN(sumPercentage));
+    const allocation = allocations[i];
+    if (!allocation) {
+      throw new Error(`Allocation at index ${i} is undefined`);
+    }
+    const amount = lpAmount.mul(new BN(allocation.percentage)).div(new BN(sumPercentage));
     sum = sum.add(amount);
     amounts.push({
-      address: new PublicKey(allocations[i].address),
+      address: new PublicKey(allocation.address),
       amount,
-      percentage: allocations[i].percentage,
+      percentage: allocation.percentage,
     });
   }
   // the last wallet get remaining amount
+  const lastAllocation = allocations[allocations.length - 1];
+  if (!lastAllocation) {
+    throw new Error(`Last allocation is undefined`);
+  }
   amounts.push({
-    address: new PublicKey(allocations[allocations.length - 1].address),
+    address: new PublicKey(lastAllocation.address),
     amount: lpAmount.sub(sum),
-    percentage: allocations[allocations.length - 1].percentage,
+    percentage: lastAllocation.percentage,
   });
   return amounts;
 }

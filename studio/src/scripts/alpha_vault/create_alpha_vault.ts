@@ -50,6 +50,9 @@ async function main() {
     throw new Error('Missing baseMint in configuration');
   }
   const baseMint = new PublicKey(config.baseMint);
+  if (!config.quoteMint) {
+    throw new Error('Missing quoteMint in configuration');
+  }
   const quoteMint = new PublicKey(config.quoteMint);
   const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
 
