@@ -151,7 +151,11 @@ the placeholders with your actual values.
 
 4. Run the studio scripts.
 
+---
+
 #### DLMM Scripts
+
+---
 
 **Create a Customizable Permissionless DLMM Pool**
 
@@ -177,7 +181,11 @@ pnpm studio dlmm-seed-liquidity-single-bin --config ./studio/config/dlmm_config.
 pnpm studio dlmm-set-pool-status --config ./studio/config/dlmm_config.jsonc
 ```
 
+---
+
 #### DAMM v2 Scripts
+
+---
 
 **Create a Balanced Constant Product Pool**
 
@@ -191,7 +199,11 @@ pnpm studio damm-v2-create-balanced-pool --config ./studio/config/damm_v2_config
 pnpm studio damm-v2-create-one-sided-pool --config ./studio/config/damm_v2_config.jsonc
 ```
 
+---
+
 #### DAMM v1 Scripts
+
+---
 
 **Create a Constant Product Pool**
 
@@ -217,7 +229,11 @@ pnpm studio damm-v1-create-stake2earn-farm --config ./studio/config/damm_v1_conf
 pnpm studio damm-v1-lock-liquidity-stake2earn --config ./studio/config/damm_v1_config.jsonc
 ```
 
+---
+
 #### DBC Scripts
+
+---
 
 **Create a DBC Config**
 
