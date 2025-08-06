@@ -109,7 +109,7 @@
     "startVestingPoint": 1746808201, // When token vesting begins and users can start claiming their vested tokens depending on pool's activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
     "endVestingPoint": 1746808201, // When token vesting ends and all tokens become fully claimable depending on pool's activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
     "escrowFee": 0, // Fee amount (in quote token) charged when creating a stake escrow account
-    "whitelistMode": "permissionless", // Whitelist mode: permissionless | permission_with_merkle_proof | permission_with_authority
+    "whitelistMode": "permissionless" // Whitelist mode: permissionless | permission_with_merkle_proof | permission_with_authority
 
     /* Optional Configuration: whitelistFilePath
      * Only use when whitelistMode is permission_with_merkle_proof or permission_with_authority
