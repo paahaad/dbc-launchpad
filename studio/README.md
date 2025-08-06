@@ -8,10 +8,10 @@ liquidity layer on Solana.
 
 Studio consists of 4 main pool types, each with dedicated scripts and configurations:
 
-- **DBC** (Dynamic Bonding Curve) - Permissionless launch pool protocol
-- **DAMM V1** (Dynamic AMM V1) - Constant product AMM with lending integration
-- **DAMM V2** (Dynamic AMM V2) - Enhanced constant product AMM with advanced features
 - **DLMM** (Dynamic Liquidity Market Maker) - Dynamic fees and precise liquidity concentration
+- **DAMM V2** (Dynamic AMM V2) - Enhanced constant product AMM with advanced features
+- **DAMM V1** (Dynamic AMM V1) - Constant product AMM with lending integration
+- **DBC** (Dynamic Bonding Curve) - Permissionless launch pool protocol
 
 ## 🚀 Getting Started
 
