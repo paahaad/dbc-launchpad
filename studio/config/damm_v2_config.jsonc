@@ -25,8 +25,8 @@
    */
   // "baseMint": "YOUR_BASE_MINT_ADDRESS",
   "createBaseToken": {
-      "mintBaseTokenAmount": 1000000000, // total amount of base token to be minted
-      "baseDecimals": 6 // decimals of the base token
+    "mintBaseTokenAmount": 1000000000, // total amount of base token to be minted
+    "baseDecimals": 6 // decimals of the base token
   },
 
   /* dammV2Config is only used in the following actions:
