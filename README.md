@@ -5,7 +5,8 @@ A toolkit consisting of everything you need to invent innovative token launches 
 ---
 
 ### Meet Metsumi, Your Token Launch Assistant 👉🏼😚👈🏼
-*Your intelligent companion for seamless token launches*
+
+_Your intelligent companion for seamless token launches_
 
 ![Metsumi](/assets/mascot/metsumi-banner.png)
 
@@ -70,7 +71,7 @@ meteora-invent/
     │   │   │   ├── create_stake2earn_farm.ts
     │   │   │   ├── lock_liquidity_stake2earn.ts
     │   │   │   └── lock_liquidity.ts
-    │   │   ├── damm-v2
+    │   │   ├── damm_v2
     │   │   │   ├── create_balanced_pool.ts
     │   │   │   └── create_one_sided_pool.ts
     │   │   ├── dbc
@@ -156,6 +157,13 @@ pnpm studio generate-keypair
 the placeholders with your actual values.
 
 4. Run the studio scripts.
+
+_Optional: You can also run the studio scripts on localnet - http://localhost:8899 with the
+following command_
+
+```bash
+pnpm studio start-test-validator
+```
 
 ---
 

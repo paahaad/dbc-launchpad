@@ -23,11 +23,11 @@
    * 1. damm-v2-create-balanced-pool
    * 2. damm-v2-create-one-sided-pool
    */
-  "baseMint": "YOUR_BASE_MINT_ADDRESS",
-  // "createBaseToken": {
-  //     "mintBaseTokenAmount": 1000000000, // total amount of base token to be minted
-  //     "baseDecimals": 6 // decimals of the base token
-  // },
+  // "baseMint": "YOUR_BASE_MINT_ADDRESS",
+  "createBaseToken": {
+      "mintBaseTokenAmount": 1000000000, // total amount of base token to be minted
+      "baseDecimals": 6 // decimals of the base token
+  },
 
   /* dammV2Config is only used in the following actions:
    * 1. damm-v2-create-balanced-pool
@@ -35,9 +35,9 @@
    */
   "dammV2Config": {
     "creator": "YOUR_WALLET_ADDRESS", // creator address
-    "baseAmount": 1000, // base token amount
+    "baseAmount": 10000000, // base token amount
     "quoteAmount": null, // quote token amount
-    "initPrice": 10, // initial price (in terms of quote/base price)
+    "initPrice": 0.0001, // initial price (in terms of quote/base price)
     "maxPrice": null, // max price (in terms of quote/base price)
     "poolFees": {
       "maxBaseFeeBps": 400, // max base fee (in basis points)
@@ -60,7 +60,7 @@
         "maxVolatilityAccumulator": 239 // Maximum allowed volatility accumulator value (caps dynamic fee calculation)
       }
     },
-    "collectFeeMode": 0, // 0 - Both Token | 1 - Token B Only
+    "collectFeeMode": 1, // 0 - Both Token | 1 - Token B Only
     "activationType": 1, // 0 - Slot | 1 - Timestamp
     "activationPoint": null, // Activation time of the pool depending on activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
     "hasAlphaVault": false // If true, the alpha vault will be created after the pool is created
@@ -72,7 +72,7 @@
    * There are 2 types of alpha vault: First Come First Serve (FCFS) and Prorata.
    */
   "alphaVault": {
-    "poolType": "dammv2", // DLMM = dlmm | DAMM v1 = dammv1 | DAMM v2 = dammv2
+    "poolType": "damm2", // DLMM = dlmm | DAMM v1 = dynamic | DAMM v2 = damm2
     "alphaVaultType": "fcfs", // FCFS = fcfs | Prorata = prorata
 
     /* Only use the following parameters for alphaVaultType: fcfs

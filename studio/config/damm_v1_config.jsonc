@@ -73,7 +73,7 @@
    * There are 2 types of alpha vault: First Come First Serve (FCFS) and Prorata.
    */
   "alphaVault": {
-    "poolType": "dammv1", // DLMM = dlmm | DAMM v1 = dammv1 | DAMM v2 = dammv2
+    "poolType": "dynamic", // DLMM = dlmm | DAMM v1 = dynamic | DAMM v2 = damm2
     "alphaVaultType": "fcfs", // FCFS = fcfs | Prorata = prorata
 
     /* Only use the following parameters for alphaVaultType: fcfs

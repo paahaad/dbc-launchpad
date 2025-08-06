@@ -460,7 +460,7 @@ studio/
 │   ├── scripts/              # Executable scripts
 │   │   ├── dbc/             # DBC protocol scripts
 │   │   ├── damm_v1/         # DAMM V1 scripts
-│   │   ├── damm-v2/         # DAMM V2 scripts
+│   │   ├── damm_v2/         # DAMM V2 scripts
 │   │   ├── dlmm/            # DLMM scripts
 │   │   ├── alpha_vault/     # Alpha vault scripts
 │   │   └── settings/        # Utility scripts
