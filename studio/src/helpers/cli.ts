@@ -30,8 +30,17 @@ export async function parseConfigFromCli(): Promise<MeteoraConfig> {
 
   // If the path is relative, resolve it appropriately based on where we're running from
   if (!path.isAbsolute(configFilePath)) {
-    // Always resolve relative to the current working directory first
-    configFilePath = path.resolve(process.cwd(), configFilePath);
+    const workspaceMarker = path.join(process.cwd(), '../pnpm-workspace.yaml');
+    if (fs.existsSync(workspaceMarker)) {
+      // If the path starts with './studio/', strip that prefix since we're already in studio
+      if (configFilePath.startsWith('./studio/')) {
+        configFilePath = configFilePath.replace('./studio/', './');
+      }
+      configFilePath = path.resolve(process.cwd(), configFilePath);
+    } else {
+      // We're likely in the workspace root, resolve relative to current directory
+      configFilePath = path.resolve(process.cwd(), configFilePath);
+    }
   }
 
   console.log(`> Using config file: ${configFilePath}`);
