@@ -4,6 +4,7 @@ import { safeParseJsonFromFile } from './utils';
 import { validateConfig } from './validation';
 import { parse } from 'csv-parse';
 import fs from 'fs';
+import path from 'path';
 
 export function parseCliArguments(): CliArguments {
   const { values } = parseArgs({
@@ -25,7 +26,14 @@ export async function parseConfigFromCli(): Promise<MeteoraConfig> {
   if (!cliArguments.config) {
     throw new Error('Please provide a config file path to --config flag');
   }
-  const configFilePath = cliArguments.config!;
+  let configFilePath = cliArguments.config!;
+
+  // If the path is relative, resolve it appropriately based on where we're running from
+  if (!path.isAbsolute(configFilePath)) {
+    // Always resolve relative to the current working directory first
+    configFilePath = path.resolve(process.cwd(), configFilePath);
+  }
+
   console.log(`> Using config file: ${configFilePath}`);
 
   const config: MeteoraConfig = await safeParseJsonFromFile(configFilePath);
