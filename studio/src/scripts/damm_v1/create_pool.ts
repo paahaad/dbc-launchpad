@@ -65,7 +65,7 @@ async function main() {
   if (config) {
     await createDammV1Pool(config, connection, wallet, baseMint, quoteMint);
 
-    if (config.dammV1Config.hasAlphaVault && config.alphaVault) {
+    if (config.dammV1Config?.hasAlphaVault && config.alphaVault) {
       console.log('\n> Alpha vault is enabled, creating alpha vault automatically...');
 
       const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
