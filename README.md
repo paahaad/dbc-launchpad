@@ -111,6 +111,12 @@ meteora-invent/
 
 ## 🚀 Getting Started
 
+### Clone the repository
+
+```bash
+git clone https://github.com/MeteoraAg/meteora-invent.git
+```
+
 ### Prerequisites
 
 - Node.js >= 18.0.0
