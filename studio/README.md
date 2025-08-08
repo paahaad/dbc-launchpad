@@ -63,25 +63,25 @@ the placeholders with your actual values.
 **Create a Customizable Permissionless DLMM Pool**
 
 ```bash
-pnpm studio dlmm-create-pool --config ./studio/config/dlmm_config.jsonc
+pnpm dlmm-create-pool --config ./config/dlmm_config.jsonc
 ```
 
 **Seed Liquidity (LFG)**
 
 ```bash
-pnpm studio dlmm-seed-liquidity-lfg --config ./studio/config/dlmm_config.jsonc
+pnpm dlmm-seed-liquidity-lfg --config ./config/dlmm_config.jsonc
 ```
 
 **Seed Liquidity (Single Bin)**
 
 ```bash
-pnpm studio dlmm-seed-liquidity-single-bin --config ./studio/config/dlmm_config.jsonc
+pnpm dlmm-seed-liquidity-single-bin --config ./config/dlmm_config.jsonc
 ```
 
 **Set DLMM Pool Status**
 
 ```bash
-pnpm studio dlmm-set-pool-status --config ./studio/config/dlmm_config.jsonc
+pnpm dlmm-set-pool-status --config ./config/dlmm_config.jsonc
 ```
 
 ### DAMM v2 Scripts
@@ -89,13 +89,13 @@ pnpm studio dlmm-set-pool-status --config ./studio/config/dlmm_config.jsonc
 **Create a Balanced Constant Product Pool**
 
 ```bash
-pnpm studio damm-v2-create-balanced-pool --config ./studio/config/damm_v2_config.jsonc
+pnpm damm-v2-create-balanced-pool --config ./config/damm_v2_config.jsonc
 ```
 
 **Create a One-Sided Pool**
 
 ```bash
-pnpm studio damm-v2-create-one-sided-pool --config ./studio/config/damm_v2_config.jsonc
+pnpm damm-v2-create-one-sided-pool --config ./config/damm_v2_config.jsonc
 ```
 
 ### DAMM v1 Scripts
@@ -103,25 +103,25 @@ pnpm studio damm-v2-create-one-sided-pool --config ./studio/config/damm_v2_confi
 **Create a Constant Product Pool**
 
 ```bash
-pnpm studio damm-v1-create-pool --config ./studio/config/damm_v1_config.jsonc
+pnpm damm-v1-create-pool --config ./config/damm_v1_config.jsonc
 ```
 
 **Lock Liquidity**
 
 ```bash
-pnpm studio damm-v1-lock-liquidity --config ./studio/config/damm_v1_config.jsonc
+pnpm damm-v1-lock-liquidity --config ./config/damm_v1_config.jsonc
 ```
 
 **Create a Stake2Earn Farm**
 
 ```bash
-pnpm studio damm-v1-create-stake2earn-farm --config ./studio/config/damm_v1_config.jsonc
+pnpm damm-v1-create-stake2earn-farm --config ./config/damm_v1_config.jsonc
 ```
 
 **Lock Liquidity (Stake2Earn)**
 
 ```bash
-pnpm studio damm-v1-lock-liquidity-stake2earn --config ./studio/config/damm_v1_config.jsonc
+pnpm damm-v1-lock-liquidity-stake2earn --config ./config/damm_v1_config.jsonc
 ```
 
 ### DBC Scripts
@@ -129,37 +129,37 @@ pnpm studio damm-v1-lock-liquidity-stake2earn --config ./studio/config/damm_v1_c
 **Create a DBC Config**
 
 ```bash
-pnpm studio dbc-create-config --config ./studio/config/dbc_config.jsonc
+pnpm dbc-create-config --config ./config/dbc_config.jsonc
 ```
 
 **Create a DBC Pool**
 
 ```bash
-pnpm studio dbc-create-pool --config ./studio/config/dbc_config.jsonc
+pnpm dbc-create-pool --config ./config/dbc_config.jsonc
 ```
 
 **Claim Trading Fees**
 
 ```bash
-pnpm studio dbc-claim-trading-fee --config ./studio/config/dbc_config.jsonc
+pnpm dbc-claim-trading-fee --config ./config/dbc_config.jsonc
 ```
 
 **Migrate to DAMM v1**
 
 ```bash
-pnpm studio dbc-migrate-to-damm-v1 --config ./studio/config/dbc_config.jsonc
+pnpm dbc-migrate-to-damm-v1 --config ./config/dbc_config.jsonc
 ```
 
 **Migrate to DAMM v2**
 
 ```bash
-pnpm studio dbc-migrate-to-damm-v2 --config ./studio/config/dbc_config.jsonc
+pnpm dbc-migrate-to-damm-v2 --config ./config/dbc_config.jsonc
 ```
 
 **Swap (Buy/Sell)**
 
 ```bash
-pnpm studio dbc-swap --config ./studio/config/dbc_config.jsonc
+pnpm dbc-swap --config ./config/dbc_config.jsonc
 ```
 
 ## 📖 Program Details
