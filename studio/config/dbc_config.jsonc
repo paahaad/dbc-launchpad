@@ -123,6 +123,7 @@
    * 1. dbc-create-pool
    */
   "dbcPool": {
+    // "baseMintKeypairFilepath": "./baseMintKeypair.json", // optional base mint keypair file path
     "name": "DBC Pool", // token name
     "symbol": "DBC", // token symbol
     "uri": "https://example.com" // metaplex token metadata format for the token - https://developers.metaplex.com/core/json-schema
