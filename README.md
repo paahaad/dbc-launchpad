@@ -2,16 +2,6 @@
 
 A toolkit consisting of everything you need to invent innovative token launches on Meteora.
 
----
-
-### Meet Metsumi, Your Token Launch Assistant 👉🏼😚👈🏼
-
-_Your intelligent companion for seamless token launches_
-
-![Metsumi](/assets/mascot/metsumi-banner.png)
-
----
-
 ## 🏗️ Structure
 
 ```
