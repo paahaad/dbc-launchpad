@@ -1,9 +1,25 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import { Wallet } from '@coral-xyz/anchor';
-import { DammV2Config } from '../../utils/types';
+import {
+  AlphaVaultTypeConfig,
+  DammV2Config,
+  FcfsAlphaVaultConfig,
+  ProrataAlphaVaultConfig,
+} from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
-import { createTokenMint, parseConfigFromCli, safeParseKeypairFromFile } from '../../helpers';
+import {
+  createTokenMint,
+  getQuoteDecimals,
+  parseConfigFromCli,
+  safeParseKeypairFromFile,
+} from '../../helpers';
 import { createDammV2OneSidedPool } from '../../lib/damm_v2';
+import {
+  createFcfsAlphaVault,
+  createProrataAlphaVault,
+  toAlphaVaulSdkPoolType,
+} from '../../lib/alpha_vault';
+import { deriveCustomizablePoolAddress } from '@meteora-ag/cp-amm-sdk';
 
 async function main() {
   const config: DammV2Config = (await parseConfigFromCli()) as DammV2Config;
@@ -45,6 +61,47 @@ async function main() {
   /// --------------------------------------------------------------------------
   if (config.dammV2Config) {
     await createDammV2OneSidedPool(config, connection, wallet, baseMint, quoteMint);
+
+    if (config.dammV2Config.hasAlphaVault && config.alphaVault) {
+      console.log('\n> Alpha vault is enabled, creating alpha vault automatically...');
+
+      const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
+      const poolType = toAlphaVaulSdkPoolType(config.alphaVault.poolType);
+
+      const poolAddress = deriveCustomizablePoolAddress(baseMint, quoteMint);
+
+      if (config.alphaVault.alphaVaultType === AlphaVaultTypeConfig.Fcfs) {
+        await createFcfsAlphaVault(
+          connection,
+          wallet,
+          poolType,
+          poolAddress,
+          baseMint,
+          quoteMint,
+          quoteDecimals,
+          config.alphaVault as FcfsAlphaVaultConfig,
+          config.dryRun,
+          config.computeUnitPriceMicroLamports
+        );
+      } else if (config.alphaVault.alphaVaultType === AlphaVaultTypeConfig.Prorata) {
+        await createProrataAlphaVault(
+          connection,
+          wallet,
+          poolType,
+          poolAddress,
+          baseMint,
+          quoteMint,
+          quoteDecimals,
+          config.alphaVault as ProrataAlphaVaultConfig,
+          config.dryRun,
+          config.computeUnitPriceMicroLamports
+        );
+      } else {
+        throw new Error(`Unsupported alpha vault type: ${config.alphaVault.alphaVaultType}`);
+      }
+
+      console.log('\n>>> DAMM V2 pool and alpha vault created successfully! 🎉');
+    }
   } else {
     throw new Error('Must provide Dynamic V2 configuration');
   }

@@ -100,7 +100,7 @@ async function main() {
         throw new Error(`Unsupported alpha vault type: ${config.alphaVault.alphaVaultType}`);
       }
 
-      console.log('\n>>> DLMM pool and alpha vault created successfully! 🎉');
+      console.log('\n>>> DAMM V2 pool and alpha vault created successfully! 🎉');
     }
   } else {
     throw new Error('Must provide Dynamic V2 configuration');
