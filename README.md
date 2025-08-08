@@ -104,7 +104,7 @@ meteora-invent/
 ### Prerequisites
 
 - Node.js >= 18.0.0
-- pnpm >= 9.0.0
+- pnpm >= 10.0.0
 
 ### Clone the repository
 
