@@ -86,7 +86,6 @@ async function main() {
 
   console.log(`\n> Pool address: ${poolKey}, pool type ${poolType}`);
 
-  // create permissioned alpha vault with authority
   if (config.alphaVault.whitelistMode == WhitelistModeConfig.PermissionedWithAuthority) {
     if (!config.alphaVault.whitelistFilepath) {
       throw new Error('Missing whitelist filepath in configuration');

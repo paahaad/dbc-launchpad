@@ -276,6 +276,7 @@ export type DbcSwap = {
 /* Alpha Vault */
 
 export type AlphaVaultConfig = MeteoraConfigBase & {
+  createBaseToken: CreateBaseMintConfig | null;
   alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
 };
 

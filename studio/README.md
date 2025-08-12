@@ -162,6 +162,14 @@ pnpm dbc-migrate-to-damm-v2 --config ./config/dbc_config.jsonc
 pnpm dbc-swap --config ./config/dbc_config.jsonc
 ```
 
+### Alpha Vault Scripts
+
+**Create an Alpha Vault**
+
+```bash
+pnpm alpha-vault-create --config ./config/alpha_vault_config.jsonc
+```
+
 ## 📖 Program Details
 
 ### Dynamic Bonding Curve (DBC)
@@ -190,6 +198,13 @@ Vaults. DAMM v2 is a new program, and not an upgrade of the Dynamic AMM v1 progr
 DLMM (Dynamic Liquidity Market Maker) gives LPs access to dynamic fees to capitalize on volatility,
 and precise liquidity concentration all in real-time, with the flexibility to select their preferred
 volatility strategy.
+
+### Alpha Vault
+
+Alpha Vault is a complementary anti-bot mechanism used together with a Launch Pool that provides
+early access for genuine supporters to deposit and purchase tokens before the pool starts trading,
+thereby getting tokens at the earliest price and helping to safeguard the token launch against
+sniper bots.
 
 ## 🤝 Contributing
 
