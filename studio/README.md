@@ -37,21 +37,34 @@ pnpm install
 cp studio/.env.example studio/.env
 ```
 
-Add your private key and RPC URL to the `.env` file. RPC is optional but highly encouraged. Visit
-[Helius](https://www.helius.dev/) to get an RPC URL.
+Add your private key and RPC URL to the `.env` file.
 
-2. Generate a keypair from your private key:
+2. Optional: Start a Local Test Validator
+
+_You can also run the studio scripts on localnet - http://localhost:8899 with the following command_
 
 ```bash
-pnpm studio generate-keypair
+pnpm studio start-test-validator
 ```
 
-3. Configure the config files in the `studio/config` directory:
+3. Generate a keypair from your private key:
+
+```bash
+# For devnet (airdrops 5 SOL)
+pnpm generate-keypair --network devnet
+
+# For localnet (airdrops 5 SOL)
+# Ensure that you have already started the local validator with pnpm start-test-validator
+pnpm generate-keypair --network localnet
+```
+
+4. Configure the config files in the `studio/config` directory:
 
 - [DLMM Config](./config/dlmm_config.jsonc)
 - [DAMM v2 Config](./config/damm_v2_config.jsonc)
 - [DAMM v1 Config](./config/damm_v1_config.jsonc)
 - [DBC Config](./config/dbc_config.jsonc)
+- [Alpha Vault Config](./config/alpha_vault_config.jsonc)
 
 **Note:** You can use the provided example configurations as a starting point. Make sure to replace
 the placeholders with your actual values.

@@ -2,6 +2,16 @@
 
 A toolkit consisting of everything you need to invent innovative token launches on Meteora.
 
+## 📋 Table of Contents
+
+- [🏗️ Structure](#%EF%B8%8F-structure)
+- [🚀 Getting Started](#-getting-started)
+- [📦 Workspaces](#-workspaces)
+  - [Studio](#studio-meteora-inventstudio)
+  - [Scaffolds](#scaffolds)
+- [🤝 Contributing](#-contributing)
+- [📄 License](#-license)
+
 ## 🏗️ Structure
 
 ```
@@ -124,7 +134,11 @@ pnpm install
 
 ## 📦 Workspaces
 
-### Studio (`@meteora-invent/studio`)
+---
+
+### Studio
+
+---
 
 The studio workspace contains all the scripts for interacting with Meteora's programs.
 
@@ -136,13 +150,26 @@ The studio workspace contains all the scripts for interacting with Meteora's pro
 cp studio/.env.example studio/.env
 ```
 
-2. Generate a keypair from your private key to launch pools.
+2. Optional: Start a Local Test Validator
+
+_You can also run the studio scripts on localnet - http://localhost:8899 with the following command_
 
 ```bash
-pnpm studio generate-keypair
+pnpm studio start-test-validator
 ```
 
-3. Configure the config files in the `studio/config` directory.
+3. Generate a keypair from your private key:
+
+```bash
+# For devnet (airdrops 5 SOL)
+pnpm studio generate-keypair --network devnet
+
+# For localnet (airdrops 5 SOL)
+# Ensure that you have already started the local validator with pnpm start-test-validator
+pnpm studio generate-keypair --network localnet
+```
+
+4. Configure the config files in the `studio/config` directory.
 
 - Configure [DLMM](./studio/config/dlmm_config.jsonc)
 - Configure [DAMM v2](./studio/config/damm_v2_config.jsonc)
@@ -153,20 +180,9 @@ pnpm studio generate-keypair
 **Note:** You can use the provided example configurations as a starting point. Make sure to replace
 the placeholders with your actual values.
 
-4. Run the studio scripts.
-
-_Optional: You can also run the studio scripts on localnet - http://localhost:8899 with the
-following command_
-
-```bash
-pnpm studio start-test-validator
-```
-
 ---
 
 #### DLMM Scripts
-
----
 
 **Create a Customizable Permissionless DLMM Pool**
 
@@ -196,8 +212,6 @@ pnpm studio dlmm-set-pool-status --config ./studio/config/dlmm_config.jsonc
 
 #### DAMM v2 Scripts
 
----
-
 **Create a Balanced Constant Product Pool**
 
 ```bash
@@ -213,8 +227,6 @@ pnpm studio damm-v2-create-one-sided-pool --config ./studio/config/damm_v2_confi
 ---
 
 #### DAMM v1 Scripts
-
----
 
 **Create a Constant Product Pool**
 
@@ -243,8 +255,6 @@ pnpm studio damm-v1-lock-liquidity-stake2earn --config ./studio/config/damm_v1_c
 ---
 
 #### DBC Scripts
-
----
 
 **Create a DBC Config**
 
@@ -286,8 +296,6 @@ pnpm studio dbc-swap --config ./studio/config/dbc_config.jsonc
 
 #### Alpha Vault Scripts
 
----
-
 **Create an Alpha Vault**
 
 ```bash
@@ -297,6 +305,8 @@ pnpm studio alpha-vault-create --config ./studio/config/alpha_vault_config.jsonc
 ---
 
 ### Scaffolds
+
+---
 
 #### Fun Launch (`@meteora-invent/scaffold-fun-launch`)
 

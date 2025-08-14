@@ -1,10 +1,45 @@
-import { CliArguments, MeteoraConfig } from '../utils/types';
+import { CliArguments, MeteoraConfig, NetworkConfig } from '../utils/types';
 import { parseArgs } from 'util';
 import { safeParseJsonFromFile } from './utils';
 import { validateConfig } from './validation';
 import { parse } from 'csv-parse';
 import fs from 'fs';
 import path from 'path';
+
+export function parseNetworkFlag(): string | undefined {
+  const { values } = parseArgs({
+    args: process.argv,
+    options: {
+      network: {
+        type: 'string',
+        short: 'n',
+      },
+    },
+    strict: true,
+    allowPositionals: true,
+  });
+
+  return values.network;
+}
+
+export function getNetworkConfig(network: string): NetworkConfig {
+  switch (network.toLowerCase()) {
+    case 'devnet':
+      return {
+        rpcUrl: 'https://api.devnet.solana.com',
+        shouldAirdrop: true,
+        airdropAmount: 5,
+      };
+    case 'localnet':
+      return {
+        rpcUrl: 'http://localhost:8899',
+        shouldAirdrop: true,
+        airdropAmount: 5,
+      };
+    default:
+      throw new Error('Invalid network. Please use --network devnet or --network localnet');
+  }
+}
 
 export function parseCliArguments(): CliArguments {
   const { values } = parseArgs({

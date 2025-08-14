@@ -36,6 +36,12 @@ export type AllocationByAmount = {
   percentage: number;
 };
 
+export interface NetworkConfig {
+  rpcUrl: string;
+  shouldAirdrop: boolean;
+  airdropAmount: number;
+}
+
 /* DAMM v1 */
 
 export type DammV1Config = MeteoraConfigBase & {

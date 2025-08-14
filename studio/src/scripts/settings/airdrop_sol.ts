@@ -1,5 +1,4 @@
 import { Keypair, Connection } from '@solana/web3.js';
-import bs58 from 'bs58';
 import { config } from 'dotenv';
 import fs from 'fs';
 import path from 'path';
@@ -20,28 +19,24 @@ async function main() {
     console.log(`\nUsing network: ${network.toUpperCase()}`);
     console.log(`RPC URL: ${networkConfig.rpcUrl}`);
 
-    const privateKeyString = process.env.PRIVATE_KEY;
+    // Load keypair from file
+    const keypairPath = path.join(__dirname, '../../../keypair.json');
 
-    if (!privateKeyString) {
-      throw new Error('PRIVATE_KEY is not defined in the .env file');
+    if (!fs.existsSync(keypairPath)) {
+      throw new Error(
+        `Keypair file not found at ${keypairPath}. Please run generate-keypair first.`
+      );
     }
 
-    const secretKey = bs58.decode(privateKeyString);
-
-    const keypair = Keypair.fromSecretKey(secretKey);
+    const keypairData = fs.readFileSync(keypairPath, 'utf8');
+    const secretKeyArray = JSON.parse(keypairData);
+    const keypair = Keypair.fromSecretKey(new Uint8Array(secretKeyArray));
 
     console.log('Public Key:', keypair.publicKey.toString());
 
-    const keypairArray = Array.from(keypair.secretKey);
-
-    const outputPath = path.join(__dirname, '../../../keypair.json');
-    fs.writeFileSync(outputPath, JSON.stringify(keypairArray, null, 4));
-
-    console.log(`Keypair saved to: ${outputPath}`);
-
     if (networkConfig.shouldAirdrop) {
       console.log(
-        `\n💰 Attempting to airdrop ${networkConfig.airdropAmount} SOL on ${network.toUpperCase()}...`
+        `\nAttempting to airdrop ${networkConfig.airdropAmount} SOL on ${network.toUpperCase()}...`
       );
       const connection = new Connection(networkConfig.rpcUrl, 'confirmed');
 
@@ -51,7 +46,7 @@ async function main() {
           `Successfully airdropped ${networkConfig.airdropAmount} SOL on ${network.toUpperCase()}!`
         );
       } catch (airdropError) {
-        console.warn(`Airdrop failed: ${airdropError}`);
+        console.warn(`⚠️  Airdrop failed: ${airdropError}`);
         if (network === 'localnet') {
           console.log(
             'Make sure you have a local Solana validator running with: npm run start-test-validator'
@@ -60,11 +55,13 @@ async function main() {
           console.log('This might be due to network congestion or RPC endpoint issues.');
         }
       }
+    } else {
+      console.log(`🚫 Airdrop not enabled for ${network.toUpperCase()}`);
     }
 
     return keypair;
   } catch (error) {
-    console.error('Error generating keypair:', error);
+    console.error('Error airdropping SOL:', error);
     throw error;
   }
 }
