@@ -1,8 +1,7 @@
 # Meteora Studio
 
 A collection of scripts for interacting with Meteora's programs to innovate and create token
-launches. Part of the **Meteora Invent** toolkit - the most secure, sustainable and composable
-liquidity layer on Solana.
+launches. Part of the **Meteora Invent** toolkit.
 
 ## 🏗️ Structure
 
@@ -12,6 +11,10 @@ Studio consists of 4 main pool types, each with dedicated scripts and configurat
 - **DAMM V2** (Dynamic AMM V2) - Enhanced constant product AMM with advanced features
 - **DAMM V1** (Dynamic AMM V1) - Constant product AMM with lending integration
 - **DBC** (Dynamic Bonding Curve) - Permissionless launch pool protocol
+
+Studio also contains a collection of scripts for interacting with other Meteora programs:
+
+- **Alpha Vault** - A complementary anti-bot mechanism used together with a Launch Pool.
 
 ## 🚀 Getting Started
 
