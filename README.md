@@ -136,7 +136,7 @@ pnpm install
 
 ---
 
-### Studio
+### Studio (`@meteora-invent/studio`)
 
 ---
 
