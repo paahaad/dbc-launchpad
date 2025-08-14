@@ -12,68 +12,22 @@
   "computeUnitPriceMicroLamports": 100000,
 
   /* quoteMint is required for the following actions:
-   * 1. damm-v1-create-pool
-   * 2. damm-v1-lock-liquidity
+   * 1. alpha-vault-create
    * SOL: So11111111111111111111111111111111111111112 | USDC: EPjFWdd5AufqSSqeM2qN1xzybapC8G4wEGGkZwyTDt1v | any other token address
    */
   "quoteMint": "So11111111111111111111111111111111111111112",
 
-  /* Either use baseMint or createBaseToken, but not both.
-   * baseMint is required for the following actions:
-   * 1. damm-v1-create-pool
-   * 2. damm-v1-lock-liquidity
+  /* baseMint is required for the following actions:
+   * 1. alpha-vault-create
    */
   "baseMint": "YOUR_BASE_MINT_ADDRESS",
-  // "createBaseToken": {
-  //     "mintBaseTokenAmount": 1000000000, // total amount of base token to be minted
-  //     "baseDecimals": 6 // decimals of the base token
-  // },
-
-  /* dammV1Config is only used in the following actions:
-   * 1. damm-v1-create-pool
-   */
-  "dammV1Config": {
-    "baseAmount": 100, // base token amount
-    "quoteAmount": 0.001, // quote token amount
-    "tradeFeeNumerator": 2500, // pool fee in bps
-    "activationType": 1, // 0 - Slot | 1 - Timestamp
-    "activationPoint": null, // Activation time of the pool depending on activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
-    "hasAlphaVault": false // If true, the alpha vault will be created after the pool is created
-  },
-
-  /* dammV1LockLiquidity is only used in the following actions:
-   * 1. damm-v1-lock-liquidity
-   * 2. damm-v1-lock-liquidity-stake2earn
-   */
-  "dammV1LockLiquidity": {
-    "allocations": [
-      {
-        "percentage": 80, // percentage of the LP tokens that will be allocated to address 1
-        "address": "YOUR_ADDRESS_1" // address 1
-      },
-      {
-        "percentage": 20, // percentage of the LP tokens that will be allocated to address 2
-        "address": "YOUR_ADDRESS_2" // address 2
-      }
-    ]
-  },
-
-  /* stake2EarnFarm is only used in the following actions:
-   * 1. damm-v1-create-stake2earn-farm
-   */
-  "stake2EarnFarm": {
-    "topListLength": 100, // Maximum number of top stakers eligible for fee rewards (minimum 50, maximum 1000)
-    "unstakeLockDurationSecs": 25200, // 7-hour cooldown period before unstaked tokens can be withdrawn
-    "secondsToFullUnlock": 86400, // 24-hour period for locked fees to fully drip/release to stakers
-    "startFeeDistributeTimestamp": 1753441790 // Start date for fee distribution (Jan 24, 2025 17:49:50 UTC)
-  },
 
   /* alphaVault is only used in the following actions:
-   * 1. damm-v1-create-pool
+   * 1. alpha-vault-create
    * There are 2 types of alpha vault: First Come First Serve (FCFS) and Prorata.
    */
   "alphaVault": {
-    "poolType": "dynamic", // DLMM = dlmm | DAMM v1 = dynamic | DAMM v2 = damm2
+    "poolType": "dlmm", // DLMM = dlmm | DAMM v1 = dynamic | DAMM v2 = damm2
     "alphaVaultType": "fcfs", // FCFS = fcfs | Prorata = prorata
 
     /* Only use the following parameters for alphaVaultType: fcfs

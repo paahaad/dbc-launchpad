@@ -50,6 +50,7 @@ async function main() {
     throw new Error('Missing baseMint in configuration');
   }
   const baseMint = new PublicKey(config.baseMint);
+
   if (!config.quoteMint) {
     throw new Error('Missing quoteMint in configuration');
   }
@@ -85,7 +86,6 @@ async function main() {
 
   console.log(`\n> Pool address: ${poolKey}, pool type ${poolType}`);
 
-  // create permissioned alpha vault with authority
   if (config.alphaVault.whitelistMode == WhitelistModeConfig.PermissionedWithAuthority) {
     if (!config.alphaVault.whitelistFilepath) {
       throw new Error('Missing whitelist filepath in configuration');

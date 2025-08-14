@@ -148,6 +148,7 @@ pnpm studio generate-keypair
 - Configure [DAMM v2](./studio/config/damm_v2_config.jsonc)
 - Configure [DAMM v1](./studio/config/damm_v1_config.jsonc)
 - Configure [DBC](./studio/config/dbc_config.jsonc)
+- Configure [Alpha Vault](./studio/config/alpha_vault_config.jsonc)
 
 **Note:** You can use the provided example configurations as a starting point. Make sure to replace
 the placeholders with your actual values.
@@ -280,6 +281,20 @@ pnpm studio dbc-migrate-to-damm-v2 --config ./studio/config/dbc_config.jsonc
 ```bash
 pnpm studio dbc-swap --config ./studio/config/dbc_config.jsonc
 ```
+
+---
+
+#### Alpha Vault Scripts
+
+---
+
+**Create an Alpha Vault**
+
+```bash
+pnpm studio alpha-vault-create --config ./studio/config/alpha_vault_config.jsonc
+```
+
+---
 
 ### Scaffolds
 
