@@ -46,7 +46,7 @@ async function main() {
           `Successfully airdropped ${networkConfig.airdropAmount} SOL on ${network.toUpperCase()}!`
         );
       } catch (airdropError) {
-        console.warn(`⚠️  Airdrop failed: ${airdropError}`);
+        console.warn(`Airdrop failed: ${airdropError}`);
         if (network === 'localnet') {
           console.log(
             'Make sure you have a local Solana validator running with: npm run start-test-validator'

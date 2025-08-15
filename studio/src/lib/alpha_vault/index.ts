@@ -1,5 +1,9 @@
 import { Wallet } from '@coral-xyz/anchor';
-import AlphaVault, { PoolType, WalletDepositCap } from '@meteora-ag/alpha-vault';
+import AlphaVault, {
+  deriveMerkleProofMetadata,
+  PoolType,
+  WalletDepositCap,
+} from '@meteora-ag/alpha-vault';
 import {
   Cluster,
   Connection,
@@ -17,10 +21,13 @@ import {
   MAX_INSTRUCTIONS_PER_STAKE_ESCROW_ACCOUNTS_CREATED,
 } from '../../utils/constants';
 import {
+  AlphaVaultConfig,
   AlphaVaultTypeConfig,
   FcfsAlphaVaultConfig,
+  KvMerkleProof,
   PoolTypeConfig,
   ProrataAlphaVaultConfig,
+  WhitelistCsv,
   WhitelistModeConfig,
 } from '../../utils/types';
 import {
@@ -30,8 +37,11 @@ import {
   runSimulateTransaction,
   deriveAlphaVault,
   deriveMerkleRootConfig,
+  parseCsv,
+  getQuoteDecimals,
 } from '../../helpers';
 import { getAlphaVaultWhitelistMode, getClusterFromProgramId } from './utils';
+import { uploadProof } from './merkle_tree/metadata';
 
 export async function createFcfsAlphaVault(
   connection: Connection,
@@ -313,14 +323,6 @@ export async function createPermissionedAlphaVaultWithMerkleProof(
     const tree = createMerkleTree(chunkedWhitelistList);
     const root = tree.getRoot();
 
-    interface KvMerkleProof {
-      [key: string]: {
-        merkle_root_config: string;
-        max_cap: number;
-        proof: number[][];
-      };
-    }
-
     const kvProofs: KvMerkleProof = {};
     const kvProofFilePath = `${kvProofFolderPath}/${i}.json`;
 
@@ -514,5 +516,196 @@ export function toAlphaVaulSdkPoolType(poolType: PoolTypeConfig): PoolType {
       return PoolType.DAMMV2;
     default:
       throw new Error(`Unsupported alpha vault pool type: ${poolType}`);
+  }
+}
+
+export async function createMerkleProofMetadata(
+  poolKey: PublicKey,
+  wallet: Wallet,
+  connection: Connection,
+  config: AlphaVaultConfig
+) {
+  const alphaVaultProgramId = new PublicKey(ALPHA_VAULT_PROGRAM_IDS['mainnet-beta']);
+
+  const alphaVaultPubkey = deriveAlphaVault(wallet.publicKey, poolKey, alphaVaultProgramId);
+
+  const cluster = getClusterFromProgramId(alphaVaultProgramId);
+
+  const alphaVault = await AlphaVault.create(connection, alphaVaultPubkey, {
+    cluster: cluster as Cluster,
+  });
+  const [merkleProofMetadata] = deriveMerkleProofMetadata(alphaVaultPubkey, alphaVaultProgramId);
+
+  const merkleProofMetadataAccount = await connection.getAccountInfo(merkleProofMetadata);
+
+  if (!merkleProofMetadataAccount) {
+    if (!config.alphaVault) {
+      throw new Error('Alpha vault configuration is missing');
+    }
+
+    const createMerkleProofMetadataTx = await alphaVault.createMerkleProofMetadata(
+      wallet.publicKey,
+      config.alphaVault.merkleProofBaseUrl
+    );
+
+    if (config.dryRun) {
+      console.log(`\n> Simulating init merkle proof metadata tx...`);
+      await runSimulateTransaction(connection, [wallet.payer], wallet.publicKey, [
+        createMerkleProofMetadataTx,
+      ]);
+    } else {
+      console.log(`>> Sending init merkle proof metadata transaction...`);
+      const initAlphaVaulTxHash = await sendAndConfirmTransaction(
+        connection,
+        createMerkleProofMetadataTx,
+        [wallet.payer],
+        {
+          commitment: connection.commitment,
+          maxRetries: DEFAULT_SEND_TX_MAX_RETRIES,
+        }
+      ).catch((err) => {
+        console.error(err);
+        throw err;
+      });
+      console.log(
+        `>>> Merkle proof metadata initialized successfully with tx hash: ${initAlphaVaulTxHash}`
+      );
+    }
+  }
+
+  if (config.alphaVault?.cloudflareKvProofUpload) {
+    console.log(`\n> Uploading merkle proof to cloudflare...`);
+
+    const { kvNamespaceId, apiKey, accountId } = config.alphaVault.cloudflareKvProofUpload;
+
+    // Get from https://github.com/MeteoraAg/cloudflare-kv-merkle-proof/blob/main/scripts/upload_merkle_proof.ts
+    const kvProofFilepath = config.alphaVault.kvProofFilepath ?? `./${alphaVaultPubkey.toBase58()}`;
+    await uploadProof(
+      kvProofFilepath,
+      alphaVaultPubkey.toBase58(),
+      kvNamespaceId,
+      accountId,
+      apiKey
+    );
+  }
+}
+
+export async function createAlphaVault(
+  connection: Connection,
+  wallet: Wallet,
+  config: AlphaVaultConfig,
+  poolAddress: PublicKey
+) {
+  if (!config.alphaVault) {
+    throw new Error('Alpha vault configuration is missing');
+  }
+
+  if (!config.quoteMint) {
+    throw new Error('Quote mint configuration is missing');
+  }
+
+  if (!config.baseMint) {
+    throw new Error('Base mint configuration is missing');
+  }
+
+  const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
+  const poolType = toAlphaVaulSdkPoolType(config.alphaVault.poolType);
+
+  if (config.alphaVault.whitelistMode == WhitelistModeConfig.PermissionedWithAuthority) {
+    if (!config.alphaVault.whitelistFilepath) {
+      throw new Error('Missing whitelist filepath in configuration');
+    }
+
+    const whitelistListCsv: Array<WhitelistCsv> = await parseCsv(
+      config.alphaVault.whitelistFilepath
+    );
+
+    const whitelistList: Array<WalletDepositCap> = new Array(0);
+    for (const item of whitelistListCsv) {
+      whitelistList.push({
+        address: new PublicKey(item.address),
+        maxAmount: getAmountInLamports(item.maxAmount, quoteDecimals),
+      });
+    }
+
+    await createPermissionedAlphaVaultWithAuthority(
+      connection,
+      wallet,
+      config.alphaVault.alphaVaultType,
+      poolType,
+      poolAddress,
+      new PublicKey(config.baseMint),
+      new PublicKey(config.quoteMint),
+      quoteDecimals,
+      config.alphaVault,
+      whitelistList,
+      config.dryRun,
+      config.computeUnitPriceMicroLamports
+    );
+  } else if (config.alphaVault.whitelistMode == WhitelistModeConfig.Permissionless) {
+    if (config.alphaVault.alphaVaultType == AlphaVaultTypeConfig.Fcfs) {
+      await createFcfsAlphaVault(
+        connection,
+        wallet,
+        poolType,
+        poolAddress,
+        new PublicKey(config.baseMint),
+        new PublicKey(config.quoteMint),
+        quoteDecimals,
+        config.alphaVault as FcfsAlphaVaultConfig,
+        config.dryRun,
+        config.computeUnitPriceMicroLamports
+      );
+    } else if (config.alphaVault.alphaVaultType == AlphaVaultTypeConfig.Prorata) {
+      await createProrataAlphaVault(
+        connection,
+        wallet,
+        poolType,
+        poolAddress,
+        new PublicKey(config.baseMint),
+        new PublicKey(config.quoteMint),
+        quoteDecimals,
+        config.alphaVault as ProrataAlphaVaultConfig,
+        config.dryRun,
+        config.computeUnitPriceMicroLamports
+      );
+    } else {
+      throw new Error(`Invalid alpha vault type ${config.alphaVault.alphaVaultType}`);
+    }
+  } else if (config.alphaVault.whitelistMode == WhitelistModeConfig.PermissionedWithMerkleProof) {
+    if (!config.alphaVault.whitelistFilepath) {
+      throw new Error('Missing whitelist filepath in configuration');
+    }
+
+    const whitelistListCsv: Array<WhitelistCsv> = await parseCsv(
+      config.alphaVault.whitelistFilepath
+    );
+
+    const whitelistList: Array<WalletDepositCap> = new Array(0);
+    for (const item of whitelistListCsv) {
+      whitelistList.push({
+        address: new PublicKey(item.address),
+        maxAmount: getAmountInLamports(item.maxAmount, quoteDecimals),
+      });
+    }
+
+    await createPermissionedAlphaVaultWithMerkleProof(
+      connection,
+      wallet,
+      config.alphaVault.alphaVaultType,
+      poolType,
+      poolAddress,
+      new PublicKey(config.baseMint),
+      new PublicKey(config.quoteMint),
+      quoteDecimals,
+      config.alphaVault,
+      whitelistList,
+      config.dryRun,
+      config.computeUnitPriceMicroLamports
+    );
+
+    if (config.alphaVault.cloudflareKvProofUpload) {
+      await createMerkleProofMetadata(poolAddress, wallet, connection, config);
+    }
   }
 }

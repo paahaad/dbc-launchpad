@@ -49,16 +49,16 @@
     "whitelistMode": "permissionless" // Whitelist mode: permissionless | permissioned_with_merkle_proof | permissioned_with_authority
 
     /* Optional Configuration: whitelistFilePath
-     * Only use when whitelistMode is permission_with_merkle_proof or permission_with_authority
+     * Only use when whitelistMode is permissioned_with_merkle_proof or permissioned_with_authority
      */
     // "whitelistFilepath": "./data/whitelist_wallet.csv", // Optional path to CSV file containing whitelisted wallet addresses and their deposit caps (format: wallet,deposit_cap)
 
     /* Optional Configuration: merkleProofBaseUrl, chunkSize, kvProofFilepath, cloudflareKvProofUpload
-     * Only use when whitelistMode is permission_with_merkle_proof
+     * Only use when whitelistMode is permissioned_with_merkle_proof
      */
     // "merkleProofBaseUrl": "https://example.workers.dev/", // Base URL endpoint where merkle proofs are stored and can be retrieved for whitelisted wallet verification
     // "chunkSize": 1000, // Optional batch size for processing large whitelist files or merkle tree operations to avoid memory/performance issues
-    // "kvProofFilepath": "./data/kv_proof.json", // Optional path to key-value file storing pre-computed merkle proofs for whitelisted addresses
+    // "kvProofFilepath": "./data/kv_proofs", // Optional path to key-value file storing pre-computed merkle proofs for whitelisted addresses
     // "cloudflareKvProofUpload": {
     //   "kvNamespaceId": "YOUR_KV_NAMESPACE_ID",
     //   "accountId": "YOUR_ACCOUNT_ID",
