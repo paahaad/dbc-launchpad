@@ -15,14 +15,14 @@
   },
   "dependencies": {
     "bn.js": "^5.2.2",
-    "decimal.js": "^10.5.0"
+    "decimal.js": "^10.6.0"
   },
   "devDependencies": {
     "@meteora-invent/config-eslint": "workspace:*",
     "@meteora-invent/config-prettier": "workspace:*",
     "@meteora-invent/config-typescript": "workspace:*",
     "@types/bn.js": "^5.1.5",
-    "eslint": "^8.57.0",
-    "typescript": "^5.0.0"
+    "eslint": "^9.33.0",
+    "typescript": "^5.9.2"
   }
 }
