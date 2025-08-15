@@ -539,6 +539,10 @@ export async function createMerkleProofMetadata(
   const merkleProofMetadataAccount = await connection.getAccountInfo(merkleProofMetadata);
 
   if (!merkleProofMetadataAccount) {
+    if (!config.alphaVault) {
+      throw new Error('Alpha vault configuration is missing');
+    }
+
     const createMerkleProofMetadataTx = await alphaVault.createMerkleProofMetadata(
       wallet.publicKey,
       config.alphaVault.merkleProofBaseUrl
@@ -569,7 +573,7 @@ export async function createMerkleProofMetadata(
     }
   }
 
-  if (config.alphaVault.cloudflareKvProofUpload) {
+  if (config.alphaVault?.cloudflareKvProofUpload) {
     console.log(`\n> Uploading merkle proof to cloudflare...`);
 
     const { kvNamespaceId, apiKey, accountId } = config.alphaVault.cloudflareKvProofUpload;
@@ -592,6 +596,18 @@ export async function createAlphaVault(
   config: AlphaVaultConfig,
   poolAddress: PublicKey
 ) {
+  if (!config.alphaVault) {
+    throw new Error('Alpha vault configuration is missing');
+  }
+
+  if (!config.quoteMint) {
+    throw new Error('Quote mint configuration is missing');
+  }
+
+  if (!config.baseMint) {
+    throw new Error('Base mint configuration is missing');
+  }
+
   const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
   const poolType = toAlphaVaulSdkPoolType(config.alphaVault.poolType);
 

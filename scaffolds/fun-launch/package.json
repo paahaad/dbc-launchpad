@@ -24,7 +24,7 @@
     "@solana/spl-token": "^0.4.13",
     "@solana/spl-token-registry": "^0.2.4574",
     "@solana/wallet-adapter-wallets": "^0.19.33",
-    "@solana/web3.js": "^1.98.2",
+    "@solana/web3.js": "^1.98.4",
     "@tailwindcss/cli": "^4.1.4",
     "@tanstack/react-form": "^1.2.3",
     "@tanstack/react-query": "^4.29.5",
