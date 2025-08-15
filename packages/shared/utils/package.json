@@ -18,6 +18,7 @@
     "decimal.js": "^10.6.0"
   },
   "devDependencies": {
+    "@eslint/eslintrc": "^3.3.1",
     "@meteora-invent/config-eslint": "workspace:*",
     "@meteora-invent/config-prettier": "workspace:*",
     "@meteora-invent/config-typescript": "workspace:*",
