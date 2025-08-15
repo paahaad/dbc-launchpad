@@ -41,7 +41,7 @@ async function main() {
 
     if (networkConfig.shouldAirdrop) {
       console.log(
-        `\n💰 Attempting to airdrop ${networkConfig.airdropAmount} SOL on ${network.toUpperCase()}...`
+        `\nAttempting to airdrop ${networkConfig.airdropAmount} SOL on ${network.toUpperCase()}...`
       );
       const connection = new Connection(networkConfig.rpcUrl, 'confirmed');
 

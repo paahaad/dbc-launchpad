@@ -355,6 +355,33 @@ export interface CloudflareKvProofUploadConfig {
   apiKey: string;
 }
 
+export interface WhitelistCsv {
+  address: string;
+  maxAmount: string;
+}
+
+export interface ProofRecord {
+  [key: string]: {
+    merkle_tree: string;
+    amount: number;
+    proof: Array<number[]>;
+  };
+}
+
+export interface BodyItem {
+  base64: boolean;
+  key: string;
+  value: string;
+}
+
+export interface KvMerkleProof {
+  [key: string]: {
+    merkle_root_config: string;
+    max_cap: number;
+    proof: number[][];
+  };
+}
+
 /* Stake2Earn */
 
 export type Stake2EarnConfig = MeteoraConfigBase & {
