@@ -451,29 +451,30 @@ pnpm studio dbc-create-config && pnpm studio dbc-create-pool
 ### Directory Overview
 ```
 studio/
-├── config/                    # Configuration files (AI modifies these)
-│   ├── dbc_config.jsonc      # Dynamic Bonding Curve settings
-│   ├── damm_v1_config.jsonc  # DAMM V1 pool settings
-│   ├── damm_v2_config.jsonc  # DAMM V2 pool settings
-│   └── dlmm_config.jsonc     # DLMM pool settings
-├── src/                      # Source code (AI never modifies)
-│   ├── actions/              # Executable actions
-│   │   ├── dbc/             # DBC protocol actions
-│   │   ├── damm_v1/         # DAMM V1 actions
-│   │   ├── damm_v2/         # DAMM V2 actions
-│   │   ├── dlmm/            # DLMM actions
-│   │   ├── alpha_vault/     # Alpha vault actions
-│   │   └── settings/        # Utility actions
-│   ├── lib/                 # Protocol libraries
-│   ├── helpers/             # Helper functions
-│   ├── utils/               # Utility types and constants
-│   └── tests/               # Test artifacts and data
-├── data/                    # Static data files
-├── test-ledger/            # Local validator data
-├── .env                    # Environment variables (create from .env.example)
-├── keypair.json           # Generated wallet file
-├── package.json           # Script definitions
-└── LLM.txt               # This AI guide
+├── config/                       # Configuration files (AI modifies these)
+│   ├── alpha_vault_config.jsonc  # Alpha Vault settings
+│   ├── dbc_config.jsonc          # Dynamic Bonding Curve settings
+│   ├── damm_v1_config.jsonc      # DAMM V1 pool settings
+│   ├── damm_v2_config.jsonc      # DAMM V2 pool settings
+│   └── dlmm_config.jsonc         # DLMM pool settings
+├── src/                          # Source code (AI never modifies)
+│   ├── actions/                  # Executable actions
+│   │   ├── dbc/                  # DBC protocol actions
+│   │   ├── damm_v1/              # DAMM V1 actions
+│   │   ├── damm_v2/              # DAMM V2 actions
+│   │   ├── dlmm/                 # DLMM actions
+│   │   ├── alpha_vault/          # Alpha vault actions
+│   │   └── settings/             # Utility actions
+│   ├── lib/                      # Protocol libraries
+│   ├── helpers/                  # Helper functions
+│   ├── utils/                    # Utility types and constants
+│   └── tests/                    # Test artifacts and data
+├── data/                         # Static data files
+├── test-ledger/                  # Local validator data
+├── .env                          # Environment variables (create from .env.example)
+├── keypair.json                  # Generated wallet file
+├── package.json                  # Script definitions
+└── LLM.txt                       # This AI guide
 ```
 
 ### Key Files for AI Operations
