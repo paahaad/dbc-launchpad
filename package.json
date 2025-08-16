@@ -2,7 +2,7 @@
   "name": "meteora-invent",
   "version": "0.0.0",
   "private": true,
-  "description": "Meteora Invent - Monorepo for studio scripts and scaffold templates",
+  "description": "Meteora Invent - Monorepo for studio actions and scaffold templates",
   "author": "Dann Wee <dann@raccoons.dev>",
   "license": "ISC",
   "packageManager": "pnpm@10.14.0",
@@ -25,6 +25,7 @@
     "studio:damm-v2": "pnpm --filter @meteora-invent/studio run damm-v2:*",
     "studio:dlmm": "pnpm --filter @meteora-invent/studio run dlmm:*",
     "studio:dbc": "pnpm --filter @meteora-invent/studio run dbc:*",
+    "studio:alpha-vault": "pnpm --filter @meteora-invent/studio run alpha-vault:*",
     "prepare": "husky install",
     "syncpack:check": "syncpack list-mismatches",
     "syncpack:fix": "syncpack fix-mismatches"

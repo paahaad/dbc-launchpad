@@ -1,18 +1,18 @@
 # Meteora Studio
 
-A collection of scripts for interacting with Meteora's programs to innovate and create token
+A collection of actions for interacting with Meteora's programs to innovate and create token
 launches. Part of the **Meteora Invent** toolkit.
 
 ## 🏗️ Structure
 
-Studio consists of 4 main pool types, each with dedicated scripts and configurations:
+Studio consists of 4 main pool types, each with dedicated actions and configurations:
 
 - **DLMM** (Dynamic Liquidity Market Maker) - Dynamic fees and precise liquidity concentration
 - **DAMM V2** (Dynamic AMM V2) - Enhanced constant product AMM with advanced features
 - **DAMM V1** (Dynamic AMM V1) - Constant product AMM with lending integration
 - **DBC** (Dynamic Bonding Curve) - Permissionless launch pool protocol
 
-Studio also contains a collection of scripts for interacting with other Meteora programs:
+Studio also contains a collection of actions for interacting with other Meteora programs:
 
 - **Alpha Vault** - A complementary anti-bot mechanism used together with a Launch Pool.
 
@@ -44,7 +44,7 @@ Add your private key and RPC URL to the `.env` file.
 
 2. Optional: Start a Local Test Validator
 
-_You can also run the studio scripts on localnet - http://localhost:8899 with the following command_
+_You can also run the studio actions on localnet - http://localhost:8899 with the following command_
 
 ```bash
 pnpm studio start-test-validator
@@ -72,9 +72,9 @@ pnpm generate-keypair --network localnet
 **Note:** You can use the provided example configurations as a starting point. Make sure to replace
 the placeholders with your actual values.
 
-## 📋 Available Scripts
+## 📋 Available Actions
 
-### DLMM Scripts
+### DLMM Actions
 
 **Create a Customizable Permissionless DLMM Pool**
 
@@ -100,7 +100,7 @@ pnpm dlmm-seed-liquidity-single-bin --config ./config/dlmm_config.jsonc
 pnpm dlmm-set-pool-status --config ./config/dlmm_config.jsonc
 ```
 
-### DAMM v2 Scripts
+### DAMM v2 Actions
 
 **Create a Balanced Constant Product Pool**
 
@@ -114,7 +114,7 @@ pnpm damm-v2-create-balanced-pool --config ./config/damm_v2_config.jsonc
 pnpm damm-v2-create-one-sided-pool --config ./config/damm_v2_config.jsonc
 ```
 
-### DAMM v1 Scripts
+### DAMM v1 Actions
 
 **Create a Constant Product Pool**
 
@@ -140,7 +140,7 @@ pnpm damm-v1-create-stake2earn-farm --config ./config/damm_v1_config.jsonc
 pnpm damm-v1-lock-liquidity-stake2earn --config ./config/damm_v1_config.jsonc
 ```
 
-### DBC Scripts
+### DBC Actions
 
 **Create a DBC Config**
 
@@ -178,7 +178,7 @@ pnpm dbc-migrate-to-damm-v2 --config ./config/dbc_config.jsonc
 pnpm dbc-swap --config ./config/dbc_config.jsonc
 ```
 
-### Alpha Vault Scripts
+### Alpha Vault Actions
 
 **Create an Alpha Vault**
 

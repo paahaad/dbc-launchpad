@@ -153,7 +153,7 @@ fun-launch/
 ### **4. Pool Creation Interface**
 - **Location**: `src/pages/create-pool.tsx`
 - **Component**: `CreatePoolButton`
-- **Backend Integration**: Calls studio DBC scripts via API
+- **Backend Integration**: Calls studio DBC actions via API
 - **Features**:
   - ✅ Token launch with bonding curve
   - ✅ Custom pool parameters

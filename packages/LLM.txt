@@ -60,7 +60,7 @@ packages/
 
 ## Using Packages
 
-### In Studio Scripts
+### In Studio Actions
 ```json
 // In studio/package.json
 {

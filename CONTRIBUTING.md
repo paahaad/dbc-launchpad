@@ -48,8 +48,9 @@ meteora-invent/
 │       └── typescript/
 ├── scaffolds/         # Scaffolds - production-ready frontend application templates
 │   └── fun-launch/
-└── studio/            # Studio - a collection of scripts for you to innovate and create
+└── studio/            # Studio - a collection of actions for you to innovate and create
     ├── config
+    │   ├── alpha_vault_config.jsonc
     │   ├── damm_v1_config.jsonc
     │   ├── damm_v2_config.jsonc
     │   ├── dbc_config.jsonc
@@ -71,24 +72,7 @@ meteora-invent/
     │   │   ├── transaction.ts
     │   │   ├── utils.ts
     │   │   └── validation.ts
-    │   ├── lib
-    │   │   ├── alpha_vault
-    │   │   │   ├── index.ts
-    │   │   │   ├── merkle_tree
-    │   │   │   │   ├── balance_tree.ts
-    │   │   │   │   ├── index.ts
-    │   │   │   │   └── merkle_tree.ts
-    │   │   │   └── utils.ts
-    │   │   ├── damm_v1
-    │   │   │   ├── index.ts
-    │   │   │   └── stake2earn.ts
-    │   │   ├── damm_v2
-    │   │   │   └── index.ts
-    │   │   ├── dbc
-    │   │   │   └── index.ts
-    │   │   └── dlmm
-    │   │       └── index.ts
-    │   ├── scripts
+    │   ├── actions
     │   │   ├── alpha_vault
     │   │   │   └── create_alpha_vault.ts
     │   │   ├── damm_v1
@@ -112,7 +96,26 @@ meteora-invent/
     │   │   │   ├── seed_liquidity_single_bin.ts
     │   │   │   └── set_pool_status.ts
     │   │   └── settings
+    │   │       ├── airdrop_sol.ts
     │   │       └── generate_keypair.ts
+    │   ├── lib
+    │   │   ├── alpha_vault
+    │   │   │   ├── index.ts
+    │   │   │   ├── merkle_tree
+    │   │   │   │   ├── balance_tree.ts
+    │   │   │   │   ├── index.ts
+    │   │   │   │   └── merkle_tree.ts
+    │   │   │   │   └── metadata.ts
+    │   │   │   └── utils.ts
+    │   │   ├── damm_v1
+    │   │   │   ├── index.ts
+    │   │   │   └── stake2earn.ts
+    │   │   ├── damm_v2
+    │   │   │   └── index.ts
+    │   │   ├── dbc
+    │   │   │   └── index.ts
+    │   │   └── dlmm
+    │   │       └── index.ts
     │   ├── tests
     │   │   ├── artifacts
     │   │   │   ├── accounts
@@ -143,8 +146,8 @@ meteora-invent/
 pnpm --filter @meteora-invent/studio <command>
 pnpm --filter @meteora-invent/scaffold/fun-launch <command>
 
-# Run studio scripts
-pnpm studio <script-name>
+# Run studio actions
+pnpm studio <action-name>
 
 # Run scaffold commands
 pnpm scaffold <command>
@@ -279,7 +282,7 @@ chore: update dependencies
 
 ## Environment Variables
 
-When adding new scripts that require environment variables:
+When adding new actions that require environment variables:
 
 1. Update the `.env.example` file with new variables
 2. Document the variables in the relevant README

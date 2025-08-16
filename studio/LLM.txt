@@ -4,12 +4,12 @@
 
 ## 🎯 Quick AI Context
 
-Meteora Studio is a TypeScript-based automation toolkit for Meteora's Solana DeFi Operations. All scripts use **JSON configuration files**, making them AI-friendly and easily automatable.
+Meteora Studio is a TypeScript-based automation toolkit for Meteora's Solana DeFi Operations. All actions use **JSON configuration files**, making them AI-friendly and easily automatable.
 
 ### Core Architecture
 - **Config-driven**: All parameters are in `studio/config/*.jsonc` files
-- **CLI-based**: Scripts are executed via `pnpm studio [command]`
-- **Modular**: Each protocol (DBC, DAMM, DLMM) has dedicated scripts
+- **CLI-based**: Actions are executed via `pnpm studio [command]`
+- **Modular**: Each protocol (DBC, DAMM, DLMM) has dedicated actions
 - **Safe**: Built-in dry-run mode for testing
 
 ## 🛠️ Initial Setup & Prerequisites
@@ -47,7 +47,7 @@ pnpm studio generate-keypair
    - Use provided examples as starting points
    - Replace placeholder values with actual addresses/parameters
 
-## 🚀 Available Scripts & Commands
+## 🚀 Available Actions & Commands
 
 ### Environment Setup
 ```bash
@@ -441,7 +441,7 @@ Adjust priority fees in config:
 Each config supports different networks simultaneously by changing `rpcUrl`.
 
 ### Batch Operations
-Multiple scripts can be chained for complex workflows:
+Multiple actions can be chained for complex workflows:
 ```bash
 pnpm studio dbc-create-config && pnpm studio dbc-create-pool
 ```
@@ -451,29 +451,30 @@ pnpm studio dbc-create-config && pnpm studio dbc-create-pool
 ### Directory Overview
 ```
 studio/
-├── config/                    # Configuration files (AI modifies these)
-│   ├── dbc_config.jsonc      # Dynamic Bonding Curve settings
-│   ├── damm_v1_config.jsonc  # DAMM V1 pool settings
-│   ├── damm_v2_config.jsonc  # DAMM V2 pool settings
-│   └── dlmm_config.jsonc     # DLMM pool settings
-├── src/                      # Source code (AI never modifies)
-│   ├── scripts/              # Executable scripts
-│   │   ├── dbc/             # DBC protocol scripts
-│   │   ├── damm_v1/         # DAMM V1 scripts
-│   │   ├── damm_v2/         # DAMM V2 scripts
-│   │   ├── dlmm/            # DLMM scripts
-│   │   ├── alpha_vault/     # Alpha vault scripts
-│   │   └── settings/        # Utility scripts
-│   ├── lib/                 # Protocol libraries
-│   ├── helpers/             # Helper functions
-│   ├── utils/               # Utility types and constants
-│   └── tests/               # Test artifacts and data
-├── data/                    # Static data files
-├── test-ledger/            # Local validator data
-├── .env                    # Environment variables (create from .env.example)
-├── keypair.json           # Generated wallet file
-├── package.json           # Script definitions
-└── LLM.txt               # This AI guide
+├── config/                       # Configuration files (AI modifies these)
+│   ├── alpha_vault_config.jsonc  # Alpha Vault settings
+│   ├── dbc_config.jsonc          # Dynamic Bonding Curve settings
+│   ├── damm_v1_config.jsonc      # DAMM V1 pool settings
+│   ├── damm_v2_config.jsonc      # DAMM V2 pool settings
+│   └── dlmm_config.jsonc         # DLMM pool settings
+├── src/                          # Source code (AI never modifies)
+│   ├── actions/                  # Executable actions
+│   │   ├── dbc/                  # DBC protocol actions
+│   │   ├── damm_v1/              # DAMM V1 actions
+│   │   ├── damm_v2/              # DAMM V2 actions
+│   │   ├── dlmm/                 # DLMM actions
+│   │   ├── alpha_vault/          # Alpha vault actions
+│   │   └── settings/             # Utility actions
+│   ├── lib/                      # Protocol libraries
+│   ├── helpers/                  # Helper functions
+│   ├── utils/                    # Utility types and constants
+│   └── tests/                    # Test artifacts and data
+├── data/                         # Static data files
+├── test-ledger/                  # Local validator data
+├── .env                          # Environment variables (create from .env.example)
+├── keypair.json                  # Generated wallet file
+├── package.json                  # Script definitions
+└── LLM.txt                       # This AI guide
 ```
 
 ### Key Files for AI Operations
@@ -489,7 +490,7 @@ studio/
 
 #### **Important Executables**
 - `package.json` - Contains all available npm scripts
-- `src/scripts/**/*.ts` - Individual protocol operations
+- `src/actions/**/*.ts` - Individual protocol operations
 
 ### File Permissions & Safety
 - **Read-only**: Everything in `src/` directory
@@ -505,7 +506,7 @@ studio/
 - **Meteora App**: UI management (`https://app.meteora.ag/`)
 
 ### API Integration
-All scripts output structured data suitable for:
+All actions output structured data suitable for:
 - Database storage (JSON format)
 - API responses (structured output)
 - Dashboard integration (real-time data)

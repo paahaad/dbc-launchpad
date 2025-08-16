@@ -50,7 +50,7 @@ pnpm install
 
 ---
 
-The studio workspace contains all the scripts for interacting with Meteora's programs.
+The studio workspace contains all the actions for interacting with Meteora's programs.
 
 #### Getting Started
 
@@ -62,7 +62,7 @@ cp studio/.env.example studio/.env
 
 2. Optional: Start a Local Test Validator
 
-_You can also run the studio scripts on localnet - http://localhost:8899 with the following command_
+_You can also run the studio actions on localnet - http://localhost:8899 with the following command_
 
 ```bash
 pnpm studio start-test-validator
@@ -92,7 +92,7 @@ the placeholders with your actual values.
 
 ---
 
-#### DLMM Scripts
+#### DLMM Actions
 
 **Create a Customizable Permissionless DLMM Pool**
 
@@ -120,7 +120,7 @@ pnpm studio dlmm-set-pool-status --config ./studio/config/dlmm_config.jsonc
 
 ---
 
-#### DAMM v2 Scripts
+#### DAMM v2 Actions
 
 **Create a Balanced Constant Product Pool**
 
@@ -136,7 +136,7 @@ pnpm studio damm-v2-create-one-sided-pool --config ./studio/config/damm_v2_confi
 
 ---
 
-#### DAMM v1 Scripts
+#### DAMM v1 Actions
 
 **Create a Constant Product Pool**
 
@@ -164,7 +164,7 @@ pnpm studio damm-v1-lock-liquidity-stake2earn --config ./studio/config/damm_v1_c
 
 ---
 
-#### DBC Scripts
+#### DBC Actions
 
 **Create a DBC Config**
 
@@ -204,7 +204,7 @@ pnpm studio dbc-swap --config ./studio/config/dbc_config.jsonc
 
 ---
 
-#### Alpha Vault Scripts
+#### Alpha Vault Actions
 
 **Create an Alpha Vault**
 
@@ -257,8 +257,9 @@ meteora-invent/
 │       └── typescript/
 ├── scaffolds/         # Scaffolds - production-ready frontend application templates
 │   └── fun-launch/
-└── studio/            # Studio - a collection of scripts for you to innovate and create
+└── studio/            # Studio - a collection of actions for you to innovate and create
     ├── config
+    │   ├── alpha_vault_config.jsonc
     │   ├── damm_v1_config.jsonc
     │   ├── damm_v2_config.jsonc
     │   ├── dbc_config.jsonc
@@ -280,24 +281,7 @@ meteora-invent/
     │   │   ├── transaction.ts
     │   │   ├── utils.ts
     │   │   └── validation.ts
-    │   ├── lib
-    │   │   ├── alpha_vault
-    │   │   │   ├── index.ts
-    │   │   │   ├── merkle_tree
-    │   │   │   │   ├── balance_tree.ts
-    │   │   │   │   ├── index.ts
-    │   │   │   │   └── merkle_tree.ts
-    │   │   │   └── utils.ts
-    │   │   ├── damm_v1
-    │   │   │   ├── index.ts
-    │   │   │   └── stake2earn.ts
-    │   │   ├── damm_v2
-    │   │   │   └── index.ts
-    │   │   ├── dbc
-    │   │   │   └── index.ts
-    │   │   └── dlmm
-    │   │       └── index.ts
-    │   ├── scripts
+    │   ├── actions
     │   │   ├── alpha_vault
     │   │   │   └── create_alpha_vault.ts
     │   │   ├── damm_v1
@@ -321,7 +305,26 @@ meteora-invent/
     │   │   │   ├── seed_liquidity_single_bin.ts
     │   │   │   └── set_pool_status.ts
     │   │   └── settings
+    │   │       ├── airdrop_sol.ts
     │   │       └── generate_keypair.ts
+    │   ├── lib
+    │   │   ├── alpha_vault
+    │   │   │   ├── index.ts
+    │   │   │   ├── merkle_tree
+    │   │   │   │   ├── balance_tree.ts
+    │   │   │   │   ├── index.ts
+    │   │   │   │   └── merkle_tree.ts
+    │   │   │   │   └── metadata.ts
+    │   │   │   └── utils.ts
+    │   │   ├── damm_v1
+    │   │   │   ├── index.ts
+    │   │   │   └── stake2earn.ts
+    │   │   ├── damm_v2
+    │   │   │   └── index.ts
+    │   │   ├── dbc
+    │   │   │   └── index.ts
+    │   │   └── dlmm
+    │   │       └── index.ts
     │   ├── tests
     │   │   ├── artifacts
     │   │   │   ├── accounts
