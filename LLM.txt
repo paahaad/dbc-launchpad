@@ -5,7 +5,7 @@
 ## 🎯 Quick AI Context
 
 Meteora Invent is a comprehensive monorepo providing:
-- **Automated Scripts**: Config-driven protocol interactions
+- **Automated Actions**: Config-driven protocol interactions
 - **Production Templates**: Ready-to-deploy frontend scaffolds  
 - **Shared Libraries**: Reusable configurations and utilities
 
@@ -14,7 +14,7 @@ Meteora Invent is a comprehensive monorepo providing:
 ## 📊 Repository Architecture
 
 ### **Core Workspaces**
-- **`studio/`** → **Backend Operations**: Protocol scripts, config-driven automation
+- **`studio/`** → **Backend Operations**: Protocol actions, config-driven automation
 - **`scaffolds/`** → **Frontend Templates**: Production-ready UI applications  
 - **`packages/`** → **Shared Code**: Configurations, utilities, TypeScript settings
 
@@ -94,7 +94,7 @@ Is this a new token?
 
 | **Operation** | **Command** | **Details** |
 |---------------|-------------|-------------|
-| Studio scripts | `pnpm studio [script-name]` | All protocol operations |
+| Studio actions | `pnpm studio [action-name]` | All protocol operations |
 | Frontend dev | `pnpm scaffold dev` | Run all scaffold dev servers |
 | Type checking | `pnpm type-check` | Validate TypeScript across repo |
 | Linting | `pnpm lint` | Check all workspaces |
@@ -119,7 +119,7 @@ meteora-invent/
 │   │   ├── damm_v2_config.jsonc   # DAMM V2 pool settings
 │   │   └── dlmm_config.jsonc      # DLMM pool settings
 │   ├── 📁 src/                    # 🔒 Source code (AI never modifies)
-│   │   ├── scripts/               # Executable protocol scripts
+│   │   ├── actions/               # Executable protocol actions
 │   │   ├── lib/                   # Protocol-specific libraries
 │   │   ├── helpers/               # Utility functions
 │   │   └── utils/                 # Types and constants
@@ -213,7 +213,7 @@ pnpm dev  # Runs on http://localhost:3000
 - `scaffolds/*/src/**` - Frontend source code (when building UIs)
 
 ### **Files AI Must NEVER Modify**
-- `studio/src/**` - Protocol logic and scripts
+- `studio/src/**` - Protocol logic and actions
 - `**/package.json` - Dependencies and scripts (unless explicitly requested)
 - `**/node_modules/**` - Generated dependencies
 - `**/.git/**` - Git repository data
@@ -256,7 +256,7 @@ const privateKey = "actual_private_key_here"  // NEVER DO THIS
 - **Tool Configuration**: Check `packages/LLM.txt` for shared configs
 
 ### **For Advanced Users**
-- **Custom Scripts**: Extend existing scripts in `studio/src/scripts/`
+- **Custom Actions**: Extend existing actions in `studio/src/actions/`
 - **New Scaffolds**: Create based on `scaffolds/fun-launch/` pattern
 - **Shared Libraries**: Contribute to `packages/shared/utils/`
 
