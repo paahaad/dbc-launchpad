@@ -71,7 +71,7 @@
     "@meteora-invent/config-prettier": "workspace:*",
     "@meteora-invent/config-typescript": "workspace:*",
     "babar": "^0.2.3",
-    "eslint": "^9.33.0",
+    "eslint": "^9.34.0",
     "jest": "^30.0.5",
     "tsx": "^4.20.4"
   }
