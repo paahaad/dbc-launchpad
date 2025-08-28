@@ -31,13 +31,13 @@
     "syncpack:fix": "syncpack fix-mismatches"
   },
   "devDependencies": {
-    "@types/node": "^24.2.1",
-    "eslint": "^9.33.0",
+    "@types/node": "^24.3.0",
+    "eslint": "^9.34.0",
     "husky": "^9.1.7",
     "lint-staged": "^16.1.5",
     "prettier": "^3.6.2",
     "syncpack": "^13.0.4",
-    "turbo": "^2.5.5",
+    "turbo": "^2.5.6",
     "typescript": "^5.9.2"
   },
   "lint-staged": {

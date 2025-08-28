@@ -5,6 +5,7 @@ import { validateConfig } from './validation';
 import { parse } from 'csv-parse';
 import fs from 'fs';
 import path from 'path';
+import * as readline from 'readline';
 
 export function parseNetworkFlag(): string | undefined {
   const { values } = parseArgs({
@@ -101,5 +102,45 @@ export async function parseCsv<T>(filePath: string): Promise<Array<T>> {
       .on('data', (row: T) => results.push(row)) // Collect rows
       .on('end', () => resolve(results)) // Resolve the promise with results
       .on('error', (err) => reject(err)); // Reject the promise if error occurs
+  });
+}
+
+/**
+ * Interactive CLI selection helper that displays options and returns user's choice
+ * @param options - Array of display strings for each option
+ * @param prompt - The question to ask the user
+ * @returns Promise that resolves to the selected index (0-based)
+ */
+export async function promptForSelection(
+  options: string[],
+  prompt: string = 'Please select an option'
+): Promise<number> {
+  return new Promise((resolve) => {
+    const rl = readline.createInterface({
+      input: process.stdin,
+      output: process.stdout,
+    });
+
+    console.log(`\n${prompt}:`);
+    options.forEach((option, index) => {
+      console.log(`  ${index + 1}. ${option}`);
+    });
+
+    const askQuestion = () => {
+      rl.question(`\nEnter your choice (1-${options.length}): `, (answer) => {
+        const choice = parseInt(answer.trim(), 10);
+
+        if (isNaN(choice) || choice < 1 || choice > options.length) {
+          console.log(`Invalid choice. Please enter a number between 1 and ${options.length}.`);
+          askQuestion();
+          return;
+        }
+
+        rl.close();
+        resolve(choice - 1); // Convert to 0-based index
+      });
+    };
+
+    askQuestion();
   });
 }
