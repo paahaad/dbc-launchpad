@@ -81,6 +81,7 @@ export interface Stake2EarnFarmConfig {
 
 export type DammV2Config = MeteoraConfigBase & {
   createBaseToken: CreateBaseMintConfig | null;
+  poolAddress: string | null;
   dammV2Config: DynamicAmmV2Config | null;
   alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
 };

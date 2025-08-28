@@ -29,15 +29,20 @@
     "baseDecimals": 6 // decimals of the base token
   },
 
+  /* poolAddress is required for the following actions:
+   * 1. damm-v2-claim-position-fee
+   */
+  "poolAddress": "YOUR_POOL_ADDRESS",
+
   /* dammV2Config is only used in the following actions:
    * 1. damm-v2-create-balanced-pool
    * 2. damm-v2-create-one-sided-pool
    */
   "dammV2Config": {
-    "creator": "YOUR_WALLET_ADDRESS", // creator address
+    "creator": "Dc85YcHkAWs62ndssWcGN5V4xYaQzPzgUDiRGtvnZas6", // creator address
     "baseAmount": 10000000, // base token amount
     "quoteAmount": null, // quote token amount
-    "initPrice": 0.0001, // initial price (in terms of quote/base price)
+    "initPrice": 0.0001, // initial price (in terms of quote/base price) 1 SOL / 1000000000 = initialPrice
     "maxPrice": null, // max price (in terms of quote/base price)
     "poolFees": {
       "maxBaseFeeBps": 400, // max base fee (in basis points)
@@ -45,7 +50,7 @@
       "numberOfPeriod": 0, // number of period
       "totalDuration": 0, // total duration (If activationType is 0 (slots), totalDuration = duration / 0.4 | If activationType is 1 (timestamp), totalDuration = duration)
       "feeSchedulerMode": 0, // 0 - Fee Scheduler: Linear | 1 - Fee Scheduler: Exponential
-      "useDynamicFee": true, // use dynamic fee
+      "useDynamicFee": true,
 
       /* Optional Configuration.
        * Only used if useDynamicFee is true and if you want to configure dynamic fee.
