@@ -17,6 +17,8 @@
     "dlmm-set-pool-status": "tsx src/actions/dlmm/set_pool_status.ts",
     "damm-v2-create-balanced-pool": "tsx src/actions/damm_v2/create_balanced_pool.ts",
     "damm-v2-create-one-sided-pool": "tsx src/actions/damm_v2/create_one_sided_pool.ts",
+    "damm-v2-split-position": "tsx src/actions/damm_v2/split_position.ts",
+    "damm-v2-claim-position-fee": "tsx src/actions/damm_v2/claim_position_fee.ts",
     "damm-v1-create-pool": "tsx src/actions/damm_v1/create_pool.ts",
     "damm-v1-lock-liquidity": "tsx src/actions/damm_v1/lock_liquidity.ts",
     "damm-v1-create-stake2earn-farm": "tsx src/actions/damm_v1/create_stake2earn_farm.ts",
@@ -69,7 +71,7 @@
     "@meteora-invent/config-prettier": "workspace:*",
     "@meteora-invent/config-typescript": "workspace:*",
     "babar": "^0.2.3",
-    "eslint": "^9.33.0",
+    "eslint": "^9.34.0",
     "jest": "^30.0.5",
     "tsx": "^4.20.4"
   }

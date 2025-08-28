@@ -45,6 +45,13 @@ export function getDecimalizedAmount(amountLamport: BN, decimals: number): BN {
   return amountLamport.div(new BN(10 ** decimals));
 }
 
+export function getAmountInTokens(amountLamport: BN, decimals: number): string {
+  const amountDecimal = new Decimal(amountLamport.toString());
+  const divisor = new Decimal(10 ** decimals);
+  const formatted = amountDecimal.div(divisor);
+  return formatted.toString();
+}
+
 export function fromAllocationsToAmount(
   lpAmount: BN,
   allocations: LockLiquidityAllocation[]

@@ -29,15 +29,20 @@
     "baseDecimals": 6 // decimals of the base token
   },
 
+  /* poolAddress is required for the following actions:
+   * 1. damm-v2-claim-position-fee
+   */
+  "poolAddress": "YOUR_POOL_ADDRESS",
+
   /* dammV2Config is only used in the following actions:
    * 1. damm-v2-create-balanced-pool
    * 2. damm-v2-create-one-sided-pool
    */
   "dammV2Config": {
-    "creator": "YOUR_WALLET_ADDRESS", // creator address
+    "creator": "YOUR_CREATOR_ADDRESS", // creator address
     "baseAmount": 10000000, // base token amount
     "quoteAmount": null, // quote token amount
-    "initPrice": 0.0001, // initial price (in terms of quote/base price)
+    "initPrice": 0.0001, // initial price (in terms of quote/base price) 1 SOL / 1000000000 = initialPrice
     "maxPrice": null, // max price (in terms of quote/base price)
     "poolFees": {
       "maxBaseFeeBps": 400, // max base fee (in basis points)
@@ -45,7 +50,7 @@
       "numberOfPeriod": 0, // number of period
       "totalDuration": 0, // total duration (If activationType is 0 (slots), totalDuration = duration / 0.4 | If activationType is 1 (timestamp), totalDuration = duration)
       "feeSchedulerMode": 0, // 0 - Fee Scheduler: Linear | 1 - Fee Scheduler: Exponential
-      "useDynamicFee": true, // use dynamic fee
+      "useDynamicFee": true,
 
       /* Optional Configuration.
        * Only used if useDynamicFee is true and if you want to configure dynamic fee.
@@ -64,6 +69,19 @@
     "activationType": 1, // 0 - Slot | 1 - Timestamp
     "activationPoint": null, // Activation time of the pool depending on activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
     "hasAlphaVault": false // If true, the alpha vault will be created after the pool is created
+  },
+
+  /* splitPosition is only used in the following actions:
+   * 1. damm-v2-split-position
+   */
+  "splitPosition": {
+    "newPositionOwner": "YOUR_NEW_POSITION_OWNER_ADDRESS", // this is the address that will receive the new DAMM v2 NFT position
+    "unlockedLiquidityPercentage": 50, // this is the percentage of unlocked liquidity that will be split and transferred to the newPositionOwner's position
+    "permanentLockedLiquidityPercentage": 50, // this is the percentage of permanent locked liquidity that will be split and transferred to the newPositionOwner's position
+    "feeAPercentage": 50, // this is the percentage of unclaimed fee that will be transferred to the newPositionOwner's position
+    "feeBPercentage": 50, // this is the percentage of unclaimed fee that will be transferred to the newPositionOwner's position
+    "reward0Percentage": 50, // this is the percentage of unclaimed reward that will be transferred to the newPositionOwner's position
+    "reward1Percentage": 50 // this is the percentage of unclaimed reward that will be transferred to the newPositionOwner's position
   },
 
   /* alphaVault is only used in the following actions:

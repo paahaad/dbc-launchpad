@@ -10,6 +10,8 @@ import {
   getLiquidityDeltaFromAmountA,
   getPriceFromSqrtPrice,
   getSqrtPriceFromPrice,
+  getTokenProgram,
+  getUnClaimReward,
   MAX_SQRT_PRICE,
   MIN_SQRT_PRICE,
   PoolFeesParams,
@@ -20,10 +22,12 @@ import { DammV2Config } from '../../utils/types';
 import {
   getAmountInLamports,
   getDecimalizedAmount,
+  getAmountInTokens,
   getQuoteDecimals,
   modifyComputeUnitPriceIx,
   runSimulateTransaction,
 } from '../../helpers';
+import { promptForSelection } from '../../helpers/cli';
 import { DEFAULT_SEND_TX_MAX_RETRIES } from '../../utils/constants';
 
 /**
@@ -460,5 +464,329 @@ export async function createDammV2BalancedPool(
       throw err;
     });
     console.log(`>>> Pool initialized successfully with tx hash: ${initPoolTxHash}`);
+  }
+}
+
+/**
+ * Split position for DAMM V2
+ * @param config - The DAMM V2 config
+ * @param connection - The connection to the network
+ * @param wallet - The wallet to use for the transaction
+ * @param poolAddress - The pool address
+ */
+export async function splitPosition(
+  config: DammV2Config,
+  connection: Connection,
+  wallet: Wallet,
+  poolAddress: PublicKey
+) {
+  if (!poolAddress) {
+    throw new Error('Pool address is required');
+  }
+
+  if (!config.splitPosition) {
+    throw new Error('Split position configuration is required');
+  }
+
+  console.log('\n> Splitting position...');
+
+  const cpAmmInstance = new CpAmm(connection);
+
+  const poolState = await cpAmmInstance.fetchPoolState(poolAddress);
+
+  const userPositions = await cpAmmInstance.getUserPositionByPool(poolAddress, wallet.publicKey);
+
+  if (userPositions.length === 0) {
+    console.log('> No position found');
+    return;
+  }
+
+  console.log(`\n> Pool address: ${poolAddress.toString()}`);
+  console.log(`\n> Found ${userPositions.length} position(s) in this pool`);
+
+  const positionDataArray = [];
+  for (const userPosition of userPositions) {
+    const positionState = await cpAmmInstance.fetchPositionState(userPosition.position);
+    const unclaimReward = getUnClaimReward(poolState, positionState);
+    positionDataArray.push({
+      userPosition,
+      positionState,
+      unclaimReward,
+      totalPositionFeeA: positionState.metrics.totalClaimedAFee.add(unclaimReward.feeTokenA),
+      totalPositionFeeB: positionState.metrics.totalClaimedBFee.add(unclaimReward.feeTokenB),
+    });
+  }
+
+  let selectedPositionData;
+
+  if (userPositions.length === 1) {
+    selectedPositionData = positionDataArray[0];
+    console.log('> Only one position found, splitting that position...');
+  } else {
+    const tokenAMintInfo = await connection.getAccountInfo(poolState.tokenAMint);
+    const tokenBMintInfo = await connection.getAccountInfo(poolState.tokenBMint);
+
+    if (!tokenAMintInfo || !tokenBMintInfo) {
+      throw new Error('Failed to fetch token mint information');
+    }
+    const tokenAMint = unpackMint(poolState.tokenAMint, tokenAMintInfo, tokenAMintInfo.owner);
+    const tokenBMint = unpackMint(poolState.tokenBMint, tokenBMintInfo, tokenBMintInfo.owner);
+
+    const positionOptions = positionDataArray.map((data, index) => {
+      const { unclaimReward, totalPositionFeeA, totalPositionFeeB } = data;
+      const positionAddress = data.userPosition.position.toString().slice(0, 8) + '...';
+
+      return [
+        `Position ${index + 1} (${positionAddress})`,
+        `  - Unclaimed Fee A: ${getAmountInTokens(unclaimReward.feeTokenA, tokenAMint.decimals)}`,
+        `  - Unclaimed Fee B: ${getAmountInTokens(unclaimReward.feeTokenB, tokenBMint.decimals)}`,
+        `  - Total Position Fee A: ${getAmountInTokens(totalPositionFeeA, tokenAMint.decimals)}`,
+        `  - Total Position Fee B: ${getAmountInTokens(totalPositionFeeB, tokenBMint.decimals)}`,
+      ].join('\n');
+    });
+
+    const selectedIndex = await promptForSelection(
+      positionOptions,
+      'Which position would you like to split from?'
+    );
+
+    selectedPositionData = positionDataArray[selectedIndex];
+    console.log(`\n> Selected position ${selectedIndex + 1} for splitting...`);
+  }
+
+  if (!selectedPositionData) {
+    throw new Error('No position selected');
+  }
+
+  const { userPosition, positionState, unclaimReward, totalPositionFeeA, totalPositionFeeB } =
+    selectedPositionData;
+
+  console.log('\n> Position Fee Information:');
+  console.log(`- Position Address: ${userPosition.position.toString()}`);
+  console.log(`- Total Claimed Fee A: ${positionState.metrics.totalClaimedAFee.toString()}`);
+  console.log(`- Unclaimed Fee A: ${unclaimReward.feeTokenA.toString()}`);
+  console.log(`- TOTAL POSITION FEE A: ${totalPositionFeeA.toString()}`);
+  console.log(`- Total Claimed Fee B: ${positionState.metrics.totalClaimedBFee.toString()}`);
+  console.log(`- Unclaimed Fee B: ${unclaimReward.feeTokenB.toString()}`);
+  console.log(`- TOTAL POSITION FEE B: ${totalPositionFeeB.toString()}`);
+
+  // CREATE THE SECOND POSITION FIRST
+  const secondPositionKP = Keypair.generate();
+
+  const createSecondPositionTx = await cpAmmInstance.createPosition({
+    owner: new PublicKey(config.splitPosition.newPositionOwner),
+    payer: wallet.publicKey,
+    pool: poolAddress,
+    positionNft: secondPositionKP.publicKey,
+  });
+
+  const createSignature = await sendAndConfirmTransaction(
+    connection,
+    createSecondPositionTx,
+    [wallet.payer, secondPositionKP],
+    {
+      commitment: 'confirmed',
+      skipPreflight: true,
+    }
+  );
+  console.log('Second position created:', createSignature);
+
+  // Now get the newly created second position
+  const secondPositions = await cpAmmInstance.getUserPositionByPool(
+    poolAddress,
+    new PublicKey(config.splitPosition.newPositionOwner)
+  );
+
+  console.log('secondPositions', secondPositions);
+  console.log('secondPositionKP', secondPositionKP.publicKey);
+
+  const secondPosition = secondPositions.find((pos) =>
+    pos.positionState.nftMint.equals(secondPositionKP.publicKey)
+  );
+
+  if (!secondPosition) {
+    throw new Error('Could not find the newly created second position');
+  }
+
+  const splitPositionTx = await cpAmmInstance.splitPosition({
+    firstPositionOwner: wallet.publicKey,
+    secondPositionOwner: new PublicKey(config.splitPosition.newPositionOwner),
+    pool: poolAddress,
+    firstPosition: userPosition.position,
+    firstPositionNftAccount: userPosition.positionNftAccount,
+    secondPosition: secondPosition.position,
+    secondPositionNftAccount: secondPosition.positionNftAccount,
+    unlockedLiquidityPercentage: config.splitPosition.unlockedLiquidityPercentage,
+    permanentLockedLiquidityPercentage: config.splitPosition.permanentLockedLiquidityPercentage,
+    feeAPercentage: config.splitPosition.feeAPercentage,
+    feeBPercentage: config.splitPosition.feeBPercentage,
+    reward0Percentage: config.splitPosition.reward0Percentage,
+    reward1Percentage: config.splitPosition.reward1Percentage,
+  });
+
+  modifyComputeUnitPriceIx(splitPositionTx, config.computeUnitPriceMicroLamports);
+
+  if (config.dryRun) {
+    console.log(`\n> Simulating split position transaction...`);
+    await runSimulateTransaction(connection, [wallet.payer], wallet.publicKey, [splitPositionTx]);
+    console.log('> Split position simulation successful');
+  } else {
+    console.log(`\n>> Sending split position transaction...`);
+
+    const claimFeeTxHash = await sendAndConfirmTransaction(
+      connection,
+      splitPositionTx,
+      [wallet.payer],
+      {
+        commitment: connection.commitment,
+        maxRetries: DEFAULT_SEND_TX_MAX_RETRIES,
+      }
+    ).catch((err) => {
+      console.error(`Failed to claim fee for position:`, err);
+      throw err;
+    });
+
+    console.log(`>>> Position split successfully with tx hash: ${claimFeeTxHash}`);
+  }
+}
+
+/**
+ * Claim position fee for user positions (with interactive selection if multiple positions exist)
+ * @param config - The DAMM V2 config
+ * @param connection - The connection to the network
+ * @param wallet - The wallet to use for the transaction
+ * @param poolAddress - The pool address
+ */
+export async function claimPositionFee(
+  config: DammV2Config,
+  connection: Connection,
+  wallet: Wallet,
+  poolAddress: PublicKey
+) {
+  if (!poolAddress) {
+    throw new Error('Pool address is required');
+  }
+
+  console.log('\n> Claiming position fee...');
+
+  const cpAmmInstance = new CpAmm(connection);
+
+  const poolState = await cpAmmInstance.fetchPoolState(poolAddress);
+
+  const userPositions = await cpAmmInstance.getUserPositionByPool(poolAddress, wallet.publicKey);
+
+  if (userPositions.length === 0) {
+    console.log('> No position found');
+    return;
+  }
+
+  console.log(`\n> Pool address: ${poolAddress.toString()}`);
+  console.log(`\n> Found ${userPositions.length} position(s) in this pool`);
+
+  const positionDataArray = [];
+  for (const userPosition of userPositions) {
+    const positionState = await cpAmmInstance.fetchPositionState(userPosition.position);
+    const unclaimReward = getUnClaimReward(poolState, positionState);
+    positionDataArray.push({
+      userPosition,
+      positionState,
+      unclaimReward,
+      totalPositionFeeA: positionState.metrics.totalClaimedAFee.add(unclaimReward.feeTokenA),
+      totalPositionFeeB: positionState.metrics.totalClaimedBFee.add(unclaimReward.feeTokenB),
+    });
+  }
+
+  let selectedPositionData;
+
+  if (userPositions.length === 1) {
+    selectedPositionData = positionDataArray[0];
+    console.log('> Only one position found, claiming fees from that position...');
+  } else {
+    const tokenAMintInfo = await connection.getAccountInfo(poolState.tokenAMint);
+    const tokenBMintInfo = await connection.getAccountInfo(poolState.tokenBMint);
+
+    if (!tokenAMintInfo || !tokenBMintInfo) {
+      throw new Error('Failed to fetch token mint information');
+    }
+    const tokenAMint = unpackMint(poolState.tokenAMint, tokenAMintInfo, tokenAMintInfo.owner);
+    const tokenBMint = unpackMint(poolState.tokenBMint, tokenBMintInfo, tokenBMintInfo.owner);
+
+    const positionOptions = positionDataArray.map((data, index) => {
+      const { unclaimReward, totalPositionFeeA, totalPositionFeeB } = data;
+      const positionAddress = data.userPosition.position.toString().slice(0, 8) + '...';
+
+      return [
+        `Position ${index + 1} (${positionAddress})`,
+        `  - Unclaimed Fee A: ${getAmountInTokens(unclaimReward.feeTokenA, tokenAMint.decimals)}`,
+        `  - Unclaimed Fee B: ${getAmountInTokens(unclaimReward.feeTokenB, tokenBMint.decimals)}`,
+        `  - Total Position Fee A: ${getAmountInTokens(totalPositionFeeA, tokenAMint.decimals)}`,
+        `  - Total Position Fee B: ${getAmountInTokens(totalPositionFeeB, tokenBMint.decimals)}`,
+      ].join('\n');
+    });
+
+    const selectedIndex = await promptForSelection(
+      positionOptions,
+      'Which position would you like to claim fees from?'
+    );
+
+    selectedPositionData = positionDataArray[selectedIndex];
+    console.log(`\n> Selected position ${selectedIndex + 1} for fee claiming...`);
+  }
+
+  if (!selectedPositionData) {
+    throw new Error('No position selected');
+  }
+  const { userPosition, positionState, unclaimReward, totalPositionFeeA, totalPositionFeeB } =
+    selectedPositionData;
+
+  console.log('\n> Position Fee Information:');
+  console.log(`- Position Address: ${userPosition.position.toString()}`);
+  console.log(`- Total Claimed Fee A: ${positionState.metrics.totalClaimedAFee.toString()}`);
+  console.log(`- Unclaimed Fee A: ${unclaimReward.feeTokenA.toString()}`);
+  console.log(`- TOTAL POSITION FEE A: ${totalPositionFeeA.toString()}`);
+  console.log(`- Total Claimed Fee B: ${positionState.metrics.totalClaimedBFee.toString()}`);
+  console.log(`- Unclaimed Fee B: ${unclaimReward.feeTokenB.toString()}`);
+  console.log(`- TOTAL POSITION FEE B: ${totalPositionFeeB.toString()}`);
+
+  const claimPositionFeeTx = await cpAmmInstance.claimPositionFee({
+    owner: wallet.publicKey,
+    receiver: wallet.publicKey,
+    pool: poolAddress,
+    position: userPosition.position,
+    positionNftAccount: userPosition.positionNftAccount,
+    tokenAVault: poolState.tokenAVault,
+    tokenBVault: poolState.tokenBVault,
+    tokenAMint: poolState.tokenAMint,
+    tokenBMint: poolState.tokenBMint,
+    tokenAProgram: getTokenProgram(poolState.tokenAFlag),
+    tokenBProgram: getTokenProgram(poolState.tokenBFlag),
+    feePayer: wallet.publicKey,
+  });
+
+  modifyComputeUnitPriceIx(claimPositionFeeTx, config.computeUnitPriceMicroLamports);
+
+  if (config.dryRun) {
+    console.log(`\n> Simulating claim position fee transaction...`);
+    await runSimulateTransaction(connection, [wallet.payer], wallet.publicKey, [
+      claimPositionFeeTx,
+    ]);
+    console.log('> Claim position fee simulation successful');
+  } else {
+    console.log(`\n>> Sending claim position fee transaction...`);
+
+    const claimFeeTxHash = await sendAndConfirmTransaction(
+      connection,
+      claimPositionFeeTx,
+      [wallet.payer],
+      {
+        commitment: connection.commitment,
+        maxRetries: DEFAULT_SEND_TX_MAX_RETRIES,
+      }
+    ).catch((err) => {
+      console.error(`Failed to claim fee for position:`, err);
+      throw err;
+    });
+
+    console.log(`>>> Position fee claimed successfully with tx hash: ${claimFeeTxHash}`);
   }
 }

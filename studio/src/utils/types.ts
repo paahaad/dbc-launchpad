@@ -81,7 +81,9 @@ export interface Stake2EarnFarmConfig {
 
 export type DammV2Config = MeteoraConfigBase & {
   createBaseToken: CreateBaseMintConfig | null;
+  poolAddress: string | null;
   dammV2Config: DynamicAmmV2Config | null;
+  splitPosition: SplitPositionConfig | null;
   alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
 };
 
@@ -112,6 +114,16 @@ export interface DynamicFee {
   reductionFactor: number;
   variableFeeControl: number;
   maxVolatilityAccumulator: number;
+}
+
+export interface SplitPositionConfig {
+  newPositionOwner: string;
+  unlockedLiquidityPercentage: number;
+  permanentLockedLiquidityPercentage: number;
+  feeAPercentage: number;
+  feeBPercentage: number;
+  reward0Percentage: number;
+  reward1Percentage: number;
 }
 
 /* DLMM */
