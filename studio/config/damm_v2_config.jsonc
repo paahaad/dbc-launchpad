@@ -39,7 +39,7 @@
    * 2. damm-v2-create-one-sided-pool
    */
   "dammV2Config": {
-    "creator": "Dc85YcHkAWs62ndssWcGN5V4xYaQzPzgUDiRGtvnZas6", // creator address
+    "creator": "YOUR_CREATOR_ADDRESS", // creator address
     "baseAmount": 10000000, // base token amount
     "quoteAmount": null, // quote token amount
     "initPrice": 0.0001, // initial price (in terms of quote/base price) 1 SOL / 1000000000 = initialPrice
@@ -69,6 +69,19 @@
     "activationType": 1, // 0 - Slot | 1 - Timestamp
     "activationPoint": null, // Activation time of the pool depending on activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
     "hasAlphaVault": false // If true, the alpha vault will be created after the pool is created
+  },
+
+  /* splitPosition is only used in the following actions:
+   * 1. damm-v2-split-position
+   */
+  "splitPosition": {
+    "newPositionOwner": "YOUR_NEW_POSITION_OWNER_ADDRESS", // this is the address that will receive the new DAMM v2 NFT position
+    "unlockedLiquidityPercentage": 50, // this is the percentage of unlocked liquidity that will be split and transferred to the newPositionOwner's position
+    "permanentLockedLiquidityPercentage": 50, // this is the percentage of permanent locked liquidity that will be split and transferred to the newPositionOwner's position
+    "feeAPercentage": 50, // this is the percentage of unclaimed fee that will be transferred to the newPositionOwner's position
+    "feeBPercentage": 50, // this is the percentage of unclaimed fee that will be transferred to the newPositionOwner's position
+    "reward0Percentage": 50, // this is the percentage of unclaimed reward that will be transferred to the newPositionOwner's position
+    "reward1Percentage": 50 // this is the percentage of unclaimed reward that will be transferred to the newPositionOwner's position
   },
 
   /* alphaVault is only used in the following actions:
