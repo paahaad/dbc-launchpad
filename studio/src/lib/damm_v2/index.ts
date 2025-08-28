@@ -10,6 +10,7 @@ import {
   getLiquidityDeltaFromAmountA,
   getPriceFromSqrtPrice,
   getSqrtPriceFromPrice,
+  getTokenProgram,
   MAX_SQRT_PRICE,
   MIN_SQRT_PRICE,
   PoolFeesParams,
@@ -460,5 +461,83 @@ export async function createDammV2BalancedPool(
       throw err;
     });
     console.log(`>>> Pool initialized successfully with tx hash: ${initPoolTxHash}`);
+  }
+}
+
+/**
+ * Claim position fee for all user positions
+ * @param config - The DAMM V2 config
+ * @param connection - The connection to the network
+ * @param wallet - The wallet to use for the transaction
+ * @param pool - The pool address
+ */
+export async function claimPositionFee(
+  config: DammV2Config,
+  connection: Connection,
+  wallet: Wallet,
+  poolAddress: PublicKey
+) {
+  if (!poolAddress) {
+    throw new Error('Pool address is required');
+  }
+
+  console.log('\n> Claiming position fee...');
+
+  const cpAmmInstance = new CpAmm(connection);
+
+  const poolState = await cpAmmInstance.fetchPoolState(poolAddress);
+
+  const userPositions = await cpAmmInstance.getUserPositionByPool(poolAddress, wallet.publicKey);
+
+  if (userPositions.length === 0) {
+    console.log('> No position found');
+    return;
+  }
+
+  for (const userPosition of userPositions) {
+    const claimPositionFeeTx = await cpAmmInstance.claimPositionFee({
+      owner: wallet.publicKey,
+      receiver: wallet.publicKey,
+      pool: poolAddress,
+      position: userPosition.position,
+      positionNftAccount: userPosition.positionNftAccount,
+      tokenAVault: poolState.tokenAVault,
+      tokenBVault: poolState.tokenBVault,
+      tokenAMint: poolState.tokenAMint,
+      tokenBMint: poolState.tokenBMint,
+      tokenAProgram: getTokenProgram(poolState.tokenAFlag),
+      tokenBProgram: getTokenProgram(poolState.tokenBFlag),
+      feePayer: wallet.publicKey,
+    });
+
+    modifyComputeUnitPriceIx(claimPositionFeeTx, config.computeUnitPriceMicroLamports);
+
+    console.log(`\n> Pool address: ${poolAddress.toString()}`);
+    console.log(`\n> Found ${userPositions.length} position(s) to claim fees from`);
+
+    if (config.dryRun) {
+      console.log(`> Simulating claim position fee transaction...`);
+      await runSimulateTransaction(connection, [wallet.payer], wallet.publicKey, [
+        claimPositionFeeTx,
+      ]);
+      console.log('> Claim position fee simulation successful');
+    } else {
+      console.log(`>> Sending claim position fee transaction...`);
+
+      const claimFeeTxHash = await sendAndConfirmTransaction(
+        connection,
+        claimPositionFeeTx,
+        [wallet.payer],
+        {
+          commitment: connection.commitment,
+          maxRetries: DEFAULT_SEND_TX_MAX_RETRIES,
+        }
+      ).catch((err) => {
+        console.error(`Failed to claim fee for position:`, err);
+        throw err;
+      });
+
+      console.log(`>>> Position fee claimed successfully with tx hash: ${claimFeeTxHash}`);
+    }
   }
 }
