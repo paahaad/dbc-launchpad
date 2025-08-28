@@ -554,6 +554,10 @@ export async function splitPosition(
     console.log(`\n> Selected position ${selectedIndex + 1} for splitting...`);
   }
 
+  if (!selectedPositionData) {
+    throw new Error('No position selected');
+  }
+
   const { userPosition, positionState, unclaimReward, totalPositionFeeA, totalPositionFeeB } =
     selectedPositionData;
 
@@ -729,6 +733,9 @@ export async function claimPositionFee(
     console.log(`\n> Selected position ${selectedIndex + 1} for fee claiming...`);
   }
 
+  if (!selectedPositionData) {
+    throw new Error('No position selected');
+  }
   const { userPosition, positionState, unclaimReward, totalPositionFeeA, totalPositionFeeB } =
     selectedPositionData;
 
