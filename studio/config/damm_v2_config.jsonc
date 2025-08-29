@@ -31,6 +31,7 @@
 
   /* poolAddress is required for the following actions:
    * 1. damm-v2-claim-position-fee
+   * 2. damm-v2-split-position
    */
   "poolAddress": "YOUR_POOL_ADDRESS",
 
