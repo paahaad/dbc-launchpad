@@ -82,7 +82,9 @@ meteora-invent/
     │   │   │   └── lock_liquidity.ts
     │   │   ├── damm_v2
     │   │   │   ├── create_balanced_pool.ts
-    │   │   │   └── create_one_sided_pool.ts
+    │   │   │   ├── create_one_sided_pool.ts
+    │   │   │   ├── claim_position_fee.ts
+    │   │   │   └── split_position.ts
     │   │   ├── dbc
     │   │   │   ├── claim_trading_fee.ts
     │   │   │   ├── create_config.ts

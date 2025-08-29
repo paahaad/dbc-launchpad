@@ -114,6 +114,18 @@ pnpm damm-v2-create-balanced-pool --config ./config/damm_v2_config.jsonc
 pnpm damm-v2-create-one-sided-pool --config ./config/damm_v2_config.jsonc
 ```
 
+**Split Position**
+
+```bash
+pnpm damm-v2-split-position --config ./config/damm_v2_config.jsonc
+```
+
+**Claim Position Fee**
+
+```bash
+pnpm damm-v2-claim-position-fee --config ./config/damm_v2_config.jsonc
+```
+
 ### DAMM v1 Actions
 
 **Create a Constant Product Pool**

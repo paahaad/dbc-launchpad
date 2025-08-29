@@ -134,6 +134,18 @@ pnpm studio damm-v2-create-balanced-pool --config ./studio/config/damm_v2_config
 pnpm studio damm-v2-create-one-sided-pool --config ./studio/config/damm_v2_config.jsonc
 ```
 
+**Split Position**
+
+```bash
+pnpm studio damm-v2-split-position --config ./studio/config/damm_v2_config.jsonc
+```
+
+**Claim Position Fee**
+
+```bash
+pnpm studio damm-v2-claim-position-fee --config ./studio/config/damm_v2_config.jsonc
+```
+
 ---
 
 #### DAMM v1 Actions
@@ -292,6 +304,8 @@ meteora-invent/
     │   │   ├── damm_v2
     │   │   │   ├── create_balanced_pool.ts
     │   │   │   └── create_one_sided_pool.ts
+    │   │   │   ├── claim_position_fee.ts
+    │   │   │   └── split_position.ts
     │   │   ├── dbc
     │   │   │   ├── claim_trading_fee.ts
     │   │   │   ├── create_config.ts
