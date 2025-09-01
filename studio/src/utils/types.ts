@@ -83,6 +83,7 @@ export type DammV2Config = MeteoraConfigBase & {
   createBaseToken: CreateBaseMintConfig | null;
   poolAddress: string | null;
   dammV2Config: DynamicAmmV2Config | null;
+  addLiquidity: AddLiquidityConfig | null;
   splitPosition: SplitPositionConfig | null;
   alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
 };
@@ -124,6 +125,11 @@ export interface SplitPositionConfig {
   feeBPercentage: number;
   reward0Percentage: number;
   reward1Percentage: number;
+}
+
+export interface AddLiquidityConfig {
+  amountIn: number;
+  isTokenA: boolean;
 }
 
 /* DLMM */

@@ -4,6 +4,7 @@ import BN from 'bn.js';
 import { Signer, PublicKey, Connection } from '@solana/web3.js';
 import { getMint } from '@solana/spl-token';
 import { AllocationByAmount, LockLiquidityAllocation } from '../utils/types';
+import { ActivationType } from '@meteora-ag/dynamic-bonding-curve-sdk';
 
 export function getAmountInLamports(amount: number | string, decimals: number): BN {
   const amountD = new Decimal(amount);
@@ -95,4 +96,21 @@ export function chunks<T>(array: T[], size: number): T[][] {
   return Array.apply(0, new Array(Math.ceil(array.length / size))).map((_, index) =>
     array.slice(index * size, (index + 1) * size)
   );
+}
+
+export async function getCurrentPoint(
+  connection: Connection,
+  activationType: ActivationType
+): Promise<BN> {
+  const currentSlot = await connection.getSlot();
+
+  if (activationType === ActivationType.Slot) {
+    return new BN(currentSlot);
+  } else {
+    const currentTime = await connection.getBlockTime(currentSlot);
+    if (currentTime === null) {
+      throw new Error('Failed to get block time');
+    }
+    return new BN(currentTime);
+  }
 }

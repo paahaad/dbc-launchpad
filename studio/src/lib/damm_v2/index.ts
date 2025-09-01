@@ -26,6 +26,7 @@ import {
   getQuoteDecimals,
   modifyComputeUnitPriceIx,
   runSimulateTransaction,
+  getCurrentPoint,
 } from '../../helpers';
 import { promptForSelection } from '../../helpers/cli';
 import { DEFAULT_SEND_TX_MAX_RETRIES } from '../../utils/constants';
@@ -532,18 +533,33 @@ export async function splitPosition(
     const tokenAMint = unpackMint(poolState.tokenAMint, tokenAMintInfo, tokenAMintInfo.owner);
     const tokenBMint = unpackMint(poolState.tokenBMint, tokenBMintInfo, tokenBMintInfo.owner);
 
-    const positionOptions = positionDataArray.map((data, index) => {
-      const { unclaimReward, totalPositionFeeA, totalPositionFeeB } = data;
-      const positionAddress = data.userPosition.position.toString().slice(0, 8) + '...';
+    const positionOptions = await Promise.all(
+      positionDataArray.map(async (data, index) => {
+        const { unclaimReward, totalPositionFeeA, totalPositionFeeB, positionState } = data;
+        const positionAddress = data.userPosition.position.toString().slice(0, 8) + '...';
 
-      return [
-        `Position ${index + 1} (${positionAddress})`,
-        `  - Unclaimed Fee A: ${getAmountInTokens(unclaimReward.feeTokenA, tokenAMint.decimals)}`,
-        `  - Unclaimed Fee B: ${getAmountInTokens(unclaimReward.feeTokenB, tokenBMint.decimals)}`,
-        `  - Total Position Fee A: ${getAmountInTokens(totalPositionFeeA, tokenAMint.decimals)}`,
-        `  - Total Position Fee B: ${getAmountInTokens(totalPositionFeeB, tokenBMint.decimals)}`,
-      ].join('\n');
-    });
+        // Calculate token amounts from liquidity using withdraw quote
+        const withdrawQuote = await cpAmmInstance.getWithdrawQuote({
+          liquidityDelta: positionState.unlockedLiquidity,
+          sqrtPrice: poolState.sqrtPrice,
+          minSqrtPrice: poolState.sqrtMinPrice,
+          maxSqrtPrice: poolState.sqrtMaxPrice,
+        });
+
+        return [
+          `Position ${index + 1} (${positionAddress})`,
+          `  - Unlocked Liquidity: ${positionState.unlockedLiquidity.toString()}`,
+          `  - Token A Amount: ${getAmountInTokens(withdrawQuote.outAmountA, tokenAMint.decimals)}`,
+          `  - Token B Amount: ${getAmountInTokens(withdrawQuote.outAmountB, tokenBMint.decimals)}`,
+          `  - Vested Liquidity: ${positionState.vestedLiquidity.toString()}`,
+          `  - Permanent Locked Liquidity: ${positionState.permanentLockedLiquidity.toString()}`,
+          `  - Unclaimed Fee A: ${getAmountInTokens(unclaimReward.feeTokenA, tokenAMint.decimals)}`,
+          `  - Unclaimed Fee B: ${getAmountInTokens(unclaimReward.feeTokenB, tokenBMint.decimals)}`,
+          `  - Total Position Fee A: ${getAmountInTokens(totalPositionFeeA, tokenAMint.decimals)}`,
+          `  - Total Position Fee B: ${getAmountInTokens(totalPositionFeeB, tokenBMint.decimals)}`,
+        ].join('\n');
+      })
+    );
 
     const selectedIndex = await promptForSelection(
       positionOptions,
@@ -596,9 +612,6 @@ export async function splitPosition(
     poolAddress,
     new PublicKey(config.splitPosition.newPositionOwner)
   );
-
-  console.log('secondPositions', secondPositions);
-  console.log('secondPositionKP', secondPositionKP.publicKey);
 
   const secondPosition = secondPositions.find((pos) =>
     pos.positionState.nftMint.equals(secondPositionKP.publicKey)
@@ -788,5 +801,692 @@ export async function claimPositionFee(
     });
 
     console.log(`>>> Position fee claimed successfully with tx hash: ${claimFeeTxHash}`);
+  }
+}
+
+/**
+ * Add liquidity to a position
+ * @param config - The DAMM V2 config
+ * @param connection - The connection to the network
+ * @param wallet - The wallet to use for the transaction
+ * @param poolAddress - The pool address
+ */
+export async function addLiquidity(
+  config: DammV2Config,
+  connection: Connection,
+  wallet: Wallet,
+  poolAddress: PublicKey
+) {
+  if (!poolAddress) {
+    throw new Error('Pool address is required');
+  }
+
+  if (!config.addLiquidity) {
+    throw new Error('Add liquidity config is required');
+  }
+
+  console.log('\n> Adding liquidity...');
+
+  const cpAmmInstance = new CpAmm(connection);
+
+  const poolState = await cpAmmInstance.fetchPoolState(poolAddress);
+
+  const userPositions = await cpAmmInstance.getUserPositionByPool(poolAddress, wallet.publicKey);
+
+  if (userPositions.length === 0) {
+    console.log('> No position found');
+    return;
+  }
+
+  console.log(`\n> Pool address: ${poolAddress.toString()}`);
+  console.log(`\n> Found ${userPositions.length} position(s) in this pool`);
+
+  const positionDataArray = [];
+  for (const userPosition of userPositions) {
+    const positionState = await cpAmmInstance.fetchPositionState(userPosition.position);
+    const unclaimReward = getUnClaimReward(poolState, positionState);
+    positionDataArray.push({
+      userPosition,
+      positionState,
+      unclaimReward,
+    });
+  }
+
+  let selectedPositionData;
+
+  if (userPositions.length === 1) {
+    selectedPositionData = positionDataArray[0];
+    console.log('> Only one position found, adding liquidity to that position...');
+  } else {
+    const positionOptions = positionDataArray.map((data, index) => {
+      const { positionState } = data;
+      const positionAddress = data.userPosition.position.toString().slice(0, 8) + '...';
+
+      return [
+        `Position ${index + 1} (${positionAddress})`,
+        `  - Unlocked Liquidity: ${positionState.unlockedLiquidity.toString()}`,
+        `  - Vested Liquidity: ${positionState.vestedLiquidity.toString()}`,
+        `  - Permanent Locked Liquidity: ${positionState.permanentLockedLiquidity.toString()}`,
+        `  - Unclaimed Fee A: ${data.unclaimReward.feeTokenA.toString()}`,
+        `  - Unclaimed Fee B: ${data.unclaimReward.feeTokenB.toString()}`,
+      ].join('\n');
+    });
+
+    const selectedIndex = await promptForSelection(
+      positionOptions,
+      'Which position would you like to add liquidity to?'
+    );
+
+    selectedPositionData = positionDataArray[selectedIndex];
+    console.log(`\n> Selected position ${selectedIndex + 1} for adding liquidity...`);
+  }
+
+  if (!selectedPositionData) {
+    throw new Error('No position selected');
+  }
+  const { userPosition } = selectedPositionData;
+
+  const tokenAMintInfo = await connection.getAccountInfo(poolState.tokenAMint);
+  const tokenBMintInfo = await connection.getAccountInfo(poolState.tokenBMint);
+
+  if (!tokenAMintInfo || !tokenBMintInfo) {
+    throw new Error('Failed to fetch token mint information');
+  }
+
+  const tokenAMintData = unpackMint(poolState.tokenAMint, tokenAMintInfo, tokenAMintInfo.owner);
+  const tokenBMintData = unpackMint(poolState.tokenBMint, tokenBMintInfo, tokenBMintInfo.owner);
+
+  const amountIn = getAmountInLamports(
+    config.addLiquidity.amountIn,
+    config.addLiquidity.isTokenA ? tokenAMintData.decimals : tokenBMintData.decimals
+  );
+
+  console.log(`\n> Adding liquidity configuration:`);
+  console.log(
+    `- Amount In: ${config.addLiquidity.amountIn} ${config.addLiquidity.isTokenA ? 'Token A' : 'Token B'}`
+  );
+  console.log(`- Amount In (raw): ${amountIn.toString()}`);
+
+  const depositQuote = await cpAmmInstance.getDepositQuote({
+    inAmount: amountIn,
+    isTokenA: config.addLiquidity.isTokenA,
+    minSqrtPrice: poolState.sqrtMinPrice,
+    maxSqrtPrice: poolState.sqrtMaxPrice,
+    sqrtPrice: poolState.sqrtPrice,
+  });
+
+  console.log(`\n> Deposit quote:`);
+  console.log(`- Liquidity Delta: ${depositQuote.liquidityDelta.toString()}`);
+  console.log(
+    `- Output Amount: ${getAmountInTokens(depositQuote.outputAmount, tokenBMintData.decimals)}`
+  );
+
+  const maxAmountTokenA = config.addLiquidity.isTokenA ? amountIn : depositQuote.outputAmount;
+  const maxAmountTokenB = config.addLiquidity.isTokenA ? depositQuote.outputAmount : amountIn;
+
+  const tokenAAmountThreshold = config.addLiquidity.isTokenA ? amountIn : depositQuote.outputAmount;
+  const tokenBAmountThreshold = config.addLiquidity.isTokenA ? depositQuote.outputAmount : amountIn;
+
+  console.log(`\n> Slippage protection:`);
+  console.log(`- Max Token A: ${getAmountInTokens(maxAmountTokenA, tokenAMintData.decimals)}`);
+  console.log(`- Max Token B: ${getAmountInTokens(maxAmountTokenB, tokenBMintData.decimals)}`);
+  console.log(
+    `- Min Token A: ${getAmountInTokens(tokenAAmountThreshold, tokenAMintData.decimals)}`
+  );
+  console.log(
+    `- Min Token B: ${getAmountInTokens(tokenBAmountThreshold, tokenBMintData.decimals)}`
+  );
+
+  console.log(`\n> Adding ${depositQuote.liquidityDelta.toString()} liquidity units...`);
+
+  const addLiquidityTx = await cpAmmInstance.addLiquidity({
+    owner: wallet.publicKey,
+    pool: poolAddress,
+    position: userPosition.position,
+    positionNftAccount: userPosition.positionNftAccount,
+    liquidityDelta: depositQuote.liquidityDelta,
+    maxAmountTokenA,
+    maxAmountTokenB,
+    tokenAAmountThreshold,
+    tokenBAmountThreshold,
+    tokenAMint: poolState.tokenAMint,
+    tokenBMint: poolState.tokenBMint,
+    tokenAVault: poolState.tokenAVault,
+    tokenBVault: poolState.tokenBVault,
+    tokenAProgram: getTokenProgram(poolState.tokenAFlag),
+    tokenBProgram: getTokenProgram(poolState.tokenBFlag),
+  });
+
+  modifyComputeUnitPriceIx(addLiquidityTx, config.computeUnitPriceMicroLamports);
+
+  if (config.dryRun) {
+    console.log(`\n> Simulating add liquidity transaction...`);
+    await runSimulateTransaction(connection, [wallet.payer], wallet.publicKey, [addLiquidityTx]);
+    console.log('> Add liquidity simulation successful');
+  } else {
+    console.log(`\n>> Sending add liquidity transaction...`);
+
+    const addLiquidityTxHash = await sendAndConfirmTransaction(
+      connection,
+      addLiquidityTx,
+      [wallet.payer],
+      {
+        commitment: connection.commitment,
+        maxRetries: DEFAULT_SEND_TX_MAX_RETRIES,
+      }
+    ).catch((err) => {
+      console.error(`Failed to add liquidity:`, err);
+      throw err;
+    });
+
+    console.log(`>>> Liquidity added successfully with tx hash: ${addLiquidityTxHash}`);
+
+    await connection.confirmTransaction(addLiquidityTxHash, 'finalized');
+  }
+
+  // Show updated position state
+  const updatedPositionState = await cpAmmInstance.fetchPositionState(userPosition.position);
+  console.log(`\n> Updated position state after adding liquidity:`);
+  console.log(`- Unlocked liquidity: ${updatedPositionState.unlockedLiquidity.toString()}`);
+  console.log(`- Vested liquidity: ${updatedPositionState.vestedLiquidity.toString()}`);
+  console.log(
+    `- Permanent locked liquidity: ${updatedPositionState.permanentLockedLiquidity.toString()}`
+  );
+}
+
+/**
+ * Remove liquidity from a position
+ * @param config - The DAMM V2 config
+ * @param connection - The connection to the network
+ * @param wallet - The wallet to use for the transaction
+ * @param poolAddress - The pool address
+ */
+export async function removeLiquidity(
+  config: DammV2Config,
+  connection: Connection,
+  wallet: Wallet,
+  poolAddress: PublicKey
+) {
+  if (!config.dammV2Config) {
+    throw new Error('Missing DAMM V2 configuration');
+  }
+  if (!poolAddress) {
+    throw new Error('Pool address is required');
+  }
+
+  console.log('\n> Removing liquidity...');
+
+  const cpAmmInstance = new CpAmm(connection);
+
+  const poolState = await cpAmmInstance.fetchPoolState(poolAddress);
+
+  const userPositions = await cpAmmInstance.getUserPositionByPool(poolAddress, wallet.publicKey);
+
+  if (userPositions.length === 0) {
+    console.log('> No position found');
+    return;
+  }
+
+  console.log(`\n> Pool address: ${poolAddress.toString()}`);
+  console.log(`\n> Found ${userPositions.length} position(s) in this pool`);
+
+  const positionDataArray = [];
+  for (const userPosition of userPositions) {
+    const positionState = await cpAmmInstance.fetchPositionState(userPosition.position);
+    const unclaimReward = getUnClaimReward(poolState, positionState);
+    positionDataArray.push({
+      userPosition,
+      positionState,
+      unclaimReward,
+      totalPositionFeeA: positionState.metrics.totalClaimedAFee.add(unclaimReward.feeTokenA),
+      totalPositionFeeB: positionState.metrics.totalClaimedBFee.add(unclaimReward.feeTokenB),
+    });
+  }
+
+  let selectedPositionData;
+
+  if (userPositions.length === 1) {
+    selectedPositionData = positionDataArray[0];
+    console.log('> Only one position found, removing liquidity from that position...');
+  } else {
+    const tokenAMintInfo = await connection.getAccountInfo(poolState.tokenAMint);
+    const tokenBMintInfo = await connection.getAccountInfo(poolState.tokenBMint);
+
+    if (!tokenAMintInfo || !tokenBMintInfo) {
+      throw new Error('Failed to fetch token mint information');
+    }
+    const tokenAMint = unpackMint(poolState.tokenAMint, tokenAMintInfo, tokenAMintInfo.owner);
+    const tokenBMint = unpackMint(poolState.tokenBMint, tokenBMintInfo, tokenBMintInfo.owner);
+
+    const positionOptions = await Promise.all(
+      positionDataArray.map(async (data, index) => {
+        const { positionState } = data;
+        const positionAddress = data.userPosition.position.toString().slice(0, 8) + '...';
+
+        const withdrawQuote = await cpAmmInstance.getWithdrawQuote({
+          liquidityDelta: positionState.unlockedLiquidity,
+          sqrtPrice: poolState.sqrtPrice,
+          minSqrtPrice: poolState.sqrtMinPrice,
+          maxSqrtPrice: poolState.sqrtMaxPrice,
+        });
+
+        return [
+          `Position ${index + 1} (${positionAddress})`,
+          `  - Unlocked Liquidity: ${positionState.unlockedLiquidity.toString()}`,
+          `  - Token A Amount: ${getAmountInTokens(withdrawQuote.outAmountA, tokenAMint.decimals)}`,
+          `  - Token B Amount: ${getAmountInTokens(withdrawQuote.outAmountB, tokenBMint.decimals)}`,
+          `  - Vested Liquidity: ${positionState.vestedLiquidity.toString()}`,
+          `  - Permanent Locked Liquidity: ${positionState.permanentLockedLiquidity.toString()}`,
+        ].join('\n');
+      })
+    );
+
+    const selectedIndex = await promptForSelection(
+      positionOptions,
+      'Which position would you like to remove liquidity from?'
+    );
+
+    selectedPositionData = positionDataArray[selectedIndex];
+    console.log(`\n> Selected position ${selectedIndex + 1} for removing liquidity...`);
+  }
+
+  if (!selectedPositionData) {
+    throw new Error('No position selected');
+  }
+  const { userPosition, positionState, unclaimReward, totalPositionFeeA, totalPositionFeeB } =
+    selectedPositionData;
+
+  console.log('\n> Position Fee Information:');
+  console.log(`- Position Address: ${userPosition.position.toString()}`);
+  console.log(`- Total Claimed Fee A: ${positionState.metrics.totalClaimedAFee.toString()}`);
+  console.log(`- Unclaimed Fee A: ${unclaimReward.feeTokenA.toString()}`);
+  console.log(`- TOTAL POSITION FEE A: ${totalPositionFeeA.toString()}`);
+  console.log(`- Total Claimed Fee B: ${positionState.metrics.totalClaimedBFee.toString()}`);
+  console.log(`- Unclaimed Fee B: ${unclaimReward.feeTokenB.toString()}`);
+  console.log(`- TOTAL POSITION FEE B: ${totalPositionFeeB.toString()}`);
+
+  const tokenAMintInfo = await connection.getAccountInfo(poolState.tokenAMint);
+  const tokenBMintInfo = await connection.getAccountInfo(poolState.tokenBMint);
+
+  if (!tokenAMintInfo || !tokenBMintInfo) {
+    throw new Error('Failed to fetch token mint information');
+  }
+
+  const tokenAMintData = unpackMint(poolState.tokenAMint, tokenAMintInfo, tokenAMintInfo.owner);
+  const tokenBMintData = unpackMint(poolState.tokenBMint, tokenBMintInfo, tokenBMintInfo.owner);
+
+  const currentPositionState = await cpAmmInstance.fetchPositionState(userPosition.position);
+
+  console.log(`\n> Current position liquidity:`);
+  console.log(`- Unlocked liquidity: ${currentPositionState.unlockedLiquidity.toString()}`);
+  console.log(`- Vested liquidity: ${currentPositionState.vestedLiquidity.toString()}`);
+  console.log(
+    `- Permanent locked liquidity: ${currentPositionState.permanentLockedLiquidity.toString()}`
+  );
+
+  const vestings = await cpAmmInstance.getAllVestingsByPosition(userPosition.position);
+  console.log(`\n> Found ${vestings.length} vesting account(s) for this position`);
+
+  // total liquidity to remove (unlocked + vested)
+  const finalPositionState = await cpAmmInstance.fetchPositionState(userPosition.position);
+  const totalRemovableLiquidity = finalPositionState.unlockedLiquidity.add(
+    finalPositionState.vestedLiquidity
+  );
+  const liquidityToRemove = totalRemovableLiquidity;
+
+  if (liquidityToRemove.isZero()) {
+    console.log('> No removable liquidity to remove');
+    return;
+  }
+
+  console.log(`\n> Total removable liquidity: ${liquidityToRemove.toString()}`);
+  console.log(`  - Unlocked: ${finalPositionState.unlockedLiquidity.toString()}`);
+  console.log(
+    `  - Vested (will be unlocked by SDK): ${finalPositionState.vestedLiquidity.toString()}`
+  );
+
+  console.log(`\n> Removing ${liquidityToRemove.toString()} liquidity units...`);
+
+  const withdrawQuote = await cpAmmInstance.getWithdrawQuote({
+    liquidityDelta: liquidityToRemove,
+    sqrtPrice: poolState.sqrtPrice,
+    minSqrtPrice: poolState.sqrtMinPrice,
+    maxSqrtPrice: poolState.sqrtMaxPrice,
+  });
+
+  console.log(`\n> Withdraw quote:`);
+  console.log(
+    `- Expected token A amount: ${getAmountInTokens(withdrawQuote.outAmountA, tokenAMintData.decimals)}`
+  );
+  console.log(
+    `- Expected token B amount: ${getAmountInTokens(withdrawQuote.outAmountB, tokenBMintData.decimals)}`
+  );
+
+  const currentPoint = await getCurrentPoint(connection, config.dammV2Config.activationType);
+
+  const removeLiquidityTx = await cpAmmInstance.removeLiquidity({
+    owner: wallet.publicKey,
+    position: userPosition.position,
+    pool: poolAddress,
+    positionNftAccount: userPosition.positionNftAccount,
+    liquidityDelta: liquidityToRemove,
+    tokenAAmountThreshold: withdrawQuote.outAmountA,
+    tokenBAmountThreshold: withdrawQuote.outAmountB,
+    tokenAMint: poolState.tokenAMint,
+    tokenBMint: poolState.tokenBMint,
+    tokenAVault: poolState.tokenAVault,
+    tokenBVault: poolState.tokenBVault,
+    tokenAProgram: getTokenProgram(poolState.tokenAFlag),
+    tokenBProgram: getTokenProgram(poolState.tokenBFlag),
+    currentPoint,
+    vestings: vestings.map((vesting) => ({
+      account: vesting.publicKey,
+      vestingState: vesting.account,
+    })),
+  });
+
+  modifyComputeUnitPriceIx(removeLiquidityTx, config.computeUnitPriceMicroLamports);
+
+  if (config.dryRun) {
+    console.log(`\n> Simulating remove liquidity transaction...`);
+    await runSimulateTransaction(connection, [wallet.payer], wallet.publicKey, [removeLiquidityTx]);
+    console.log('> Remove liquidity simulation successful');
+  } else {
+    console.log(`\n>> Sending remove liquidity transaction...`);
+
+    const removeLiquidityTxHash = await sendAndConfirmTransaction(
+      connection,
+      removeLiquidityTx,
+      [wallet.payer],
+      {
+        commitment: connection.commitment,
+        maxRetries: DEFAULT_SEND_TX_MAX_RETRIES,
+      }
+    ).catch((err) => {
+      console.error(`Failed to remove liquidity:`, err);
+      throw err;
+    });
+
+    console.log(`>>> Liquidity removed successfully with tx hash: ${removeLiquidityTxHash}`);
+
+    await connection.confirmTransaction(removeLiquidityTxHash, 'finalized');
+  }
+
+  // sanity check if position can be closed (all liquidity removed and fees claimed)
+  const updatedPositionState = await cpAmmInstance.fetchPositionState(userPosition.position);
+  const updatedUnclaimReward = getUnClaimReward(poolState, updatedPositionState);
+
+  console.log(`\n> Updated position state after liquidity removal:`);
+  console.log(`- Unlocked liquidity: ${updatedPositionState.unlockedLiquidity.toString()}`);
+  console.log(`- Vested liquidity: ${updatedPositionState.vestedLiquidity.toString()}`);
+  console.log(
+    `- Permanent locked liquidity: ${updatedPositionState.permanentLockedLiquidity.toString()}`
+  );
+
+  const hasRemainingLiquidity =
+    !updatedPositionState.unlockedLiquidity.isZero() ||
+    !updatedPositionState.vestedLiquidity.isZero() ||
+    !updatedPositionState.permanentLockedLiquidity.isZero();
+
+  const hasUnclaimedFees =
+    !updatedUnclaimReward.feeTokenA.isZero() || !updatedUnclaimReward.feeTokenB.isZero();
+
+  console.log(`\n> Position status check:`);
+  console.log(`- Has remaining liquidity: ${hasRemainingLiquidity}`);
+  console.log(`- Has unclaimed fees: ${hasUnclaimedFees}`);
+
+  if (hasRemainingLiquidity) {
+    console.log(`\n> Position still has liquidity remaining:`);
+    console.log(`- Unlocked liquidity: ${updatedPositionState.unlockedLiquidity.toString()}`);
+    console.log(`- Vested liquidity: ${updatedPositionState.vestedLiquidity.toString()}`);
+    console.log(
+      `- Permanent locked liquidity: ${updatedPositionState.permanentLockedLiquidity.toString()}`
+    );
+    console.log('> Position cannot be closed yet');
+    return;
+  }
+
+  // claim any remaining fees before closing position
+  if (hasUnclaimedFees) {
+    console.log(`\n> Found unclaimed fees, claiming before closing position:`);
+    console.log(`- Unclaimed Fee A: ${updatedUnclaimReward.feeTokenA.toString()}`);
+    console.log(`- Unclaimed Fee B: ${updatedUnclaimReward.feeTokenB.toString()}`);
+
+    const claimPositionFeeTx = await cpAmmInstance.claimPositionFee({
+      owner: wallet.publicKey,
+      position: userPosition.position,
+      positionNftAccount: userPosition.positionNftAccount,
+      pool: poolAddress,
+      tokenAVault: poolState.tokenAVault,
+      tokenBVault: poolState.tokenBVault,
+      tokenAMint: poolState.tokenAMint,
+      tokenBMint: poolState.tokenBMint,
+      tokenAProgram: getTokenProgram(poolState.tokenAFlag),
+      tokenBProgram: getTokenProgram(poolState.tokenBFlag),
+    });
+
+    modifyComputeUnitPriceIx(claimPositionFeeTx, config.computeUnitPriceMicroLamports);
+
+    if (config.dryRun) {
+      console.log(`\n> Simulating claim position fee transaction...`);
+      await runSimulateTransaction(connection, [wallet.payer], wallet.publicKey, [
+        claimPositionFeeTx,
+      ]);
+      console.log('> Claim position fee simulation successful');
+    } else {
+      console.log(`\n>> Sending claim position fee transaction...`);
+
+      const claimFeeTxHash = await sendAndConfirmTransaction(
+        connection,
+        claimPositionFeeTx,
+        [wallet.payer],
+        {
+          commitment: connection.commitment,
+          maxRetries: DEFAULT_SEND_TX_MAX_RETRIES,
+        }
+      ).catch((err) => {
+        console.error(`Failed to claim fee for position:`, err);
+        throw err;
+      });
+
+      console.log(`>>> Position fee claimed successfully with tx hash: ${claimFeeTxHash}`);
+
+      // wait for the fee claiming transaction to be finalized
+      await connection.confirmTransaction(claimFeeTxHash, 'confirmed');
+    }
+
+    // verify final position state after fee claiming
+    const finalPositionState = await cpAmmInstance.fetchPositionState(userPosition.position);
+    const finalUnclaimReward = getUnClaimReward(poolState, finalPositionState);
+
+    console.log(`\n> Final position state after fee claiming:`);
+    console.log(`- Unlocked liquidity: ${finalPositionState.unlockedLiquidity.toString()}`);
+    console.log(`- Vested liquidity: ${finalPositionState.vestedLiquidity.toString()}`);
+    console.log(
+      `- Permanent locked liquidity: ${finalPositionState.permanentLockedLiquidity.toString()}`
+    );
+    console.log(`- Unclaimed Fee A: ${finalUnclaimReward.feeTokenA.toString()}`);
+    console.log(`- Unclaimed Fee B: ${finalUnclaimReward.feeTokenB.toString()}`);
+  }
+
+  console.log(`\n> All liquidity removed and fees claimed. Closing position...`);
+
+  const closePositionTx = await cpAmmInstance.closePosition({
+    owner: wallet.publicKey,
+    pool: poolAddress,
+    position: userPosition.position,
+    positionNftMint: updatedPositionState.nftMint,
+    positionNftAccount: userPosition.positionNftAccount,
+  });
+
+  modifyComputeUnitPriceIx(closePositionTx, config.computeUnitPriceMicroLamports);
+
+  if (config.dryRun) {
+    console.log(`\n> Simulating close position transaction...`);
+    await runSimulateTransaction(connection, [wallet.payer], wallet.publicKey, [closePositionTx]);
+    console.log('> Close position simulation successful');
+  } else {
+    console.log(`\n>> Sending close position transaction...`);
+
+    const closePositionTxHash = await sendAndConfirmTransaction(
+      connection,
+      closePositionTx,
+      [wallet.payer],
+      {
+        commitment: connection.commitment,
+        maxRetries: DEFAULT_SEND_TX_MAX_RETRIES,
+      }
+    ).catch((err) => {
+      console.error(`Failed to close position:`, err);
+      throw err;
+    });
+
+    console.log(`>>> Position closed successfully with tx hash: ${closePositionTxHash}`);
+  }
+}
+
+/**
+ *
+ * @param config - The DAMM V2 config
+ * @param connection - The connection to the network
+ * @param wallet - The wallet to use for the transaction
+ * @param poolAddress - The pool address
+ */
+export async function closePosition(
+  config: DammV2Config,
+  connection: Connection,
+  wallet: Wallet,
+  poolAddress: PublicKey
+) {
+  if (!poolAddress) {
+    throw new Error('Pool address is required');
+  }
+
+  console.log('\n> Closing position...');
+
+  const cpAmmInstance = new CpAmm(connection);
+
+  const poolState = await cpAmmInstance.fetchPoolState(poolAddress);
+
+  const userPositions = await cpAmmInstance.getUserPositionByPool(poolAddress, wallet.publicKey);
+
+  if (userPositions.length === 0) {
+    console.log('> No position found');
+    return;
+  }
+
+  console.log(`\n> Pool address: ${poolAddress.toString()}`);
+  console.log(`\n> Found ${userPositions.length} position(s) in this pool`);
+
+  const positionDataArray = [];
+  for (const userPosition of userPositions) {
+    const positionState = await cpAmmInstance.fetchPositionState(userPosition.position);
+    const unclaimReward = getUnClaimReward(poolState, positionState);
+    positionDataArray.push({
+      userPosition,
+      positionState,
+      unclaimReward,
+      totalPositionFeeA: positionState.metrics.totalClaimedAFee.add(unclaimReward.feeTokenA),
+      totalPositionFeeB: positionState.metrics.totalClaimedBFee.add(unclaimReward.feeTokenB),
+    });
+  }
+
+  let selectedPositionData;
+
+  if (userPositions.length === 1) {
+    selectedPositionData = positionDataArray[0];
+    console.log('> Only one position found, closing that position...');
+  } else {
+    const positionOptions = positionDataArray.map((data, index) => {
+      const { positionState } = data;
+      const positionAddress = data.userPosition.position.toString().slice(0, 8) + '...';
+
+      return [
+        `Position ${index + 1} (${positionAddress})`,
+        `  - Unlocked Liquidity: ${positionState.unlockedLiquidity.toString()}`,
+        `  - Vested Liquidity: ${positionState.vestedLiquidity.toString()}`,
+        `  - Permanent Locked Liquidity: ${positionState.permanentLockedLiquidity.toString()}`,
+        `  - Unclaimed Fee A: ${data.unclaimReward.feeTokenA.toString()}`,
+        `  - Unclaimed Fee B: ${data.unclaimReward.feeTokenB.toString()}`,
+      ].join('\n');
+    });
+
+    const selectedIndex = await promptForSelection(
+      positionOptions,
+      'Which position would you like to close?'
+    );
+
+    selectedPositionData = positionDataArray[selectedIndex];
+    console.log(`\n> Selected position ${selectedIndex + 1} for closing...`);
+  }
+
+  if (!selectedPositionData) {
+    throw new Error('No position selected');
+  }
+  const { userPosition } = selectedPositionData;
+
+  const currentPositionState = await cpAmmInstance.fetchPositionState(userPosition.position);
+  const currentUnclaimReward = getUnClaimReward(poolState, currentPositionState);
+
+  console.log(`\n> Current position state:`);
+  console.log(`- Unlocked liquidity: ${currentPositionState.unlockedLiquidity.toString()}`);
+  console.log(`- Vested liquidity: ${currentPositionState.vestedLiquidity.toString()}`);
+  console.log(
+    `- Permanent locked liquidity: ${currentPositionState.permanentLockedLiquidity.toString()}`
+  );
+  console.log(`- Unclaimed Fee A: ${currentUnclaimReward.feeTokenA.toString()}`);
+  console.log(`- Unclaimed Fee B: ${currentUnclaimReward.feeTokenB.toString()}`);
+
+  const hasRemainingLiquidity =
+    !currentPositionState.unlockedLiquidity.isZero() ||
+    !currentPositionState.vestedLiquidity.isZero() ||
+    !currentPositionState.permanentLockedLiquidity.isZero();
+
+  const hasUnclaimedFees =
+    !currentUnclaimReward.feeTokenA.isZero() || !currentUnclaimReward.feeTokenB.isZero();
+
+  if (hasRemainingLiquidity) {
+    console.log(`\n> Position still has liquidity remaining. Please remove liquidity first.`);
+    return;
+  }
+
+  if (hasUnclaimedFees) {
+    console.log(`\n> Position still has unclaimed fees. Please claim fees first.`);
+    return;
+  }
+
+  console.log(`\n> Position is ready to be closed. Proceeding...`);
+
+  const closePositionTx = await cpAmmInstance.closePosition({
+    owner: wallet.publicKey,
+    pool: poolAddress,
+    position: userPosition.position,
+    positionNftMint: currentPositionState.nftMint,
+    positionNftAccount: userPosition.positionNftAccount,
+  });
+
+  modifyComputeUnitPriceIx(closePositionTx, config.computeUnitPriceMicroLamports);
+
+  if (config.dryRun) {
+    console.log(`\n> Simulating close position transaction...`);
+    await runSimulateTransaction(connection, [wallet.payer], wallet.publicKey, [closePositionTx]);
+    console.log('> Close position simulation successful');
+  } else {
+    console.log(`\n>> Sending close position transaction...`);
+
+    const closePositionTxHash = await sendAndConfirmTransaction(
+      connection,
+      closePositionTx,
+      [wallet.payer],
+      {
+        commitment: connection.commitment,
+        maxRetries: DEFAULT_SEND_TX_MAX_RETRIES,
+      }
+    ).catch((err) => {
+      console.error(`Failed to close position:`, err);
+      throw err;
+    });
+
+    console.log(`>>> Position closed successfully with tx hash: ${closePositionTxHash}`);
   }
 }
