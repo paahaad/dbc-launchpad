@@ -1007,6 +1007,9 @@ export async function removeLiquidity(
   wallet: Wallet,
   poolAddress: PublicKey
 ) {
+  if (!config.dammV2Config) {
+    throw new Error('Missing DAMM V2 configuration');
+  }
   if (!poolAddress) {
     throw new Error('Pool address is required');
   }

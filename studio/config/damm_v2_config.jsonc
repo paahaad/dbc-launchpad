@@ -75,7 +75,7 @@
   /* addLiquidity is only used in the following actions:
    * 1. damm-v2-add-liquidity
    */
-   "addLiquidity": {
+  "addLiquidity": {
     "amountIn": 5, // this is the amount of token A or token B that will be added to the pool (in terms of the token amount)
     "isTokenA": false // if your amountIn is in terms of token A, set isTokenA to true, if your amountIn is in terms of token B, set isTokenA to false
   },

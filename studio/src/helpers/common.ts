@@ -108,6 +108,9 @@ export async function getCurrentPoint(
     return new BN(currentSlot);
   } else {
     const currentTime = await connection.getBlockTime(currentSlot);
+    if (currentTime === null) {
+      throw new Error('Failed to get block time');
+    }
     return new BN(currentTime);
   }
 }
