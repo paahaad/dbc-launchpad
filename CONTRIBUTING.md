@@ -84,7 +84,10 @@ meteora-invent/
     │   │   │   ├── create_balanced_pool.ts
     │   │   │   ├── create_one_sided_pool.ts
     │   │   │   ├── claim_position_fee.ts
-    │   │   │   └── split_position.ts
+    │   │   │   ├── split_position.ts
+    │   │   │   ├── add_liquidity.ts
+    │   │   │   ├── remove_liquidity.ts
+    │   │   │   └── close_position.ts
     │   │   ├── dbc
     │   │   │   ├── claim_trading_fee.ts
     │   │   │   ├── create_config.ts

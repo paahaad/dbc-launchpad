@@ -126,6 +126,24 @@ pnpm damm-v2-split-position --config ./config/damm_v2_config.jsonc
 pnpm damm-v2-claim-position-fee --config ./config/damm_v2_config.jsonc
 ```
 
+**Add Liquidity**
+
+```bash
+pnpm damm-v2-add-liquidity --config ./config/damm_v2_config.jsonc
+```
+
+**Remove Liquidity**
+
+```bash
+pnpm damm-v2-remove-liquidity --config ./config/damm_v2_config.jsonc
+```
+
+**Close Position**
+
+```bash
+pnpm damm-v2-close-position --config ./config/damm_v2_config.jsonc
+```
+
 ### DAMM v1 Actions
 
 **Create a Constant Product Pool**

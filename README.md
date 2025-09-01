@@ -146,6 +146,24 @@ pnpm studio damm-v2-split-position --config ./studio/config/damm_v2_config.jsonc
 pnpm studio damm-v2-claim-position-fee --config ./studio/config/damm_v2_config.jsonc
 ```
 
+**Add Liquidity**
+
+```bash
+pnpm studio damm-v2-add-liquidity --config ./studio/config/damm_v2_config.jsonc
+```
+
+**Remove Liquidity**
+
+```bash
+pnpm studio damm-v2-remove-liquidity --config ./studio/config/damm_v2_config.jsonc
+```
+
+**Close Position**
+
+```bash
+pnpm studio damm-v2-close-position --config ./studio/config/damm_v2_config.jsonc
+```
+
 ---
 
 #### DAMM v1 Actions
@@ -305,7 +323,10 @@ meteora-invent/
     │   │   │   ├── create_balanced_pool.ts
     │   │   │   └── create_one_sided_pool.ts
     │   │   │   ├── claim_position_fee.ts
-    │   │   │   └── split_position.ts
+    │   │   │   ├── split_position.ts
+    │   │   │   ├── add_liquidity.ts
+    │   │   │   ├── remove_liquidity.ts
+    │   │   │   └── close_position.ts
     │   │   ├── dbc
     │   │   │   ├── claim_trading_fee.ts
     │   │   │   ├── create_config.ts
