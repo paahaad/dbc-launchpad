@@ -68,7 +68,7 @@
    */
   "singleBinSeedLiquidity": {
     "price": 0.0000017, // Exact price where liquidity will be concentrated in a single bin
-    "priceRounding": "up", // Price calculation rounding direction for bin ID conversion
+    "priceRounding": "up", // Price calculation rounding direction for bin ID conversion. "up" = round up, "down" = round down
     "seedAmount": "100000", // Amount of token X (base token) to seed into the single bin (in token units)
     "operatorKeypairFilepath": "./keypair.json", // File path to operator's private key for signing seeding transactions
     "positionOwner": "YOUR_POSITION_OWNER_ADDRESS", // Public key of the position owner who controls the liquidity
