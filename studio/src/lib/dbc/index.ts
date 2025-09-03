@@ -4,11 +4,115 @@ import {
   PublicKey,
   sendAndConfirmTransaction,
   Transaction,
+  VersionedTransaction,
 } from '@solana/web3.js';
 import { DbcConfig } from '../../utils/types';
 import { Wallet } from '@coral-xyz/anchor';
 import { getQuoteDecimals, modifyComputeUnitPriceIx, runSimulateTransaction } from '../../helpers';
 import { DEFAULT_SEND_TX_MAX_RETRIES } from '../../utils/constants';
+
+/**
+ * Custom transaction sender that uses polling instead of WebSocket subscriptions
+ * This avoids the WebSocket dependency for validators with WS disabled
+ */
+async function sendAndConfirmTransactionPolling(
+  connection: Connection,
+  transaction: Transaction | VersionedTransaction,
+  signers: Keypair[],
+  options?: {
+    commitment?: 'processed' | 'confirmed' | 'finalized';
+    maxRetries?: number;
+    skipPreflight?: boolean;
+  }
+): Promise<string> {
+  const commitment = options?.commitment || 'confirmed';
+  const maxRetries = options?.maxRetries || 3;
+  const skipPreflight = options?.skipPreflight || false;
+
+  // Set recent blockhash and fee payer before signing
+  if (transaction instanceof Transaction) {
+    const { blockhash } = await connection.getLatestBlockhash();
+    transaction.recentBlockhash = blockhash;
+    transaction.feePayer = signers[0].publicKey;
+    transaction.sign(...signers);
+  }
+
+  let signature: string;
+  let retries = 0;
+
+  // Send transaction with retries
+  while (retries < maxRetries) {
+    try {
+      signature = await connection.sendRawTransaction(
+        transaction instanceof Transaction
+          ? transaction.serialize()
+          : Buffer.from(transaction.serialize()),
+        {
+          skipPreflight,
+          maxRetries: 0, // We handle retries ourselves
+        }
+      );
+      break;
+    } catch (error) {
+      retries++;
+      if (retries >= maxRetries) {
+        throw new Error(`Failed to send transaction after ${maxRetries} attempts: ${error}`);
+      }
+      console.log(`Send attempt ${retries} failed, retrying...`);
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second before retry
+    }
+  }
+
+  // Poll for confirmation instead of using WebSocket
+  console.log(`Transaction sent: ${signature!}`);
+  console.log(`Polling for ${commitment} confirmation...`);
+
+  const maxPollAttempts = 60; // 60 attempts = ~60 seconds max wait
+  let pollAttempts = 0;
+
+  while (pollAttempts < maxPollAttempts) {
+    try {
+      const status = await connection.getSignatureStatus(signature!, {
+        searchTransactionHistory: true,
+      });
+
+      if (status.value) {
+        if (status.value.err) {
+          throw new Error(`Transaction failed: ${JSON.stringify(status.value.err)}`);
+        }
+
+        // Check if we have the required confirmation level
+        if (
+          (commitment === 'processed' && status.value.confirmationStatus) ||
+          (commitment === 'confirmed' &&
+            (status.value.confirmationStatus === 'confirmed' ||
+              status.value.confirmationStatus === 'finalized')) ||
+          (commitment === 'finalized' && status.value.confirmationStatus === 'finalized')
+        ) {
+          console.log(`Transaction confirmed with ${status.value.confirmationStatus} status`);
+          return signature!;
+        }
+      }
+
+      pollAttempts++;
+      if (pollAttempts % 10 === 0) {
+        console.log(`Still waiting for confirmation... (${pollAttempts}/${maxPollAttempts})`);
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1000)); // Poll every 1 second
+    } catch (error) {
+      pollAttempts++;
+      if (pollAttempts >= maxPollAttempts) {
+        throw new Error(
+          `Failed to confirm transaction after ${maxPollAttempts} attempts: ${error}`
+        );
+      }
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+    }
+  }
+
+  throw new Error(`Transaction confirmation timeout after ${maxPollAttempts} seconds`);
+}
+
 import {
   buildCurve,
   buildCurveWithLiquidityWeights,
@@ -94,12 +198,12 @@ export async function createDbcConfig(
     console.log(`> Config simulation successful`);
   } else {
     console.log(`>> Sending create config transaction...`);
-    const createConfigTxHash = await sendAndConfirmTransaction(
+    const createConfigTxHash = await sendAndConfirmTransactionPolling(
       connection,
       createConfigTx,
       [wallet.payer, configKeypair],
       {
-        commitment: connection.commitment,
+        commitment: 'confirmed',
         maxRetries: DEFAULT_SEND_TX_MAX_RETRIES,
       }
     ).catch((err) => {
@@ -110,8 +214,7 @@ export async function createDbcConfig(
     console.log(`>>> Config created successfully with tx hash: ${createConfigTxHash}`);
     console.log(`>>> Config public key: ${configKeypair.publicKey.toString()}`);
 
-    console.log(`> Waiting for config transaction to be finalized...`);
-    await connection.confirmTransaction(createConfigTxHash, 'finalized');
+    console.log(`> Config transaction confirmed!`);
     console.log(`>>> Config transaction finalized`);
   }
 
