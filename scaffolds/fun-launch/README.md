@@ -1,6 +1,23 @@
-# Fun Launch
+# DBC Token Launchpad
 
-A platform for launching tokens with customizable price curves.
+A platform for launching tokens with Dynamic Bonding Curves on Solana using Meteora's DBC protocol.
+
+## Features
+
+- **DBC Token Launches**: Create tokens with Dynamic Bonding Curves for fair price discovery
+- **Customizable Parameters**: Set initial price, bonding curve slope, and total supply
+- **Token Metadata**: Upload logos, descriptions, and social links
+- **Real-time Discovery**: Explore and discover DBC tokens
+- **Mobile Responsive**: Optimized for all devices
+- **Wallet Integration**: Full Solana wallet support
+
+## What is DBC?
+
+Dynamic Bonding Curves (DBC) provide a fair and transparent way to launch tokens where:
+- **Price Discovery**: Token price automatically adjusts based on supply and demand
+- **Fair Launch**: No pre-mines or unfair advantages
+- **Liquidity**: Built-in liquidity from the start
+- **Transparency**: All parameters are visible and verifiable on-chain
 
 ## Setup
 
@@ -68,6 +85,21 @@ The pool config key is used to configure the bonding curve parameters. You'll ne
 pnpm dev
 ```
 
+## How to Launch a DBC Token
+
+1. **Connect Wallet**: Connect your Solana wallet
+2. **Token Details**: Enter token name, symbol, and upload logo
+3. **DBC Parameters**: Set initial price, bonding curve slope, and total supply
+4. **Metadata**: Add description and social links (optional)
+5. **Launch**: Confirm and launch your token
+
+## DBC Parameters Explained
+
+- **Initial Price**: Starting price per token in SOL
+- **Bonding Curve Slope**: Controls how quickly price increases with demand
+- **Total Supply**: Maximum number of tokens that can exist
+- **Bonding Curve**: Price = Initial Price × (Supply / Initial Supply)^Slope
+
 ## Deployment
 
 ### Deploying to Vercel
@@ -115,22 +147,14 @@ You can manage your environment variables in Vercel:
 3. Add your custom domain
 4. Follow Vercel's instructions to configure your DNS settings
 
-## Features
-
-- Create token pools with customizable price curves
-- Upload token metadata and logos
-- View token statistics and charts
-- Track token transactions
-- Mobile-friendly interface
-
 ## Tech Stack
 
-- Next.js
-- TypeScript
-- Tailwind CSS
-- Solana Web3.js
-- Dynamic Bonding Curve SDK
-- Cloudflare R2 for storage
+- **Frontend**: Next.js 14+ with TypeScript
+- **Styling**: Tailwind CSS
+- **Blockchain**: Solana Web3.js + Wallet Adapter
+- **Protocol**: Meteora DBC SDK (@meteora-ag/dynamic-bonding-curve-sdk)
+- **Storage**: Cloudflare R2 for metadata and images
+- **State Management**: React Context + Custom Hooks
 
 ## Contributing
 
@@ -139,3 +163,7 @@ You can manage your environment variables in Vercel:
 3. Commit your changes (`git commit -m 'Add some amazing feature'`)
 4. Push to the branch (`git push origin feature/amazing-feature`)
 5. Open a Pull Request
+
+## License
+
+ISC

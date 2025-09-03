@@ -1,9 +1,10 @@
 {
-  "name": "@meteora-invent/scaffold/fun-launch",
+  "name": "@meteora-invent/scaffold/dbc-launchpad",
   "version": "0.1.0",
   "private": true,
   "author": "Dann Wee <dann@raccoons.dev>",
   "license": "ISC",
+  "description": "DBC Token Launchpad - Launch tokens with Dynamic Bonding Curves on Solana",
   "scripts": {
     "clean": "rm -rf node_modules .next .turbo",
     "dev": "next dev --turbopack",

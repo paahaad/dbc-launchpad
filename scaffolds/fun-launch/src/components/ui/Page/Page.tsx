@@ -1,4 +1,4 @@
-import Header from '@/components/Header';
+import { Header } from '@/components/Header';
 import { cn } from '@/lib/utils';
 
 interface IProps {

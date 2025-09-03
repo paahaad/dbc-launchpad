@@ -1,7 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import AWS from 'aws-sdk';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey, Keypair, SystemProgram, Transaction } from '@solana/web3.js';
 import { DynamicBondingCurveClient } from '@meteora-ag/dynamic-bonding-curve-sdk';
+import {
+  createInitializeMint2Instruction,
+  getMinimumBalanceForRentExemptMint,
+  MINT_SIZE,
+  TOKEN_PROGRAM_ID,
+} from '@solana/spl-token';
 
 // Environment variables with type assertions
 const R2_ACCESS_KEY_ID = process.env.R2_ACCESS_KEY_ID as string;
@@ -30,8 +36,9 @@ type UploadRequest = {
   tokenLogo: string;
   tokenName: string;
   tokenSymbol: string;
-  mint: string;
+  mintKeypair: string; // base58 encoded secret key
   userWallet: string;
+  totalSupply: number;
 };
 
 type Metadata = {
@@ -62,41 +69,49 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { tokenLogo, tokenName, tokenSymbol, mint, userWallet } = req.body as UploadRequest;
+    const { tokenLogo, tokenName, tokenSymbol, mintKeypair, userWallet, totalSupply } = req.body as UploadRequest;
 
     // Validate required fields
-    if (!tokenLogo || !tokenName || !tokenSymbol || !mint || !userWallet) {
+    if (!tokenLogo || !tokenName || !tokenSymbol || !mintKeypair || !userWallet || !totalSupply) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
+    // Decode the mint keypair
+    const mintKeypairDecoded = Keypair.fromSecretKey(
+      Buffer.from(mintKeypair, 'base64')
+    );
+    const mintAddress = mintKeypairDecoded.publicKey.toBase58();
+
     // Upload image and metadata
-    const imageUrl = await uploadImage(tokenLogo, mint);
+    const imageUrl = await uploadImage(tokenLogo, mintAddress);
     if (!imageUrl) {
       return res.status(400).json({ error: 'Failed to upload image' });
     }
 
-    const metadataUrl = await uploadMetadata({ tokenName, tokenSymbol, mint, image: imageUrl });
+    const metadataUrl = await uploadMetadata({ tokenName, tokenSymbol, mint: mintAddress, image: imageUrl });
     if (!metadataUrl) {
       return res.status(400).json({ error: 'Failed to upload metadata' });
     }
 
     // Create pool transaction
-    const poolTx = await createPoolTransaction({
-      mint,
+    const result = await createPoolTransaction({
+      mintKeypair: mintKeypairDecoded,
       tokenName,
       tokenSymbol,
       metadataUrl,
       userWallet,
+      totalSupply,
     });
 
     res.status(200).json({
       success: true,
-      poolTx: poolTx
+      poolTx: result.transaction
         .serialize({
           requireAllSignatures: false,
           verifySignatures: false,
         })
         .toString('base64'),
+      mintAddress: result.mintKeypair.publicKey.toBase58(),
     });
   } catch (error) {
     console.error('Upload error:', error);
@@ -169,25 +184,64 @@ async function uploadToR2(
   });
 }
 
+async function createTokenMint(
+  connection: Connection,
+  payer: PublicKey,
+  mintKeypair: Keypair,
+  decimals: number = 6
+): Promise<Transaction> {
+  const lamports = await getMinimumBalanceForRentExemptMint(connection);
+
+  const createAccountIx = SystemProgram.createAccount({
+    fromPubkey: payer,
+    newAccountPubkey: mintKeypair.publicKey,
+    space: MINT_SIZE,
+    lamports,
+    programId: TOKEN_PROGRAM_ID,
+  });
+
+  const initializeMintIx = createInitializeMint2Instruction(
+    mintKeypair.publicKey,
+    decimals,
+    payer, // mint authority
+    payer, // freeze authority
+    TOKEN_PROGRAM_ID
+  );
+
+  const transaction = new Transaction().add(createAccountIx, initializeMintIx);
+  
+  return transaction;
+}
+
 async function createPoolTransaction({
-  mint,
+  mintKeypair,
   tokenName,
   tokenSymbol,
   metadataUrl,
   userWallet,
+  totalSupply,
 }: {
-  mint: string;
+  mintKeypair: Keypair;
   tokenName: string;
   tokenSymbol: string;
   metadataUrl: string;
   userWallet: string;
+  totalSupply: number;
 }) {
   const connection = new Connection(RPC_URL, 'confirmed');
   const client = new DynamicBondingCurveClient(connection, 'confirmed');
 
+  // First create the SPL token mint
+  const createMintTx = await createTokenMint(
+    connection,
+    new PublicKey(userWallet),
+    mintKeypair
+  );
+
+  // Then create the DBC pool
   const poolTx = await client.pool.createPool({
     config: new PublicKey(POOL_CONFIG_KEY),
-    baseMint: new PublicKey(mint),
+    baseMint: mintKeypair.publicKey,
     name: tokenName,
     symbol: tokenSymbol,
     uri: metadataUrl,
@@ -195,9 +249,14 @@ async function createPoolTransaction({
     poolCreator: new PublicKey(userWallet),
   });
 
-  const { blockhash } = await connection.getLatestBlockhash();
-  poolTx.feePayer = new PublicKey(userWallet);
-  poolTx.recentBlockhash = blockhash;
+  // Combine transactions
+  const combinedTx = new Transaction();
+  combinedTx.add(...createMintTx.instructions);
+  combinedTx.add(...poolTx.instructions);
 
-  return poolTx;
+  const { blockhash } = await connection.getLatestBlockhash();
+  combinedTx.feePayer = new PublicKey(userWallet);
+  combinedTx.recentBlockhash = blockhash;
+
+  return { transaction: combinedTx, mintKeypair };
 }

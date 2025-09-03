@@ -2,7 +2,7 @@ import { useMemo, useState } from 'react';
 import Head from 'next/head';
 import Link from 'next/link';
 import { z } from 'zod';
-import Header from '../components/Header';
+import { Header } from '../components/Header';
 
 import { useForm } from '@tanstack/react-form';
 import { Button } from '@/components/ui/button';
@@ -10,21 +10,29 @@ import { Keypair, Transaction } from '@solana/web3.js';
 import { useUnifiedWalletContext, useWallet } from '@jup-ag/wallet-adapter';
 import { toast } from 'sonner';
 
-// Define the schema for form validation
-const poolSchema = z.object({
+// Define the schema for DBC token launch validation
+const dbcTokenSchema = z.object({
   tokenName: z.string().min(3, 'Token name must be at least 3 characters'),
-  tokenSymbol: z.string().min(1, 'Token symbol is required'),
-  tokenLogo: z.instanceof(File, { message: 'Token logo is required' }).optional(),
+  tokenSymbol: z.string().min(1, 'Token symbol is required').max(10, 'Token symbol must be 10 characters or less'),
+  tokenLogo: z.instanceof(File, { message: 'Token logo is required' }),
+  totalSupply: z.number().min(1000, 'Total supply must be at least 1,000'),
+  initialPrice: z.number().min(0.000001, 'Initial price must be at least 0.000001'),
+  bondingCurveSlope: z.number().min(0.1, 'Bonding curve slope must be at least 0.1'),
   website: z.string().url({ message: 'Please enter a valid URL' }).optional().or(z.literal('')),
   twitter: z.string().url({ message: 'Please enter a valid URL' }).optional().or(z.literal('')),
+  description: z.string().max(500, 'Description must be 500 characters or less').optional(),
 });
 
-interface FormValues {
+interface DBCFormValues {
   tokenName: string;
   tokenSymbol: string;
-  tokenLogo: File | undefined;
+  tokenLogo: File;
+  totalSupply: number;
+  initialPrice: number;
+  bondingCurveSlope: number;
   website?: string;
   twitter?: string;
+  description?: string;
 }
 
 export default function CreatePool() {
@@ -38,10 +46,14 @@ export default function CreatePool() {
     defaultValues: {
       tokenName: '',
       tokenSymbol: '',
-      tokenLogo: undefined,
+      tokenLogo: undefined as File | undefined,
+      totalSupply: 1000000,
+      initialPrice: 0.001,
+      bondingCurveSlope: 1.0,
       website: '',
       twitter: '',
-    } as FormValues,
+      description: '',
+    } as DBCFormValues,
     onSubmit: async ({ value }) => {
       try {
         setIsLoading(true);
@@ -66,7 +78,7 @@ export default function CreatePool() {
 
         const keyPair = Keypair.generate();
 
-        // Step 1: Upload to R2 and get transaction
+        // Step 1: Upload to R2 and get DBC pool transaction
         const uploadResponse = await fetch('/api/upload', {
           method: 'POST',
           headers: {
@@ -74,9 +86,13 @@ export default function CreatePool() {
           },
           body: JSON.stringify({
             tokenLogo: base64File,
-            mint: keyPair.publicKey.toBase58(),
+            mintKeypair: Buffer.from(keyPair.secretKey).toString('base64'),
             tokenName: value.tokenName,
             tokenSymbol: value.tokenSymbol,
+            totalSupply: value.totalSupply,
+            initialPrice: value.initialPrice,
+            bondingCurveSlope: value.bondingCurveSlope,
+            description: value.description,
             userWallet: address,
           }),
         });
@@ -113,19 +129,19 @@ export default function CreatePool() {
 
         const { success } = await sendResponse.json();
         if (success) {
-          toast.success('Pool created successfully');
+          toast.success('DBC Token Pool created successfully!');
           setPoolCreated(true);
         }
       } catch (error) {
-        console.error('Error creating pool:', error);
-        toast.error(error instanceof Error ? error.message : 'Failed to create pool');
+        console.error('Error creating DBC pool:', error);
+        toast.error(error instanceof Error ? error.message : 'Failed to create DBC pool');
       } finally {
         setIsLoading(false);
       }
     },
     validators: {
       onSubmit: ({ value }) => {
-        const result = poolSchema.safeParse(value);
+        const result = dbcTokenSchema.safeParse(value);
         if (!result.success) {
           return result.error.formErrors.fieldErrors;
         }
@@ -137,10 +153,10 @@ export default function CreatePool() {
   return (
     <>
       <Head>
-        <title>Create Pool - Virtual Curve</title>
+        <title>Launch DBC Token - DBC Launchpad</title>
         <meta
           name="description"
-          content="Create a new token pool on Virtual Curve with customizable price curves."
+          content="Launch your token with a Dynamic Bonding Curve on Solana using Meteora's DBC protocol."
         />
       </Head>
 
@@ -152,8 +168,8 @@ export default function CreatePool() {
         <main className="container mx-auto px-4 py-10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
             <div>
-              <h1 className="text-4xl font-bold mb-2">Create Pool</h1>
-              <p className="text-gray-300">Launch your token with a customizable price curve</p>
+              <h1 className="text-4xl font-bold mb-2">Launch DBC Token</h1>
+              <p className="text-gray-300">Create your token with a Dynamic Bonding Curve for fair price discovery</p>
             </div>
           </div>
 
@@ -188,7 +204,7 @@ export default function CreatePool() {
                             name={field.name}
                             type="text"
                             className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white"
-                            placeholder="e.g. Virtual Coin"
+                            placeholder="e.g. My Awesome Token"
                             value={field.state.value}
                             onChange={(e) => field.handleChange(e.target.value)}
                             required
@@ -213,11 +229,36 @@ export default function CreatePool() {
                             name={field.name}
                             type="text"
                             className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white"
-                            placeholder="e.g. VRTL"
+                            placeholder="e.g. MAT"
                             value={field.state.value}
                             onChange={(e) => field.handleChange(e.target.value)}
                             required
                             maxLength={10}
+                          />
+                        ),
+                      })}
+                    </div>
+
+                    <div className="mb-4">
+                      <label
+                        htmlFor="totalSupply"
+                        className="block text-sm font-medium text-gray-300 mb-1"
+                      >
+                        Total Supply*
+                      </label>
+                      {form.Field({
+                        name: 'totalSupply',
+                        children: (field) => (
+                          <input
+                            id="totalSupply"
+                            name={field.name}
+                            type="number"
+                            className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white"
+                            placeholder="1000000"
+                            value={field.state.value}
+                            onChange={(e) => field.handleChange(Number(e.target.value))}
+                            required
+                            min={1000}
                           />
                         ),
                       })}
@@ -258,6 +299,98 @@ export default function CreatePool() {
                       ),
                     })}
                   </div>
+                </div>
+              </div>
+
+              {/* DBC Parameters Section */}
+              <div className="bg-white/5 rounded-xl p-8 backdrop-blur-sm border border-white/10">
+                <h2 className="text-2xl font-bold mb-6">Dynamic Bonding Curve Parameters</h2>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div className="mb-4">
+                    <label
+                      htmlFor="initialPrice"
+                      className="block text-sm font-medium text-gray-300 mb-1"
+                    >
+                      Initial Price (SOL)*
+                    </label>
+                    {form.Field({
+                      name: 'initialPrice',
+                      children: (field) => (
+                        <input
+                          id="initialPrice"
+                          name={field.name}
+                          type="number"
+                          step="0.000001"
+                          className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white"
+                          placeholder="0.001"
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(Number(e.target.value))}
+                          required
+                          min={0.000001}
+                        />
+                      ),
+                    })}
+                    <p className="text-xs text-gray-400 mt-1">
+                      Starting price per token in SOL
+                    </p>
+                  </div>
+
+                  <div className="mb-4">
+                    <label
+                      htmlFor="bondingCurveSlope"
+                      className="block text-sm font-medium text-gray-300 mb-1"
+                    >
+                      Bonding Curve Slope*
+                    </label>
+                    {form.Field({
+                      name: 'bondingCurveSlope',
+                      children: (field) => (
+                        <input
+                          id="bondingCurveSlope"
+                          name={field.name}
+                          type="number"
+                          step="0.1"
+                          className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white"
+                          placeholder="1.0"
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(Number(e.target.value))}
+                          required
+                          min={0.1}
+                        />
+                      ),
+                    })}
+                    <p className="text-xs text-gray-400 mt-1">
+                      Controls how quickly price increases with demand
+                    </p>
+                  </div>
+                </div>
+
+                <div className="mt-6">
+                  <label
+                    htmlFor="description"
+                    className="block text-sm font-medium text-gray-300 mb-1"
+                  >
+                    Token Description
+                  </label>
+                  {form.Field({
+                    name: 'description',
+                    children: (field) => (
+                      <textarea
+                        id="description"
+                        name={field.name}
+                        rows={3}
+                        className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white"
+                        placeholder="Describe your token and its utility..."
+                        value={field.state.value}
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        maxLength={500}
+                      />
+                    ),
+                  })}
+                  <p className="text-xs text-gray-400 mt-1">
+                    Optional description of your token (max 500 characters)
+                  </p>
                 </div>
               </div>
 
@@ -360,12 +493,12 @@ const SubmitButton = ({ isSubmitting }: { isSubmitting: boolean }) => {
       {isSubmitting ? (
         <>
           <span className="iconify ph--spinner w-5 h-5 animate-spin" />
-          <span>Creating Pool...</span>
+          <span>Launching DBC Token...</span>
         </>
       ) : (
         <>
           <span className="iconify ph--rocket-bold w-5 h-5" />
-          <span>Launch Pool</span>
+          <span>Launch DBC Token</span>
         </>
       )}
     </Button>
@@ -379,25 +512,25 @@ const PoolCreationSuccess = () => {
         <div className="bg-green-500/20 p-4 rounded-full inline-flex mb-6">
           <span className="iconify ph--check-bold w-12 h-12 text-green-500" />
         </div>
-        <h2 className="text-3xl font-bold mb-4">Pool Created Successfully!</h2>
+        <h2 className="text-3xl font-bold mb-4">DBC Token Launched Successfully!</h2>
         <p className="text-gray-300 mb-8 max-w-lg mx-auto">
-          Your token pool has been created and is now live on the Virtual Curve platform. Users can
-          now buy and trade your tokens.
+          Your token with Dynamic Bonding Curve has been created and is now live on the DBC Launchpad. 
+          Users can now discover and trade your tokens with fair price discovery.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
           <Link
-            href="/explore-pools"
+            href="/"
             className="bg-white/10 px-6 py-3 rounded-xl font-medium hover:bg-white/20 transition"
           >
-            Explore Pools
+            Explore Tokens
           </Link>
           <button
             onClick={() => {
               window.location.reload();
             }}
-            className="cursor-pointer bg-gradient-to-r from-pink-500 to-purple-500 px-6 py-3 rounded-xl font-medium hover:opacity-90 transition"
+            className="cursor-pointer bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-3 rounded-xl font-medium hover:opacity-90 transition"
           >
-            Create Another Pool
+            Launch Another Token
           </button>
         </div>
       </div>

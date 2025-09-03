@@ -10,7 +10,7 @@ Meteora Scaffolds provides production-ready **React/Next.js** templates for buil
 - ✅ **AI-Friendly**: Clear structure, comprehensive documentation
 - ✅ **Production Grade**: Optimized, tested, deployable
 
-**AI Navigation**: For detailed frontend guidance → `scaffolds/fun-launch/LLM.txt`
+**AI Navigation**: For detailed frontend guidance → `scaffolds/dbc-launchpad/LLM.txt`
 
 ## 🏗️ Scaffold Architecture
 
@@ -18,7 +18,7 @@ Meteora Scaffolds provides production-ready **React/Next.js** templates for buil
 
 | **Scaffold** | **Framework** | **Purpose** | **Status** |
 |-------------|---------------|-------------|------------|
-| **fun-launch** | Next.js + TypeScript | Token launchpad & trading UI | ✅ Production Ready |
+| **dbc-launchpad** | Next.js + TypeScript | DBC token launchpad & trading UI | ✅ Production Ready |
 | **amm-interface** | Next.js + TypeScript | AMM pool management | 🚧 Coming Soon |
 | **yield-dashboard** | Next.js + TypeScript | Yield farming interface | 🚧 Coming Soon |
 
@@ -28,21 +28,23 @@ Meteora Scaffolds provides production-ready **React/Next.js** templates for buil
 - **Styling**: Tailwind CSS + CSS Modules
 - **State**: React Context + Custom Hooks
 - **Blockchain**: @solana/web3.js + Wallet Adapter
-- **Protocols**: Meteora SDK suite (@meteora-ag/*)
+- **Protocols**: Meteora DBC SDK (@meteora-ag/dynamic-bonding-curve-sdk)
 
 ## 🚀 Quick Start Workflows
 
-### **Workflow 1: Launch Token Platform (fun-launch)**
+### **Workflow 1: Launch DBC Token Platform (dbc-launchpad)**
 ```bash
 # 1. Copy scaffold to new project
-cp -r scaffolds/fun-launch /path/to/your-launchpad
-cd /path/to/your-launchpad
+cp -r scaffolds/dbc-launchpad /path/to/your-dbc-launchpad
+cd /path/to/your-dbc-launchpad
 
 # 2. Environment setup
 cp .env.example .env
 # Edit .env with:
 # NEXT_PUBLIC_RPC_URL=your_rpc_endpoint
 # NEXT_PUBLIC_NETWORK=mainnet-beta
+# R2_ACCESS_KEY_ID=your_r2_access_key
+# POOL_CONFIG_KEY=your_pool_config_key
 
 # 3. Install & develop
 pnpm install
@@ -55,7 +57,7 @@ pnpm build && pnpm start
 ### **Workflow 2: Custom DeFi Application**
 ```bash
 # 1. Start with closest scaffold
-cp -r scaffolds/fun-launch /path/to/custom-app
+cp -r scaffolds/dbc-launchpad /path/to/custom-app
 cd /path/to/custom-app
 
 # 2. Modify for your needs
@@ -109,9 +111,9 @@ scaffold-name/
 ```typescript
 // 1. Update src/components/Header.tsx
 const SITE_CONFIG = {
-  name: "Your Launchpad Name",
+  name: "Your DBC Launchpad Name",
   logo: "/your-logo.svg",
-  description: "Your platform description"
+  description: "Your DBC platform description"
 };
 
 // 2. Modify tailwind.config.js
@@ -181,14 +183,14 @@ const YourComponent = () => {
 ### **Backend-Frontend Communication**
 ```typescript
 // Frontend calls backend operations
-const createTokenPool = async (tokenParams) => {
+const createDBCToken = async (tokenParams) => {
   // 1. Frontend validates parameters
-  if (!isValidTokenParams(tokenParams)) {
+  if (!isValidDBCTokenParams(tokenParams)) {
     throw new Error('Invalid parameters');
   }
   
   // 2. Call studio script via API
-  const response = await fetch('/api/create-pool', {
+  const response = await fetch('/api/create-dbc-token', {
     method: 'POST',
     body: JSON.stringify(tokenParams)
   });
@@ -198,7 +200,7 @@ const createTokenPool = async (tokenParams) => {
   return result.poolAddress;
 };
 
-// API route (src/pages/api/create-pool.ts)
+// API route (src/pages/api/create-dbc-token.ts)
 export default async function handler(req, res) {
   // Configure studio script parameters
   const config = {
@@ -303,6 +305,8 @@ vercel
 # 3. Set environment variables in dashboard:
 # - NEXT_PUBLIC_RPC_URL
 # - NEXT_PUBLIC_NETWORK
+# - R2_ACCESS_KEY_ID
+# - POOL_CONFIG_KEY
 # - Any API keys
 
 # 4. Configure build settings
@@ -452,6 +456,6 @@ Sentry.init({ dsn: process.env.NEXT_PUBLIC_SENTRY_DSN });
 ---
 
 **🎯 Next Steps for AI**: Choose your scaffold and navigate to its specific LLM.txt for detailed implementation guidance:
-- **Token Launchpad**: `scaffolds/fun-launch/LLM.txt`
-- **Custom DeFi App**: Start with fun-launch and modify
+- **DBC Token Launchpad**: `scaffolds/dbc-launchpad/LLM.txt`
+- **Custom DeFi App**: Start with dbc-launchpad and modify
 - **Backend Integration**: Combine with `studio/LLM.txt` workflows
