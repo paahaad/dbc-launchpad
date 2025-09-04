@@ -59,5 +59,6 @@ yarn.lock
 
 # Studio
 studio/keypair.json
+studio/baseMintKeypair.json
 studio/data/kv_proofs/
 studio/data/whitelist_wallet.csv
