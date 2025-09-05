@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react';
 import Head from 'next/head';
-import Link from 'next/link';
+import { useRouter } from 'next/router';
 import { z } from 'zod';
 import { Header } from '../components/Header';
 
@@ -9,6 +9,28 @@ import { Button } from '@/components/ui/button';
 import { Keypair, Transaction } from '@solana/web3.js';
 import { useUnifiedWalletContext, useWallet } from '@jup-ag/wallet-adapter';
 import { toast } from 'sonner';
+
+// Configuration
+const VANITY_SUFFIX = 'gor';
+const MAX_VANITY_ATTEMPTS = 100000;
+
+// Vanity address generation function
+const generateVanityKeypair = (suffix: string, maxAttempts: number = MAX_VANITY_ATTEMPTS): Keypair => {
+  let attempts = 0;
+
+  while (attempts < maxAttempts) {
+    const keypair = Keypair.generate();
+    const address = keypair.publicKey.toBase58();
+
+    if (address.toLowerCase().endsWith(suffix)) {
+      return keypair;
+    }
+
+    attempts++;
+  }
+
+  throw new Error(`Could not find vanity address ending with "${suffix}" after ${maxAttempts} attempts`);
+};
 
 // Define the schema for DBC token launch validation
 const dbcTokenSchema = z.object({
@@ -38,9 +60,11 @@ interface DBCFormValues {
 export default function CreatePool() {
   const { publicKey, signTransaction } = useWallet();
   const address = useMemo(() => publicKey?.toBase58(), [publicKey]);
+  const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
   const [poolCreated, setPoolCreated] = useState(false);
+  const [createdMintAddress, setCreatedMintAddress] = useState<string | null>(null);
 
   const form = useForm({
     defaultValues: {
@@ -76,7 +100,13 @@ export default function CreatePool() {
           reader.readAsDataURL(tokenLogo);
         });
 
-        const keyPair = Keypair.generate();
+        // Generate vanity address ending with VANITY_SUFFIX
+        let keyPair: Keypair;
+        try {
+          keyPair = generateVanityKeypair(VANITY_SUFFIX);
+        } catch (error) {
+          keyPair = Keypair.generate();
+        }
 
         // Step 1: Upload to R2 and get DBC pool transaction
         const uploadResponse = await fetch('/api/upload', {
@@ -102,7 +132,7 @@ export default function CreatePool() {
           throw new Error(error.error);
         }
 
-        const { poolTx } = await uploadResponse.json();
+        const { poolTx, mintAddress } = await uploadResponse.json();
         const transaction = Transaction.from(Buffer.from(poolTx, 'base64'));
 
         // Step 2: Sign with keypair first
@@ -129,8 +159,16 @@ export default function CreatePool() {
 
         const { success } = await sendResponse.json();
         if (success) {
-          toast.success('DBC Token Pool created successfully!');
           setPoolCreated(true);
+          setCreatedMintAddress(mintAddress);
+          toast.success(`DBC Token Pool created successfully! Mint: ${mintAddress}`, {
+            duration: 5000,
+          });
+          
+          // Redirect to market page after a short delay
+          setTimeout(() => {
+            router.push(`/market/${mintAddress}`);
+          }, 2000);
         }
       } catch (error) {
         console.error('Error creating DBC pool:', error);
@@ -174,7 +212,7 @@ export default function CreatePool() {
           </div>
 
           {poolCreated && !isLoading ? (
-            <PoolCreationSuccess />
+            <PoolCreationSuccess mintAddress={createdMintAddress} />
           ) : (
             <form
               onSubmit={(e) => {
@@ -505,7 +543,7 @@ const SubmitButton = ({ isSubmitting }: { isSubmitting: boolean }) => {
   );
 };
 
-const PoolCreationSuccess = () => {
+const PoolCreationSuccess = ({ mintAddress }: { mintAddress: string | null }) => {
   return (
     <>
       <div className="bg-white/5 rounded-xl p-8 backdrop-blur-sm border border-white/10 text-center">
@@ -513,25 +551,21 @@ const PoolCreationSuccess = () => {
           <span className="iconify ph--check-bold w-12 h-12 text-green-500" />
         </div>
         <h2 className="text-3xl font-bold mb-4">DBC Token Launched Successfully!</h2>
-        <p className="text-gray-300 mb-8 max-w-lg mx-auto">
+        <p className="text-gray-300 mb-4 max-w-lg mx-auto">
           Your token with Dynamic Bonding Curve has been created and is now live on the DBC Launchpad. 
           Users can now discover and trade your tokens with fair price discovery.
         </p>
+        {mintAddress && (
+          <div className="bg-white/10 rounded-lg p-4 mb-6 max-w-lg mx-auto">
+            <p className="text-sm text-gray-300 mb-2">Token Mint Address:</p>
+            <p className="text-white font-mono text-sm break-all">{mintAddress}</p>
+          </div>
+        )}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link
-            href="/"
-            className="bg-white/10 px-6 py-3 rounded-xl font-medium hover:bg-white/20 transition"
-          >
-            Explore Tokens
-          </Link>
-          <button
-            onClick={() => {
-              window.location.reload();
-            }}
-            className="cursor-pointer bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-3 rounded-xl font-medium hover:opacity-90 transition"
-          >
-            Launch Another Token
-          </button>
+          <div className="flex items-center gap-2 text-blue-400">
+            <span className="iconify ph--spinner w-5 h-5 animate-spin" />
+            <span>Redirecting to market page...</span>
+          </div>
         </div>
       </div>
     </>

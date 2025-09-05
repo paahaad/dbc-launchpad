@@ -26,8 +26,8 @@ export default function App({ Component, pageProps }: AppProps) {
           env: 'mainnet-beta',
           autoConnect: true,
           metadata: {
-            name: 'UnifiedWallet',
-            description: 'UnifiedWallet',
+            name: 'GOR Launchpad',
+            description: 'GOR Launchpad wallet connection',
             url: 'https://jup.ag',
             iconUrls: ['https://jup.ag/favicon.ico'],
           },
