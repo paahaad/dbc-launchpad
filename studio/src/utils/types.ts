@@ -1,3 +1,4 @@
+import { Creator, Collection, Uses } from '@metaplex-foundation/mpl-token-metadata';
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 
@@ -11,14 +12,36 @@ export type MeteoraConfig = DammV1Config | DammV2Config | DlmmConfig | DbcConfig
 
 export interface CreateTokenMintOptions {
   dryRun: boolean;
-  mintTokenAmount: string | number;
-  decimals: number;
   computeUnitPriceMicroLamports: number;
+  tokenConfig?: TokenConfig;
 }
 
-export interface CreateBaseMintConfig {
-  mintBaseTokenAmount: number | string;
-  baseDecimals: number;
+export interface TokenConfig {
+  supply: number;
+  decimals: number;
+  tokenMintKeypairFilePath?: string;
+  name: string;
+  symbol: string;
+  metadata: TokenMetadata;
+  authorities: {
+    mint: string | null;
+    freeze: string | null;
+    update: string | null;
+  };
+  sellerFeeBasisPoints: number;
+  creators: Creator[] | null;
+  collection: Collection | null;
+  uses: Uses | null;
+}
+
+export interface TokenMetadata {
+  uri?: string;
+  image?: string;
+  imageFilePath?: string;
+  description?: string;
+  website?: string;
+  twitter?: string;
+  telegram?: string;
 }
 
 export type MeteoraConfigBase = {
@@ -45,7 +68,7 @@ export interface NetworkConfig {
 /* DAMM v1 */
 
 export type DammV1Config = MeteoraConfigBase & {
-  createBaseToken: CreateBaseMintConfig | null;
+  createBaseToken: TokenConfig | null;
   dammV1Config: DynamicAmmV1Config | null;
   dammV1LockLiquidity: LockLiquidityConfig | null;
   stake2EarnFarm: Stake2EarnFarmConfig | null;
@@ -80,7 +103,7 @@ export interface Stake2EarnFarmConfig {
 /* DAMM v2 */
 
 export type DammV2Config = MeteoraConfigBase & {
-  createBaseToken: CreateBaseMintConfig | null;
+  createBaseToken: TokenConfig | null;
   poolAddress: string | null;
   dammV2Config: DynamicAmmV2Config | null;
   addLiquidity: AddLiquidityConfig | null;
@@ -135,7 +158,7 @@ export interface AddLiquidityConfig {
 /* DLMM */
 
 export type DlmmConfig = MeteoraConfigBase & {
-  createBaseToken: CreateBaseMintConfig | null;
+  createBaseToken: TokenConfig | null;
   dlmmConfig: DynamicLmmConfig | null;
   alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
   lfgSeedLiquidity: LfgSeedLiquidityConfig | null;
@@ -300,7 +323,7 @@ export type DbcSwap = {
 /* Alpha Vault */
 
 export type AlphaVaultConfig = MeteoraConfigBase & {
-  createBaseToken: CreateBaseMintConfig | null;
+  createBaseToken: TokenConfig | null;
   alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
 };
 
@@ -403,7 +426,7 @@ export interface KvMerkleProof {
 /* Stake2Earn */
 
 export type Stake2EarnConfig = MeteoraConfigBase & {
-  createBaseToken: CreateBaseMintConfig | null;
+  createBaseToken: TokenConfig | null;
   dammV1LockLiquidity: LockLiquidityConfig | null;
   alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
 };

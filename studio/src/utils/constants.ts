@@ -35,3 +35,7 @@ export const ALPHA_VAULT_PROGRAM_IDS = {
 export const STAKE2EARN_PROGRAM_IDS = {
   'mainnet-beta': 'FEESngU3neckdwib9X3KWqdL7Mjmqk9XNp3uh5JbP4KP',
 };
+
+export const TOKEN_METADATA_PROGRAM_ID = new PublicKey(
+  'metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s'
+);

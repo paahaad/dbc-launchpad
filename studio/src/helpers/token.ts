@@ -10,7 +10,7 @@ import {
   Transaction,
   TransactionSignature,
 } from '@solana/web3.js';
-import { CreateTokenMintOptions } from '../utils/types';
+import { CreateTokenMintOptions, TokenConfig } from '../utils/types';
 import { getAmountInLamports, getSigners } from './common';
 import BN from 'bn.js';
 import {
@@ -21,7 +21,9 @@ import {
   MINT_SIZE,
   TOKEN_PROGRAM_ID,
 } from '@solana/spl-token';
-import { DEFAULT_SEND_TX_MAX_RETRIES } from '../utils/constants';
+import { DEFAULT_SEND_TX_MAX_RETRIES, TOKEN_METADATA_PROGRAM_ID } from '../utils/constants';
+import { uploadTokenMetadata } from './metadata';
+import { createCreateMetadataAccountV3Instruction } from '@metaplex-foundation/mpl-token-metadata';
 
 export async function createTokenMint(
   connection: Connection,
@@ -32,18 +34,22 @@ export async function createTokenMint(
     throw new Error('cannot create token mint when in dry run mode');
   }
 
-  const mintAmount = getAmountInLamports(options.mintTokenAmount, options.decimals);
+  const mintAmount = getAmountInLamports(
+    options.tokenConfig?.supply,
+    options.tokenConfig?.decimals
+  );
 
   const mint: PublicKey = await createAndMintToken(
     connection,
     wallet,
-    options.decimals,
+    options.tokenConfig?.decimals,
     mintAmount,
-    options.computeUnitPriceMicroLamports
+    options.computeUnitPriceMicroLamports,
+    options.tokenConfig
   );
 
   console.log(
-    `>> Mint token mint ${mint} to payer wallet. Amount ${options.mintTokenAmount} in lamport ${mintAmount}`
+    `>> Mint token mint ${mint} to payer wallet. Amount ${options.tokenConfig?.supply} in lamport ${mintAmount}`
   );
 
   return mint;
@@ -54,7 +60,8 @@ async function createAndMintToken(
   wallet: Wallet,
   mintDecimals: number,
   mintAmountLamport: BN,
-  computeUnitPriceMicroLamports: number
+  computeUnitPriceMicroLamports: number,
+  tokenConfig?: TokenConfig
 ): Promise<PublicKey> {
   const mint = await createMintWithPriorityFee(
     connection,
@@ -62,7 +69,8 @@ async function createAndMintToken(
     wallet.publicKey,
     null,
     mintDecimals,
-    computeUnitPriceMicroLamports
+    computeUnitPriceMicroLamports,
+    tokenConfig
   );
   console.log(`Created token mint ${mint}`);
 
@@ -74,6 +82,7 @@ async function createAndMintToken(
     true,
     connection.commitment
   );
+
   await mintToWithPriorityFee(
     connection,
     wallet.payer,
@@ -96,6 +105,7 @@ async function createMintWithPriorityFee(
   freezeAuthority: PublicKey | null,
   decimals: number,
   computeUnitPriceMicroLamports: number,
+  tokenConfig?: TokenConfig,
   keypair = Keypair.generate(),
   programId = TOKEN_PROGRAM_ID
 ): Promise<PublicKey> {
@@ -127,10 +137,75 @@ async function createMintWithPriorityFee(
     createInitializeMint2Tx
   );
 
+  // add metadata creation if tokenConfig is provided
+  if (tokenConfig && tokenConfig.metadata) {
+    try {
+      let metadataUri: string;
+      if (tokenConfig.metadata.uri) {
+        console.log('Using existing metadata URI:', tokenConfig.metadata.uri);
+        metadataUri = tokenConfig.metadata.uri;
+      } else {
+        console.log('Uploading metadata to Irys...');
+        metadataUri = await uploadTokenMetadata(
+          connection.rpcEndpoint,
+          payer as Keypair,
+          tokenConfig
+        );
+      }
+
+      // create metadata account
+      const metadataPDA = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from('metadata'),
+          TOKEN_METADATA_PROGRAM_ID.toBuffer(),
+          keypair.publicKey.toBuffer(),
+        ],
+        TOKEN_METADATA_PROGRAM_ID
+      )[0];
+
+      const metadataData = {
+        name: tokenConfig.name,
+        symbol: tokenConfig.symbol,
+        uri: metadataUri,
+        sellerFeeBasisPoints: tokenConfig.sellerFeeBasisPoints,
+        creators: tokenConfig.creators,
+        collection: tokenConfig.collection,
+        uses: tokenConfig.uses,
+      };
+
+      const createMetadataInstruction = createCreateMetadataAccountV3Instruction(
+        {
+          metadata: metadataPDA,
+          mint: keypair.publicKey,
+          mintAuthority: mintAuthority,
+          payer: payer.publicKey,
+          updateAuthority: mintAuthority,
+        },
+        {
+          createMetadataAccountArgsV3: {
+            collectionDetails: null,
+            data: metadataData,
+            isMutable: true,
+          },
+        }
+      );
+
+      transaction.add(createMetadataInstruction);
+      console.log('Added metadata creation instruction to transaction');
+    } catch (error) {
+      console.error('Failed to create metadata instruction:', error);
+      throw error;
+    }
+  }
+
   await sendAndConfirmTransaction(connection, transaction, [payer, keypair], {
     commitment: connection.commitment,
     maxRetries: DEFAULT_SEND_TX_MAX_RETRIES,
   });
+
+  if (tokenConfig && tokenConfig.metadata) {
+    console.log(`Token created with metadata: ${tokenConfig.name} (${tokenConfig.symbol})`);
+  }
 
   return keypair.publicKey;
 }

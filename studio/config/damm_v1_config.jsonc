@@ -26,7 +26,31 @@
   "baseMint": "YOUR_BASE_MINT_ADDRESS",
   // "createBaseToken": {
   //     "mintBaseTokenAmount": 1000000000, // total amount of base token to be minted
-  //     "baseDecimals": 6 // decimals of the base token
+  //     "baseDecimals": 6, // decimals of the base token
+  //     "tokenConfig": {
+  //       "name": "My Token", // Token name
+  //       "symbol": "MYT", // Token symbol
+  //       "decimals": 6, // Should match baseDecimals
+  //       "supply": 1000000000, // Should match mintBaseTokenAmount
+  //       "keypairPath": "./baseMintKeypair.json", // Path to token mint keypair
+  //       "authorities": {
+  //         "mint": "your_mint_authority_address", // Mint authority address
+  //         "freeze": null, // Freeze authority address (null to disable)
+  //         "update": "your_update_authority_address" // Update authority address
+  //       },
+  //       "metadata": {
+  //         "uri": "", // Leave empty to auto-upload to Arweave, or provide existing URI
+  //         "description": "My awesome token description",
+  //         "image": "https://example.com/token-image.png", // Token image URL
+  //         "website": "https://example.com", // Project website
+  //         "twitter": "https://twitter.com/yourproject", // Twitter URL (optional)
+  //         "telegram": "https://t.me/yourproject", // Telegram URL (optional)
+  //         "sellerFeeBasisPoints": 0, // Royalty fee in basis points (0-10000)
+  //         "creators": null, // Array of creator objects (optional)
+  //         "collection": null, // Collection info (optional)
+  //         "uses": null // Usage restrictions (optional)
+  //       }
+  //     }
   // },
 
   /* dammV1Config is only used in the following actions:

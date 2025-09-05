@@ -45,6 +45,10 @@
   "description": "Meteora Invent is a toolkit consisting of everything you need to invent innovative token launches. Powered by Meteora, the most secure, sustainable and composable liquidity layer on Solana.",
   "dependencies": {
     "@coral-xyz/anchor": "^0.31.1",
+    "@metaplex-foundation/mpl-token-metadata": "^2.13.0",
+    "@metaplex-foundation/umi": "^1.4.1",
+    "@metaplex-foundation/umi-bundle-defaults": "^1.4.1",
+    "@metaplex-foundation/umi-uploader-irys": "^1.4.1",
     "@meteora-ag/alpha-vault": "^1.1.14",
     "@meteora-ag/cp-amm-sdk": "^1.1.1",
     "@meteora-ag/dlmm": "^1.6.1",

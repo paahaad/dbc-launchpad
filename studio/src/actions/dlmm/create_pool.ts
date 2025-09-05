@@ -31,9 +31,8 @@ async function main() {
   if (config.createBaseToken) {
     baseMint = await createTokenMint(connection, wallet, {
       dryRun: config.dryRun,
-      mintTokenAmount: config.createBaseToken.mintBaseTokenAmount,
-      decimals: config.createBaseToken.baseDecimals,
       computeUnitPriceMicroLamports: config.computeUnitPriceMicroLamports,
+      tokenConfig: config.createBaseToken,
     });
   } else {
     if (!config.baseMint) {

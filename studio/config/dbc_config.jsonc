@@ -115,15 +115,15 @@
       "feePercentage": 0, // Percentage of fee taken from migration quote threshold once pool migrates (0% to 50%)
       "creatorFeePercentage": 0 // Percentage of the migrationFee.feePercentage claimable by creator (0% to 100%)
     },
-    "leftoverReceiver": "YOUR_LEFTOVER_RECEIVER_ADDRESS", // leftover receiver address
-    "feeClaimer": "YOUR_FEE_CLAIMER_ADDRESS" // fee claimer address
+    "leftoverReceiver": "Dc85YcHkAWs62ndssWcGN5V4xYaQzPzgUDiRGtvnZas6", // leftover receiver address
+    "feeClaimer": "Dc85YcHkAWs62ndssWcGN5V4xYaQzPzgUDiRGtvnZas6" // fee claimer address
   },
 
   /* dbcPool is only used in the following actions:
    * 1. dbc-create-pool
    */
   "dbcPool": {
-    // "baseMintKeypairFilepath": "./baseMintKeypair.json", // optional base mint keypair file path
+    "baseMintKeypairFilepath": "./baseMintKeypair.json", // optional base mint keypair file path
     "name": "DBC Pool", // token name
     "symbol": "DBC", // token symbol
     "uri": "https://example.com" // metaplex token metadata format for the token - https://developers.metaplex.com/core/json-schema

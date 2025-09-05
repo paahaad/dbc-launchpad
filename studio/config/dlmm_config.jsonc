@@ -1,6 +1,6 @@
 {
   /* rpcUrl is required. You can switch between mainnet, devnet and localnet or use your own RPC URL. */
-  "rpcUrl": "https://api.devnet.solana.com", // mainnet: https://api.mainnet-beta.solana.com | devnet: https://api.devnet.solana.com | localnet: http://localhost:8899
+  "rpcUrl": "https://api.mainnet-beta.solana.com", // mainnet: https://api.mainnet-beta.solana.com | devnet: https://api.devnet.solana.com | localnet: http://localhost:8899
 
   /* dryRun is required. If true, transactions will be simulated and not executed. If false, transactions will be executed. */
   "dryRun": false,
@@ -27,23 +27,43 @@
    * 3. dlmm-seed-liquidity-single-bins
    * 4. dlmm-set-pool-status
    */
-  "baseMint": "YOUR_BASE_MINT_ADDRESS",
-  // "createBaseToken": {
-  //     "mintBaseTokenAmount": 1000000000, // total amount of base token to be minted
-  //     "baseDecimals": 6 // decimals of the base token
-  // },
+  // "baseMint": "5Dbrbkz1k2Wfv4dtZJZXtibhqrDTQszzqNQ7TYCcL8Yd",
+  "createBaseToken": {
+      "supply": 1000000000, // total amount of base token to be minted
+      "decimals": 6, // decimals of the base token
+      "tokenMintKeypairFilePath": "./baseMintKeypair.json", // path to token mint keypair if you have a specific keypair for the token mint
+      "name": "Test Token", // token name
+      "symbol": "TT", // token symbol
+      "metadata": {
+        // "uri": "https://gateway.irys.xyz/123456789", // if you already have a metadata URI created, you can specify it here
+        "image": "./data/test-token.jpg", // this can be a URL of the image address (e.g. https://example.com/token-image.png) or the image file path (e.g. ./data/test-token.jpg)
+        "description": "My awesome token description",
+        "website": "https://example.com", // Project website
+        "twitter": "https://twitter.com/yourproject", // Twitter URL (optional)
+        "telegram": "https://t.me/yourproject" // Telegram URL (optional)
+      },
+      "authorities": {
+        "mint": "disable",
+        "freeze": null, 
+        "update": "TEST"
+      },
+      "sellerFeeBasisPoints": 0, // Royalty fee in basis points (0-10000)
+      "creators": null, // Array of creator objects (optional)
+      "collection": null, // Collection info (optional)
+      "uses": null // Usage restrictions (optional)
+  },
 
   /* dlmmConfig is only used in the following actions:
    * 1. dlmm-create-pool
    */
   "dlmmConfig": {
-    "binStep": 400, // Price increment/decrement percentage in basis points (400 = 4% price step between bins)
-    "feeBps": 200, // Trading fee in basis points (200 = 2% fee per swap)
-    "initialPrice": 0.001, // Initial price(in terms of quote/base price)
+    "binStep": 25, // Price increment/decrement percentage in basis points (400 = 4% price step between bins)
+    "feeBps": 1, // Trading fee in basis points (200 = 2% fee per swap)
+    "initialPrice": 1.333, // Initial price(in terms of quote/base price)
     "activationType": 1, // 0 - Slot | 1 - Timestamp
-    "activationPoint": 1755504000, // Activation time of the pool depending on activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
+    "activationPoint": null, // Activation time of the pool depending on activationType (Calculate in slots if activationType is 0 (slots) | Calculate in seconds if activationType is 1 (timestamp))
     "priceRounding": "up", // Price calculation rounding direction for bin ID conversion
-    "creatorPoolOnOffControl": false, // Pool creator permission to enable/disable trading for permissionless pools
+    "creatorPoolOnOffControl": true, // Pool creator permission to enable/disable trading for permissionless pools
     "hasAlphaVault": false // If true, the alpha vault will be created after the pool is created
   },
 
@@ -67,12 +87,12 @@
    * 1. dlmm-seed-liquidity-single-bin
    */
   "singleBinSeedLiquidity": {
-    "price": 0.0000017, // Exact price where liquidity will be concentrated in a single bin
+    "price": 1.333, // Exact price where liquidity will be concentrated in a single bin
     "priceRounding": "up", // Price calculation rounding direction for bin ID conversion. "up" = round up, "down" = round down
-    "seedAmount": "100000", // Amount of token X (base token) to seed into the single bin (in token units)
+    "seedAmount": "750000000", // Amount of token X (base token) to seed into the single bin (in token units)
     "operatorKeypairFilepath": "./keypair.json", // File path to operator's private key for signing seeding transactions
-    "positionOwner": "YOUR_POSITION_OWNER_ADDRESS", // Public key of the position owner who controls the liquidity
-    "feeOwner": "YOUR_FEE_OWNER_ADDRESS", // Public key entitled to claim trading fees from this position
+    "positionOwner": "Dc85YcHkAWs62ndssWcGN5V4xYaQzPzgUDiRGtvnZas6", // Public key of the position owner who controls the liquidity
+    "feeOwner": "Dc85YcHkAWs62ndssWcGN5V4xYaQzPzgUDiRGtvnZas6", // Public key entitled to claim trading fees from this position
     "lockReleasePoint": 0, // Timestamp/slot when position becomes withdrawable (0 = immediately unlocked)
     "seedTokenXToPositionOwner": true // Whether to send 1 lamport of token X to position owner as ownership proof
   },
