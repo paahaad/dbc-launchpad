@@ -213,7 +213,7 @@ async function createMintWithPriorityFee(
         createMetadataAccountArgsV3: {
           collectionDetails: null,
           data: metadataData,
-          isMutable: true,
+          isMutable: tokenConfig.authorities.update !== null,
         },
       }
     );

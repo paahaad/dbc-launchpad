@@ -28,7 +28,7 @@ export interface TokenConfig {
   authorities: {
     mint: string | null;
     freeze: string | null;
-    update: string;
+    update: string | null;
   };
   sellerFeeBasisPoints: number;
   creators: Creator[] | null;
