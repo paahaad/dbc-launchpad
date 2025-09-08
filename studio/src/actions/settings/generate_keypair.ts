@@ -3,15 +3,15 @@ import bs58 from 'bs58';
 import { config } from 'dotenv';
 import fs from 'fs';
 import path from 'path';
-import { parseNetworkFlag, getNetworkConfig } from '../../helpers/cli';
+import { parseCliArguments, getNetworkConfig } from '../../helpers/cli';
 import { airdropSol } from '../../helpers/utils';
 
 config();
 
 async function main() {
   try {
-    // Parse network flag
-    const network = parseNetworkFlag();
+    // parse network flag from cli arguments
+    const network = parseCliArguments().network;
     if (!network) {
       throw new Error('Please provide --network flag (devnet or localnet)');
     }
@@ -48,7 +48,7 @@ async function main() {
       try {
         const signature = await airdropSol(connection, keypair, networkConfig.airdropAmount);
         console.log(
-          `Successfully airdropped ${networkConfig.airdropAmount} SOL on ${network.toUpperCase()}!`
+          `Successfully airdropped ${networkConfig.airdropAmount} SOL on ${network.toUpperCase()}! Signature: ${signature}`
         );
       } catch (airdropError) {
         console.warn(`Airdrop failed: ${airdropError}`);

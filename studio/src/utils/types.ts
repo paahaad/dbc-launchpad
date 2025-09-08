@@ -4,6 +4,8 @@ import BN from 'bn.js';
 
 export interface CliArguments {
   config?: string | undefined;
+  network?: string | undefined;
+  baseMint?: string | undefined;
 }
 
 /* COMMON */
@@ -26,7 +28,7 @@ export interface TokenConfig {
   authorities: {
     mint: string | null;
     freeze: string | null;
-    update: string | null;
+    update: string;
   };
   sellerFeeBasisPoints: number;
   creators: Creator[] | null;

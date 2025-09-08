@@ -1,12 +1,11 @@
 import { Connection, PublicKey } from '@solana/web3.js';
-import { safeParseKeypairFromFile, parseConfigFromCli } from '../../helpers';
+import { safeParseKeypairFromFile, getDbcConfig } from '../../helpers';
 import { Wallet } from '@coral-xyz/anchor';
-import { DbcConfig } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 import { swap } from '../../lib/dbc';
 
 async function main() {
-  const config = (await parseConfigFromCli()) as DbcConfig;
+  const config = await getDbcConfig();
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);

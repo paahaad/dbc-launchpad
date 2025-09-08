@@ -1,26 +1,70 @@
-import { CliArguments, MeteoraConfig, NetworkConfig } from '../utils/types';
+import {
+  AlphaVaultConfig,
+  CliArguments,
+  DammV1Config,
+  DammV2Config,
+  DbcConfig,
+  DlmmConfig,
+  MeteoraConfig,
+  NetworkConfig,
+} from '../utils/types';
 import { parseArgs } from 'util';
 import { safeParseJsonFromFile } from './utils';
-import { validateConfig } from './validation';
 import { parse } from 'csv-parse';
 import fs from 'fs';
-import path from 'path';
 import * as readline from 'readline';
+import path from 'path';
 
-export function parseNetworkFlag(): string | undefined {
+export function parseCliArguments(): CliArguments {
   const { values } = parseArgs({
     args: process.argv,
     options: {
       network: {
         type: 'string',
-        short: 'n',
+      },
+      baseMint: {
+        type: 'string',
       },
     },
     strict: true,
     allowPositionals: true,
   });
 
-  return values.network;
+  return values;
+}
+
+export async function getConfigFromPath(configPath: string): Promise<MeteoraConfig> {
+  return await safeParseJsonFromFile(configPath);
+}
+
+export async function getDammV1Config(): Promise<DammV1Config> {
+  const configPath = path.join(__dirname, '../../config/damm_v1_config.jsonc');
+  const config: DammV1Config = await safeParseJsonFromFile(configPath);
+  return config;
+}
+
+export async function getDammV2Config(): Promise<DammV2Config> {
+  const configPath = path.join(__dirname, '../../config/damm_v2_config.jsonc');
+  const config: DammV2Config = await safeParseJsonFromFile(configPath);
+  return config;
+}
+
+export async function getDlmmConfig(): Promise<DlmmConfig> {
+  const configPath = path.join(__dirname, '../../config/dlmm_config.jsonc');
+  const config: DlmmConfig = await safeParseJsonFromFile(configPath);
+  return config;
+}
+
+export async function getDbcConfig(): Promise<DbcConfig> {
+  const configPath = path.join(__dirname, '../../config/dbc_config.jsonc');
+  const config: DbcConfig = await safeParseJsonFromFile(configPath);
+  return config;
+}
+
+export async function getAlphaVaultConfig(): Promise<AlphaVaultConfig> {
+  const configPath = path.join(__dirname, '../../config/alpha_vault_config.jsonc');
+  const config: AlphaVaultConfig = await safeParseJsonFromFile(configPath);
+  return config;
 }
 
 export function getNetworkConfig(network: string): NetworkConfig {
@@ -40,50 +84,6 @@ export function getNetworkConfig(network: string): NetworkConfig {
     default:
       throw new Error('Invalid network. Please use --network devnet or --network localnet');
   }
-}
-
-export function parseCliArguments(): CliArguments {
-  const { values } = parseArgs({
-    args: process.argv,
-    options: {
-      config: {
-        type: 'string',
-      },
-    },
-    strict: true,
-    allowPositionals: true,
-  });
-
-  return values;
-}
-
-export async function parseConfigFromCli(): Promise<MeteoraConfig> {
-  const cliArguments = parseCliArguments();
-  if (!cliArguments.config) {
-    throw new Error('Please provide a config file path to --config flag');
-  }
-  let configFilePath = cliArguments.config!;
-
-  // If the path is relative, resolve it appropriately based on where we're running from
-  if (!path.isAbsolute(configFilePath)) {
-    const workspaceMarker = path.join(process.cwd(), '../pnpm-workspace.yaml');
-    if (fs.existsSync(workspaceMarker)) {
-      if (configFilePath.startsWith('./studio/')) {
-        configFilePath = configFilePath.replace('./studio/', './');
-      }
-      configFilePath = path.resolve(process.cwd(), configFilePath);
-    } else {
-      configFilePath = path.resolve(process.cwd(), configFilePath);
-    }
-  }
-
-  console.log(`> Using config file: ${configFilePath}`);
-
-  const config: MeteoraConfig = await safeParseJsonFromFile(configFilePath);
-
-  validateConfig(config);
-
-  return config;
 }
 
 export async function parseCsv<T>(filePath: string): Promise<Array<T>> {

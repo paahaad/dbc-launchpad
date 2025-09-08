@@ -1,8 +1,8 @@
 import { Connection, PublicKey } from '@solana/web3.js';
-import { safeParseKeypairFromFile, parseConfigFromCli, createTokenMint } from '../../helpers';
+import { safeParseKeypairFromFile, createTokenMint, getDammV1Config } from '../../helpers';
 import { Wallet } from '@coral-xyz/anchor';
 import { createDammV1Pool } from '../../lib/damm_v1';
-import { AlphaVaultConfig, DammV1Config } from '../../utils/types';
+import { AlphaVaultConfig } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 import { createAlphaVault } from '../../lib/alpha_vault';
 import {
@@ -11,7 +11,7 @@ import {
 } from '@meteora-ag/dynamic-amm-sdk/dist/cjs/src/amm/utils';
 
 async function main() {
-  const config = (await parseConfigFromCli()) as DammV1Config;
+  const config = await getDammV1Config();
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);

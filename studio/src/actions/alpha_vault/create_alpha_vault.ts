@@ -7,12 +7,12 @@ import {
 } from '@meteora-ag/dynamic-amm-sdk/dist/cjs/src/amm/utils';
 import { deriveCustomizablePoolAddress } from '@meteora-ag/cp-amm-sdk';
 import { AlphaVaultConfig, PoolTypeConfig } from '../../utils/types';
-import { parseConfigFromCli, safeParseKeypairFromFile } from '../../helpers';
+import { getAlphaVaultConfig, safeParseKeypairFromFile } from '../../helpers';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 import { createAlphaVault } from '../../lib/alpha_vault';
 
 async function main() {
-  const config = (await parseConfigFromCli()) as AlphaVaultConfig;
+  const config = await getAlphaVaultConfig();
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);

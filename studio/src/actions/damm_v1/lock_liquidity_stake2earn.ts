@@ -1,11 +1,10 @@
 import { Connection, PublicKey } from '@solana/web3.js';
-import { safeParseKeypairFromFile, parseConfigFromCli } from '../../helpers';
-import { DammV1Config } from '../../utils/types';
+import { getDammV1Config, safeParseKeypairFromFile } from '../../helpers';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 import { lockLiquidityStake2Earn } from '../../lib/damm_v1/stake2earn';
 
 async function main() {
-  const config = (await parseConfigFromCli()) as DammV1Config;
+  const config = await getDammV1Config();
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);

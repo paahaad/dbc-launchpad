@@ -1,8 +1,7 @@
 import { Wallet } from '@coral-xyz/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
-import { DammV1Config } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
-import { safeParseKeypairFromFile, parseConfigFromCli } from '../../helpers';
+import { safeParseKeypairFromFile, getDammV1Config } from '../../helpers';
 import {
   createProgram,
   deriveCustomizablePermissionlessConstantProductPoolAddress,
@@ -10,7 +9,7 @@ import {
 import { createDammV1Stake2EarnPool } from '../../lib/damm_v1/stake2earn';
 
 async function main() {
-  const config = (await parseConfigFromCli()) as DammV1Config;
+  const config = await getDammV1Config();
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);

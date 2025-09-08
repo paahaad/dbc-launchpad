@@ -23,35 +23,38 @@
    * 1. damm-v1-create-pool
    * 2. damm-v1-lock-liquidity
    */
-  "baseMint": "YOUR_BASE_MINT_ADDRESS",
-  // "createBaseToken": {
-  //     "mintBaseTokenAmount": 1000000000, // total amount of base token to be minted
-  //     "baseDecimals": 6, // decimals of the base token
-  //     "tokenConfig": {
-  //       "name": "My Token", // Token name
-  //       "symbol": "MYT", // Token symbol
-  //       "decimals": 6, // Should match baseDecimals
-  //       "supply": 1000000000, // Should match mintBaseTokenAmount
-  //       "keypairPath": "./baseMintKeypair.json", // Path to token mint keypair
-  //       "authorities": {
-  //         "mint": "your_mint_authority_address", // Mint authority address
-  //         "freeze": null, // Freeze authority address (null to disable)
-  //         "update": "your_update_authority_address" // Update authority address
-  //       },
-  //       "metadata": {
-  //         "uri": "", // Leave empty to auto-upload to Arweave, or provide existing URI
-  //         "description": "My awesome token description",
-  //         "image": "https://example.com/token-image.png", // Token image URL
-  //         "website": "https://example.com", // Project website
-  //         "twitter": "https://twitter.com/yourproject", // Twitter URL (optional)
-  //         "telegram": "https://t.me/yourproject", // Telegram URL (optional)
-  //         "sellerFeeBasisPoints": 0, // Royalty fee in basis points (0-10000)
-  //         "creators": null, // Array of creator objects (optional)
-  //         "collection": null, // Collection info (optional)
-  //         "uses": null // Usage restrictions (optional)
-  //       }
-  //     }
-  // },
+  // "baseMint": "YOUR_BASE_MINT_ADDRESS",
+  "createBaseToken": {
+    "supply": 1000000000, // total amount of base token to be minted
+    "decimals": 6, // decimals of the base token
+    // "tokenMintKeypairFilePath": "./mint-keypair.json", // path to token mint keypair if you have a specific keypair for the token mint. If not provided, a new keypair will be generated.
+    "name": "Test Token", // token name
+    "symbol": "TT", // token symbol
+    "authorities": {
+      "mint": "YOUR_MINT_AUTHORITY_ADDRESS", // token mint authority address
+      "freeze": "YOUR_FREEZE_AUTHORITY_ADDRESS", // token freeze authority address
+      "update": "YOUR_UPDATE_AUTHORITY_ADDRESS" // token update authority address
+    },
+    /* Optional Metaplex Token Metadata Properties
+    * Read more about the properties here: https://developers.metaplex.com/token-metadata
+    */
+    "sellerFeeBasisPoints": 0, // Royalty fee in basis points (0-10000)
+    "creators": null, // Array of creator objects of the token (optional)
+    "collection": null, // Collection info (optional)
+    "uses": null, // Usage restrictions (optional)
+    "metadata": {
+      // "uri": "https://gateway.irys.xyz/123456789", // if you already have a metadata URI created, you can specify it here
+
+      /* Only use the following parameters for createBaseToken if you don't have an existing metadata uri
+      * This will create an image uri and a new metadata uri and upload everything to Irys
+      */
+      "image": "./data/test-token.jpg", // this can be a URL of the image address (e.g. https://example.com/token-image.png) or the image file path (e.g. ./data/test-token.jpg)
+      "description": "YOUR_TOKEN_DESCRIPTION", // token description
+      "website": "https://example.com", // project website
+      "twitter": "https://x.com/yourproject", // twitter URL (optional)
+      "telegram": "https://t.me/yourproject" // telegram URL (optional)
+    }
+  },
 
   /* dammV1Config is only used in the following actions:
    * 1. damm-v1-create-pool

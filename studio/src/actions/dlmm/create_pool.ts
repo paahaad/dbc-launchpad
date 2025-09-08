@@ -1,14 +1,14 @@
 import { Connection, PublicKey } from '@solana/web3.js';
-import { safeParseKeypairFromFile, parseConfigFromCli, createTokenMint } from '../../helpers';
+import { safeParseKeypairFromFile, createTokenMint, getDlmmConfig } from '../../helpers';
 import { Wallet } from '@coral-xyz/anchor';
 import { createPermissionlessDlmmPool } from '../../lib/dlmm';
-import { AlphaVaultConfig, DlmmConfig } from '../../utils/types';
+import { AlphaVaultConfig } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL, DLMM_PROGRAM_IDS } from '../../utils/constants';
 import { deriveCustomizablePermissionlessLbPair } from '@meteora-ag/dlmm';
 import { createAlphaVault } from '../../lib/alpha_vault';
 
 async function main() {
-  const config: DlmmConfig = (await parseConfigFromCli()) as DlmmConfig;
+  const config = await getDlmmConfig();
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);

@@ -1,14 +1,13 @@
 import { Connection, Keypair, PublicKey } from '@solana/web3.js';
-import { getAmountInLamports, safeParseKeypairFromFile, parseConfigFromCli } from '../../helpers';
+import { getAmountInLamports, safeParseKeypairFromFile, getDlmmConfig } from '../../helpers';
 import { BN } from 'bn.js';
 import DLMM, { LBCLMM_PROGRAM_IDS, deriveCustomizablePermissionlessLbPair } from '@meteora-ag/dlmm';
 import { unpackMint } from '@solana/spl-token';
-import { DlmmConfig } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 import { seedLiquidityLfg } from '../../lib/dlmm';
 
 async function main() {
-  const config: DlmmConfig = (await parseConfigFromCli()) as DlmmConfig;
+  const config = await getDlmmConfig();
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);

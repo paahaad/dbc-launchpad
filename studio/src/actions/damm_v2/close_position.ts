@@ -1,12 +1,11 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import { Wallet } from '@coral-xyz/anchor';
-import { DammV2Config } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
-import { parseConfigFromCli, safeParseKeypairFromFile } from '../../helpers';
+import { getDammV2Config, safeParseKeypairFromFile } from '../../helpers';
 import { closePosition } from '../../lib/damm_v2';
 
 async function main() {
-  const config: DammV2Config = (await parseConfigFromCli()) as DammV2Config;
+  const config = await getDammV2Config();
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);

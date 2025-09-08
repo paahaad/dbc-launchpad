@@ -1,17 +1,16 @@
 import { Connection, PublicKey, sendAndConfirmTransaction } from '@solana/web3.js';
 import {
   safeParseKeypairFromFile,
-  parseConfigFromCli,
   modifyComputeUnitPriceIx,
   runSimulateTransaction,
+  getDlmmConfig,
 } from '../../helpers';
 import { Wallet } from '@coral-xyz/anchor';
 import DLMM from '@meteora-ag/dlmm';
-import { DlmmConfig } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL, DEFAULT_SEND_TX_MAX_RETRIES } from '../../utils/constants';
 
 async function main() {
-  const config: DlmmConfig = (await parseConfigFromCli()) as DlmmConfig;
+  const config = await getDlmmConfig();
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);

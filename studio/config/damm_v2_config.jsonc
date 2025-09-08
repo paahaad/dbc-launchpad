@@ -1,6 +1,6 @@
 {
   /* rpcUrl is required. You can switch between mainnet, devnet and localnet or use your own RPC URL. */
-  "rpcUrl": "https://api.mainnet-beta.solana.com", // mainnet: https://api.mainnet-beta.solana.com | devnet: https://api.devnet.solana.com | localnet: http://localhost:8899
+  "rpcUrl": "https://api.devnet.solana.com", // mainnet: https://api.mainnet-beta.solana.com | devnet: https://api.devnet.solana.com | localnet: http://localhost:8899
 
   /* dryRun is required. If true, transactions will be simulated and not executed. If false, transactions will be executed. */
   "dryRun": false,
@@ -23,35 +23,38 @@
    * 1. damm-v2-create-balanced-pool
    * 2. damm-v2-create-one-sided-pool
    */
-  "baseMint": "FUCKqxq7EeBkt9r437xgyGaUpMvqmWwv4m3nWqNgWAkM",
-  // "createBaseToken": {
-  //   "mintBaseTokenAmount": 1000000000, // total amount of base token to be minted
-  //   "baseDecimals": 6, // decimals of the base token
-  //   "tokenConfig": {
-  //     "name": "My Token", // Token name
-  //     "symbol": "MYT", // Token symbol
-  //     "decimals": 6, // Should match baseDecimals
-  //     "supply": 1000000000, // Should match mintBaseTokenAmount
-  //     "keypairPath": "./baseMintKeypair.json", // Path to token mint keypair
-  //     "authorities": {
-  //       "mint": "your_mint_authority_address", // Mint authority address
-  //       "freeze": null, // Freeze authority address (null to disable)
-  //       "update": "your_update_authority_address" // Update authority address
-  //     },
-  //     "metadata": {
-  //       "uri": "", // Leave empty to auto-upload to Arweave, or provide existing URI
-  //       "description": "My awesome token description",
-  //       "image": "https://example.com/token-image.png", // Token image URL
-  //       "website": "https://example.com", // Project website
-  //       "twitter": "https://twitter.com/yourproject", // Twitter URL (optional)
-  //       "telegram": "https://t.me/yourproject", // Telegram URL (optional)
-  //       "sellerFeeBasisPoints": 0, // Royalty fee in basis points (0-10000)
-  //       "creators": null, // Array of creator objects (optional)
-  //       "collection": null, // Collection info (optional)
-  //       "uses": null // Usage restrictions (optional)
-  //     }
-  //   }
-  // },
+  // "baseMint": "YOUR_BASE_MINT_ADDRESS",
+  "createBaseToken": {
+    "supply": 1000000000, // total amount of base token to be minted
+    "decimals": 6, // decimals of the base token
+    // "tokenMintKeypairFilePath": "./mint-keypair.json", // path to token mint keypair if you have a specific keypair for the token mint. If not provided, a new keypair will be generated.
+    "name": "Test Token", // token name
+    "symbol": "TT", // token symbol
+    "authorities": {
+      "mint": "YOUR_MINT_AUTHORITY_ADDRESS", // token mint authority address
+      "freeze": "YOUR_FREEZE_AUTHORITY_ADDRESS", // token freeze authority address
+      "update": "YOUR_UPDATE_AUTHORITY_ADDRESS" // token update authority address
+    },
+    /* Optional Metaplex Token Metadata Properties
+    * Read more about the properties here: https://developers.metaplex.com/token-metadata
+    */
+    "sellerFeeBasisPoints": 0, // Royalty fee in basis points (0-10000)
+    "creators": null, // Array of creator objects of the token (optional)
+    "collection": null, // Collection info (optional)
+    "uses": null, // Usage restrictions (optional)
+    "metadata": {
+      // "uri": "https://gateway.irys.xyz/123456789", // if you already have a metadata URI created, you can specify it here
+
+      /* Only use the following parameters for createBaseToken if you don't have an existing metadata uri
+      * This will create an image uri and a new metadata uri and upload everything to Irys
+      */
+      "image": "./data/test-token.jpg", // this can be a URL of the image address (e.g. https://example.com/token-image.png) or the image file path (e.g. ./data/test-token.jpg)
+      "description": "YOUR_TOKEN_DESCRIPTION", // token description
+      "website": "https://example.com", // project website
+      "twitter": "https://x.com/yourproject", // twitter URL (optional)
+      "telegram": "https://t.me/yourproject" // telegram URL (optional)
+    }
+  },
 
   /* poolAddress is required for the following actions:
    * 1. damm-v2-claim-position-fee
@@ -65,13 +68,13 @@
    */
   "dammV2Config": {
     "creator": "Dc85YcHkAWs62ndssWcGN5V4xYaQzPzgUDiRGtvnZas6", // creator address
-    "baseAmount": 500000000, // base token amount
+    "baseAmount": 100000000, // base token amount
     "quoteAmount": null, // quote token amount
     "initPrice": 0.001, // initial price (in terms of quote/base   price) 1 SOL / 1000000000 = initialPrice
     "maxPrice": null, // max price (in terms of quote/base price)
     "poolFees": {
-      "maxBaseFeeBps": 400, // max base fee (in basis points)
-      "minBaseFeeBps": 400, // min base fee (in basis points)
+      "maxBaseFeeBps": 120, // max base fee (in basis points)
+      "minBaseFeeBps": 120, // min base fee (in basis points)
       "numberOfPeriod": 0, // number of period
       "totalDuration": 0, // total duration (If activationType is 0 (slots), totalDuration = duration / 0.4 | If activationType is 1 (timestamp), totalDuration = duration)
       "feeSchedulerMode": 0, // 0 - Fee Scheduler: Linear | 1 - Fee Scheduler: Exponential

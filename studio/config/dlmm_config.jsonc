@@ -20,7 +20,8 @@
    */
   "quoteMint": "So11111111111111111111111111111111111111112",
 
-  /* Either use baseMint or createBaseToken, but not both.
+  /* If you have a baseMint already created, you can specify it in `baseMint`. If you don't have a baseMint, you can create a new one using `createBaseToken`.
+   * Either use baseMint or createBaseToken, but not both.
    * baseMint is required for the following actions:
    * 1. dlmm-create-pool
    * 2. dlmm-seed-liquidity-lfg
@@ -29,28 +30,35 @@
    */
   // "baseMint": "5Dbrbkz1k2Wfv4dtZJZXtibhqrDTQszzqNQ7TYCcL8Yd",
   "createBaseToken": {
-      "supply": 1000000000, // total amount of base token to be minted
-      "decimals": 6, // decimals of the base token
-      "tokenMintKeypairFilePath": "./baseMintKeypair.json", // path to token mint keypair if you have a specific keypair for the token mint
-      "name": "Test Token", // token name
-      "symbol": "TT", // token symbol
-      "metadata": {
-        // "uri": "https://gateway.irys.xyz/123456789", // if you already have a metadata URI created, you can specify it here
-        "image": "./data/test-token.jpg", // this can be a URL of the image address (e.g. https://example.com/token-image.png) or the image file path (e.g. ./data/test-token.jpg)
-        "description": "My awesome token description",
-        "website": "https://example.com", // Project website
-        "twitter": "https://twitter.com/yourproject", // Twitter URL (optional)
-        "telegram": "https://t.me/yourproject" // Telegram URL (optional)
-      },
-      "authorities": {
-        "mint": "disable",
-        "freeze": null, 
-        "update": "TEST"
-      },
-      "sellerFeeBasisPoints": 0, // Royalty fee in basis points (0-10000)
-      "creators": null, // Array of creator objects (optional)
-      "collection": null, // Collection info (optional)
-      "uses": null // Usage restrictions (optional)
+    "supply": 1000000000, // total amount of base token to be minted
+    "decimals": 6, // decimals of the base token
+    // "tokenMintKeypairFilePath": "./mint-keypair.json", // path to token mint keypair if you have a specific keypair for the token mint. If not provided, a new keypair will be generated.
+    "name": "Test Token", // token name
+    "symbol": "TT", // token symbol
+    "authorities": {
+      "mint": "YOUR_MINT_AUTHORITY_ADDRESS", // token mint authority address
+      "freeze": "YOUR_FREEZE_AUTHORITY_ADDRESS", // token freeze authority address
+      "update": "YOUR_UPDATE_AUTHORITY_ADDRESS" // token update authority address
+    },
+    /* Optional Metaplex Token Metadata Properties
+    * Read more about the properties here: https://developers.metaplex.com/token-metadata
+    */
+    "sellerFeeBasisPoints": 0, // Royalty fee in basis points (0-10000)
+    "creators": null, // Array of creator objects of the token (optional)
+    "collection": null, // Collection info (optional)
+    "uses": null, // Usage restrictions (optional)
+    "metadata": {
+      // "uri": "https://gateway.irys.xyz/123456789", // if you already have a metadata URI created, you can specify it here
+
+      /* Only use the following parameters for createBaseToken if you don't have an existing metadata uri
+      * This will create an image uri and a new metadata uri and upload everything to Irys
+      */
+      "image": "./data/test-token.jpg", // this can be a URL of the image address (e.g. https://example.com/token-image.png) or the image file path (e.g. ./data/test-token.jpg)
+      "description": "YOUR_TOKEN_DESCRIPTION", // token description
+      "website": "https://example.com", // project website
+      "twitter": "https://x.com/yourproject", // twitter URL (optional)
+      "telegram": "https://t.me/yourproject" // telegram URL (optional)
+    }
   },
 
   /* dlmmConfig is only used in the following actions:

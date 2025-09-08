@@ -1,14 +1,14 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import { Wallet } from '@coral-xyz/anchor';
-import { DammV2Config, AlphaVaultConfig } from '../../utils/types';
+import { AlphaVaultConfig } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
-import { createTokenMint, parseConfigFromCli, safeParseKeypairFromFile } from '../../helpers';
+import { createTokenMint, getDammV2Config, safeParseKeypairFromFile } from '../../helpers';
 import { createDammV2OneSidedPool } from '../../lib/damm_v2';
 import { createAlphaVault } from '../../lib/alpha_vault';
 import { deriveCustomizablePoolAddress } from '@meteora-ag/cp-amm-sdk';
 
 async function main() {
-  const config: DammV2Config = (await parseConfigFromCli()) as DammV2Config;
+  const config = await getDammV2Config();
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
