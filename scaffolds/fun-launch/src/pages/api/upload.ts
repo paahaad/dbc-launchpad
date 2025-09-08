@@ -104,6 +104,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         })
         .toString('base64'),
       mintAddress: result.mintKeypair.publicKey.toBase58(),
+      imageUrl,
+      metadataUrl,
     });
   } catch (error) {
     console.error('Upload error:', error);

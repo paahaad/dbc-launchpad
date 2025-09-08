@@ -1,44 +1,48 @@
 import { useState, useEffect } from 'react';
 import { useWallet } from '@jup-ag/wallet-adapter';
+import { PublicKey } from '@solana/web3.js';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { useTokenInfo } from '@/hooks/queries';
 import { ReadableNumber } from '@/components/ui/ReadableNumber';
+import { useDBCToken, useSwapQuote } from '@/hooks/use-dbc-pool';
+import { dbcSwapBuilder } from '@/utils/dbc-swap';
+import { GOR_CONFIG } from '@/config/gor-config';
 
 interface QuickTradeSidebarProps {
   tokenId: string;
 }
 
-export const QuickTradeSidebar = (_: QuickTradeSidebarProps) => {
+export const QuickTradeSidebar = ({ tokenId }: QuickTradeSidebarProps) => {
   const { publicKey, signTransaction } = useWallet();
   const { data: tokenInfo } = useTokenInfo();
+  const { data: dbcToken, isLoading: dbcLoading, error: dbcError } = useDBCToken(tokenId);
   
   const [gorAmount, setGorAmount] = useState('');
   const [tokenAmount, setTokenAmount] = useState('');
   const [isBuying, setIsBuying] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
 
-  // Calculate token amount based on GOR amount and current price
-  useEffect(() => {
-    if (gorAmount && tokenInfo?.baseAsset.usdPrice) {
-      const calculatedTokenAmount = parseFloat(gorAmount) / tokenInfo.baseAsset.usdPrice;
-      setTokenAmount(calculatedTokenAmount.toFixed(6));
-    } else {
-      setTokenAmount('');
-    }
-  }, [gorAmount, tokenInfo?.baseAsset.usdPrice]);
+  // Get swap quote when amounts change (only on client to prevent hydration issues)
+  const inputAmount = isBuying ? parseFloat(gorAmount) || 0 : parseFloat(tokenAmount) || 0;
+  const { data: swapQuote } = useSwapQuote(
+    tokenId,
+    inputAmount,
+    isBuying ? 'buy' : 'sell'
+  );
 
-  // Calculate GOR amount based on token amount and current price
+  // Update calculated amounts based on swap quote
   useEffect(() => {
-    if (tokenAmount && tokenInfo?.baseAsset.usdPrice) {
-      const calculatedGorAmount = parseFloat(tokenAmount) * tokenInfo.baseAsset.usdPrice;
-      setGorAmount(calculatedGorAmount.toFixed(6));
-    } else {
-      setGorAmount('');
+    if (swapQuote) {
+      if (isBuying && gorAmount) {
+        setTokenAmount(swapQuote.outputAmount.toFixed(6));
+      } else if (!isBuying && tokenAmount) {
+        setGorAmount(swapQuote.outputAmount.toFixed(6));
+      }
     }
-  }, [tokenAmount, tokenInfo?.baseAsset.usdPrice]);
+  }, [swapQuote, isBuying, gorAmount, tokenAmount]);
 
   const handleQuickTrade = async () => {
     if (!publicKey || !signTransaction) {
@@ -47,17 +51,44 @@ export const QuickTradeSidebar = (_: QuickTradeSidebarProps) => {
     }
 
     if (!gorAmount || parseFloat(gorAmount) <= 0) {
-      toast.error('Please enter a valid GOR amount');
+      toast.error('Please enter a valid amount');
+      return;
+    }
+
+    if (!dbcToken) {
+      toast.error('Token data not available');
       return;
     }
 
     setIsLoading(true);
 
     try {
-      // This would integrate with Jupiter API for actual trading
-      // For now, we'll show a placeholder message
+      const tokenMint = new PublicKey(tokenId);
+      const quoteMint = new PublicKey(GOR_CONFIG.QUOTE_TOKEN.mint);
+      
+      const inputAmount = isBuying ? parseFloat(gorAmount) : parseFloat(tokenAmount);
+      const minimumOutputAmount = swapQuote?.minimumReceived || 0;
+
+      // Build swap transaction
+      const transaction = await dbcSwapBuilder.buildSwapTransaction({
+        userWallet: publicKey,
+        tokenMint,
+        quoteMint,
+        inputAmount,
+        minimumOutputAmount,
+        tradeDirection: isBuying ? 'buy' : 'sell',
+        slippage: 1, // 1% slippage
+      });
+
+      // Execute swap
+      const signature = await dbcSwapBuilder.executeSwap(transaction, signTransaction);
+
       toast.success(
-        `${isBuying ? 'Buy' : 'Sell'} order placed: ${tokenAmount} tokens for ${gorAmount} GOR`
+        `${isBuying ? 'Buy' : 'Sell'} order executed successfully!`,
+        {
+          description: `Transaction: ${signature.slice(0, 8)}...`,
+          duration: 5000,
+        }
       );
 
       // Reset form
@@ -65,13 +96,31 @@ export const QuickTradeSidebar = (_: QuickTradeSidebarProps) => {
       setTokenAmount('');
     } catch (error) {
       console.error('Trade error:', error);
-      toast.error('Failed to place trade order');
+      toast.error(
+        error instanceof Error ? error.message : 'Failed to execute trade'
+      );
     } finally {
       setIsLoading(false);
     }
   };
 
   const presetAmounts = [0.1, 0.5, 1, 2, 5];
+
+  // Show error state if DBC loading failed
+  if (dbcError && !tokenInfo) {
+    return (
+      <div className="p-6">
+        <div className="bg-red-500/20 border border-red-500/50 rounded-lg p-4 text-center">
+          <div className="text-red-400 mb-2">
+            <span className="iconify ph--warning-bold w-6 h-6 mx-auto" />
+          </div>
+          <p className="text-red-200 text-sm">
+            Unable to load token data. Please try again later.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="p-6">
@@ -102,27 +151,49 @@ export const QuickTradeSidebar = (_: QuickTradeSidebarProps) => {
       </div>
 
       {/* Token Info */}
-      {tokenInfo && (
+      {(dbcToken || tokenInfo) && (
         <div className="bg-white/5 rounded-lg p-4 mb-6">
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-gray-300">Current Price</span>
             <span className="font-semibold">
-              <ReadableNumber num={tokenInfo.baseAsset.usdPrice} format="price" prefix="$" />
+              {dbcToken ? (
+                <ReadableNumber num={dbcToken.price} format="price" prefix="$" />
+              ) : (
+                <ReadableNumber num={tokenInfo?.baseAsset.usdPrice || 0} format="price" prefix="$" />
+              )}
             </span>
           </div>
           <div className="flex items-center justify-between mb-2">
             <span className="text-sm text-gray-300">Market Cap</span>
             <span className="font-semibold">
-              <ReadableNumber num={tokenInfo.baseAsset.mcap} format="price" prefix="$" />
+              {dbcToken ? (
+                <ReadableNumber num={dbcToken.marketCap} format="price" prefix="$" />
+              ) : (
+                <ReadableNumber num={tokenInfo?.baseAsset.mcap || 0} format="price" prefix="$" />
+              )}
+            </span>
+          </div>
+          <div className="flex items-center justify-between mb-2">
+            <span className="text-sm text-gray-300">Liquidity</span>
+            <span className="font-semibold">
+              {dbcToken ? (
+                <ReadableNumber 
+                  num={dbcToken.reserves.quote * (dbcToken.price || 1)} 
+                  format="price" 
+                  prefix="$" 
+                />
+              ) : (
+                'N/A'
+              )}
             </span>
           </div>
           <div className="flex items-center justify-between">
             <span className="text-sm text-gray-300">24h Change</span>
             <span className={`font-semibold ${
-              (tokenInfo.baseAsset.stats24h?.priceChange || 0) >= 0 ? 'text-green-400' : 'text-red-400'
+              (dbcToken?.priceChange24h || tokenInfo?.baseAsset.stats24h?.priceChange || 0) >= 0 ? 'text-green-400' : 'text-red-400'
             }`}>
-              {(tokenInfo.baseAsset.stats24h?.priceChange || 0) >= 0 ? '+' : ''}
-              {((tokenInfo.baseAsset.stats24h?.priceChange || 0) * 100).toFixed(2)}%
+              {(dbcToken?.priceChange24h || tokenInfo?.baseAsset.stats24h?.priceChange || 0) >= 0 ? '+' : ''}
+              {((dbcToken?.priceChange24h || tokenInfo?.baseAsset.stats24h?.priceChange || 0) * 100).toFixed(2)}%
             </span>
           </div>
         </div>
@@ -178,7 +249,7 @@ export const QuickTradeSidebar = (_: QuickTradeSidebarProps) => {
             className="w-full pr-12"
           />
           <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-400">
-            {tokenInfo?.baseAsset.symbol || 'TOKEN'}
+            {dbcToken?.metadata?.symbol || tokenInfo?.baseAsset.symbol || 'TOKEN'}
           </span>
         </div>
       </div>
@@ -206,14 +277,41 @@ export const QuickTradeSidebar = (_: QuickTradeSidebarProps) => {
         )}
       </Button>
 
-      {/* Trade Summary */}
-      {gorAmount && tokenAmount && (
+      {/* Swap Quote Info */}
+      {swapQuote && gorAmount && tokenAmount && (
         <div className="mt-4 p-3 bg-white/5 rounded-lg">
-          <div className="text-sm text-gray-300 mb-1">Trade Summary</div>
-          <div className="text-sm">
-            {isBuying ? 'Buying' : 'Selling'} <span className="font-semibold">{tokenAmount}</span> tokens
-            <br />
-            for <span className="font-semibold">{gorAmount} GOR</span>
+          <div className="text-sm text-gray-300 mb-2">Trade Summary</div>
+          <div className="space-y-1 text-sm">
+            <div className="flex justify-between">
+              <span>{isBuying ? 'You pay:' : 'You sell:'}</span>
+              <span className="font-semibold">
+                {isBuying ? `${gorAmount} GOR` : `${tokenAmount} ${dbcToken?.metadata?.symbol || 'TOKEN'}`}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span>{isBuying ? 'You receive:' : 'You receive:'}</span>
+              <span className="font-semibold">
+                {isBuying ? `${tokenAmount} ${dbcToken?.metadata?.symbol || 'TOKEN'}` : `${gorAmount} GOR`}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span>Price Impact:</span>
+              <span className={`font-semibold ${
+                swapQuote.priceImpact > 5 ? 'text-red-400' : swapQuote.priceImpact > 2 ? 'text-yellow-400' : 'text-green-400'
+              }`}>
+                {swapQuote.priceImpact.toFixed(2)}%
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span>Minimum received:</span>
+              <span className="font-semibold text-xs">
+                {swapQuote.minimumReceived.toFixed(6)} {isBuying ? (dbcToken?.metadata?.symbol || 'TOKEN') : 'GOR'}
+              </span>
+            </div>
+            <div className="flex justify-between">
+              <span>Route:</span>
+              <span className="font-semibold text-xs">{swapQuote.route}</span>
+            </div>
           </div>
         </div>
       )}

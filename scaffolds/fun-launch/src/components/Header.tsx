@@ -47,25 +47,19 @@ export const Header = () => {
         <div className="flex items-center justify-between">
           <Link href="/" className="flex items-center space-x-3">
             <div className="w-8 h-8 flex items-center justify-center">
-              <img 
-                src="https://gorbagana.wtf/images/gorb-logo.avif" 
-                alt="GOR Logo" 
+              <img
+                src="https://gorbagana.wtf/images/gorb-logo.avif"
+                alt="GOR Logo"
                 className="w-8 h-8 rounded-lg object-contain"
               />
             </div>
             <span className="text-xl font-bold text-white">Dumpster</span>
           </Link>
 
-          <nav className="hidden md:flex items-center space-x-8">
-            <Link href="/" className="text-gray-300 hover:text-white transition">
-              Explore Tokens
-            </Link>
-            <Link href="/create-pool" className="text-gray-300 hover:text-white transition">
+          <div className="flex items-center space-x-4">
+            <Link href="/create-pool" className="bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-lg text-white font-medium transition">
               Launch Token
             </Link>
-          </nav>
-
-          <div className="flex items-center space-x-4">
             {publicKey ? (
               <div className="relative" ref={dropdownRef}>
                 <button
@@ -83,13 +77,25 @@ export const Header = () => {
                     stroke="currentColor"
                     viewBox="0 0 24 24"
                   >
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
                   </svg>
                 </button>
 
                 {isDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-50">
+                  <div className="absolute right-0 mt-2 w-48 py-1.5 bg-gray-800 border border-gray-700 rounded-lg shadow-lg z-50">
                     <div className="py-1">
+                      <Link 
+                        href="/profile"
+                        onClick={() => setIsDropdownOpen(false)}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors block"
+                      >
+                        Profile
+                      </Link>
                       <button
                         onClick={handleChangeWallet}
                         className="w-full text-left px-4 py-2 text-sm text-gray-300 hover:bg-gray-700 hover:text-white transition-colors"
@@ -109,11 +115,12 @@ export const Header = () => {
             ) : (
               <button
                 onClick={handleConnectWallet}
-                className="bg-gradient-to-r from-blue-500 to-purple-600 px-6 py-2 rounded-lg text-white font-medium hover:opacity-90 transition"
+                className="bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-lg text-white font-medium transition"
               >
                 Connect Wallet
               </button>
             )}
+
           </div>
         </div>
       </div>

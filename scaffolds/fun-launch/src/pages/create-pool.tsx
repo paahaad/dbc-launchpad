@@ -55,6 +55,8 @@ interface DBCFormValues {
   website?: string;
   twitter?: string;
   description?: string;
+  telegram?: string;
+  discord?: string;
 }
 
 export default function CreatePool() {
@@ -77,6 +79,8 @@ export default function CreatePool() {
       website: '',
       twitter: '',
       description: '',
+      telegram: '',
+      discord: '',
     } as DBCFormValues,
     onSubmit: async ({ value }) => {
       try {
@@ -132,7 +136,7 @@ export default function CreatePool() {
           throw new Error(error.error);
         }
 
-        const { poolTx, mintAddress } = await uploadResponse.json();
+        const { poolTx, mintAddress, imageUrl, metadataUrl } = await uploadResponse.json();
         const transaction = Transaction.from(Buffer.from(poolTx, 'base64'));
 
         // Step 2: Sign with keypair first
@@ -149,6 +153,13 @@ export default function CreatePool() {
           },
           body: JSON.stringify({
             signedTransaction: signedTransaction.serialize().toString('base64'),
+            tokenData: {
+              ...value,
+              mintAddress,
+              imageUrl,
+              metadataUrl,
+              userWallet: address,
+            },
           }),
         });
 
@@ -159,6 +170,21 @@ export default function CreatePool() {
 
         const { success } = await sendResponse.json();
         if (success) {
+          // Store token data
+          await fetch('/api/store-token', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+              ...value,
+              mintAddress,
+              imageUrl,
+              metadataUrl,
+              userWallet: address,
+            }),
+          });
+
           setPoolCreated(true);
           setCreatedMintAddress(mintAddress);
           toast.success(`DBC Token Pool created successfully! Mint: ${mintAddress}`, {
@@ -172,7 +198,23 @@ export default function CreatePool() {
         }
       } catch (error) {
         console.error('Error creating DBC pool:', error);
-        toast.error(error instanceof Error ? error.message : 'Failed to create DBC pool');
+        
+        // Handle specific wallet transaction errors
+        if (error instanceof Error) {
+          if (error.message.includes('Approval Denied') || error.message.includes('User rejected')) {
+            toast.error('Transaction was cancelled. Please try again if you want to proceed.', {
+              duration: 4000,
+            });
+          } else if (error.message.includes('WalletSignTransactionError')) {
+            toast.error('Wallet transaction failed. Please check your wallet and try again.', {
+              duration: 4000,
+            });
+          } else {
+            toast.error(error.message);
+          }
+        } else {
+          toast.error('Failed to create DBC pool. Please try again.');
+        }
       } finally {
         setIsLoading(false);
       }
@@ -191,10 +233,10 @@ export default function CreatePool() {
   return (
     <>
       <Head>
-        <title>Launch DBC Token - DBC Launchpad</title>
+        <title>Launch Another Trash - Gorbagana Launchpad</title>
         <meta
           name="description"
-          content="Launch your token with a Dynamic Bonding Curve on Solana using Meteora's DBC protocol."
+          content="Launch your trash token on the Gorbagana chain with Dynamic Bonding Curve for fair price discovery."
         />
       </Head>
 
@@ -206,8 +248,8 @@ export default function CreatePool() {
         <main className="container mx-auto px-4 py-10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
             <div>
-              <h1 className="text-4xl font-bold mb-2">Launch DBC Token</h1>
-              <p className="text-gray-300">Create your token with a Dynamic Bonding Curve for fair price discovery</p>
+              <h1 className="text-4xl font-bold mb-2">Launch Another Trash</h1>
+              <p className="text-gray-300">Create your trash token on Gorbagana chain with Dynamic Bonding Curve</p>
             </div>
           </div>
 
@@ -482,6 +524,52 @@ export default function CreatePool() {
                       ),
                     })}
                   </div>
+
+                  <div className="mb-4">
+                    <label
+                      htmlFor="telegram"
+                      className="block text-sm font-medium text-gray-300 mb-1"
+                    >
+                      Telegram
+                    </label>
+                    {form.Field({
+                      name: 'telegram',
+                      children: (field) => (
+                        <input
+                          id="telegram"
+                          name={field.name}
+                          type="url"
+                          className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white"
+                          placeholder="https://t.me/yourgroup"
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                        />
+                      ),
+                    })}
+                  </div>
+
+                  <div className="mb-4">
+                    <label
+                      htmlFor="discord"
+                      className="block text-sm font-medium text-gray-300 mb-1"
+                    >
+                      Discord
+                    </label>
+                    {form.Field({
+                      name: 'discord',
+                      children: (field) => (
+                        <input
+                          id="discord"
+                          name={field.name}
+                          type="url"
+                          className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white"
+                          placeholder="https://discord.gg/yourserver"
+                          value={field.state.value}
+                          onChange={(e) => field.handleChange(e.target.value)}
+                        />
+                      ),
+                    })}
+                  </div>
                 </div>
               </div>
 
@@ -520,23 +608,23 @@ const SubmitButton = ({ isSubmitting }: { isSubmitting: boolean }) => {
 
   if (!publicKey) {
     return (
-      <Button type="button" onClick={() => setShowModal(true)}>
+      <Button type="button" className='bg-green-600 hover:bg-green-700 text-white py-1 rounded-lg' onClick={() => setShowModal(true)}>
         <span>Connect Wallet</span>
       </Button>
     );
   }
 
   return (
-    <Button className="flex items-center gap-2" type="submit" disabled={isSubmitting}>
+    <Button className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white" type="submit" disabled={isSubmitting}>
       {isSubmitting ? (
         <>
           <span className="iconify ph--spinner w-5 h-5 animate-spin" />
-          <span>Launching DBC Token...</span>
+          <span>Launching Another Trash...</span>
         </>
       ) : (
         <>
           <span className="iconify ph--rocket-bold w-5 h-5" />
-          <span>Launch DBC Token</span>
+          <span>Launch Another Trash</span>
         </>
       )}
     </Button>

@@ -186,6 +186,7 @@ export type Pool = {
     name: string;
     symbol: string;
     icon?: string | undefined;
+    image?: string | undefined;
     decimals: number;
     twitter?: string | undefined;
     telegram?: string | undefined;

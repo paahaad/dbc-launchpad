@@ -27,7 +27,7 @@ export default function App({ Component, pageProps }: AppProps) {
         fetch('/api/user', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ pubkey: publicKey.toBase58() }),
+          body: JSON.stringify({ address: publicKey.toBase58() }),
         })
           .then((res) => {
             if (!res.ok) {

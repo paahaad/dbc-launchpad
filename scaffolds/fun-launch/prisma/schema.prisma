@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client-js"
   output   = "../generated/prisma"
@@ -15,36 +9,68 @@ datasource db {
 }
 
 model User {
-  id Int             @id @default(autoincrement())
+  id        String   @id @default(cuid())
   name String?
-  pubkey String      @unique
-  
-  Token Token[]
+  address   String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  launchedTokens Token[] @relation("UserLaunchedTokens")
+  purchases     TokenPurchase[] @relation("UserPurchases")
+
+  @@map("users")
 }
 
 model Token {
-  id Int @id @default(autoincrement())
-  tokenId Int
+  id String @id @default(cuid())
   name String
   symbol String
   url String
+  mintAddress String @unique
   
-  userId Int
-  user User @relation(fields: [userId], references: [id])
+  userId String
+  user User @relation("UserLaunchedTokens", fields: [userId], references: [id])
 
   website String?
   twitter String?
   supply String?
 
-  ticker Int
-  price Int
-  sale_start Int
-  sale_end Int
-  min_purchase Int
-  max_purchase Int
-  available Int
+  bondingCurveSlope Float?
+  metadataUrl String?
+  imageUrl String?
+  
+  description String?
+  contractAddress String? @unique
+  decimals Int @default(18)
+  
+  marketCap String?
+  totalRaised String @default("0")
+  
+  launchDate DateTime?
+  
+  telegram String?
+  discord String?
 
-  token_mint String
-  associated_token_presale String?
-  presaleAccount String?
+  holders Int @default(0)
+  
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  purchases TokenPurchase[] @relation("TokenPurchases")
+}
+
+model TokenPurchase {
+  id String @id @default(cuid())
+  userId String
+  user User @relation("UserPurchases", fields: [userId], references: [id])
+  tokenId String
+  token Token @relation("TokenPurchases", fields: [tokenId], references: [id])
+  quantity Int
+  pricePerToken String
+  totalPrice String
+  purchaseDate DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

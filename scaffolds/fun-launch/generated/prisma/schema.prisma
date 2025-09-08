@@ -1,0 +1,75 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "../generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String?
+  address   String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  launchedTokens Token[]         @relation("UserLaunchedTokens")
+  purchases      TokenPurchase[] @relation("UserPurchases")
+
+  @@map("users")
+}
+
+model Token {
+  id          String @id @default(cuid())
+  name        String
+  symbol      String
+  url         String
+  mintAddress String @unique
+
+  userId String
+  user   User   @relation("UserLaunchedTokens", fields: [userId], references: [id])
+
+  website String?
+  twitter String?
+  supply  String?
+
+  bondingCurveSlope Float?
+  metadataUrl       String?
+  imageUrl          String?
+
+  description     String?
+  contractAddress String? @unique
+  decimals        Int     @default(18)
+
+  marketCap   String?
+  totalRaised String  @default("0")
+
+  launchDate DateTime?
+
+  telegram String?
+  discord  String?
+
+  holders Int @default(0)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  purchases TokenPurchase[] @relation("TokenPurchases")
+}
+
+model TokenPurchase {
+  id            String   @id @default(cuid())
+  userId        String
+  user          User     @relation("UserPurchases", fields: [userId], references: [id])
+  tokenId       String
+  token         Token    @relation("TokenPurchases", fields: [tokenId], references: [id])
+  quantity      Int
+  pricePerToken String
+  totalPrice    String
+  purchaseDate  DateTime @default(now())
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
