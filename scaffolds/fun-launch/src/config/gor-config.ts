@@ -42,8 +42,10 @@ export const GOR_CONFIG = {
 } as const;
 
 export function getGorConnection() {
-  const { Connection } = require('@solana/web3.js');
-  return new Connection(GOR_CONFIG.RPC_URL, 'confirmed');
+  // Use dynamic import to avoid CommonJS require
+  return import('@solana/web3.js').then(({ Connection }) => {
+    return new Connection(GOR_CONFIG.RPC_URL, 'confirmed');
+  });
 }
 
 export function getDynamicBondingCurveProgramId(): PublicKey {

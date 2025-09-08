@@ -311,7 +311,7 @@ export default function Profile() {
                     <Coins className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
                     <h3 className="text-lg font-medium mb-2">No Tokens Created</h3>
                     <p className="text-muted-foreground text-sm">
-                      You haven't created any tokens yet. Start building your first token!
+                      You haven&apos;t created any tokens yet. Start building your first token!
                     </p>
                   </div>
                 )}
