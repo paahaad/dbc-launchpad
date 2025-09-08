@@ -27,29 +27,69 @@ export class ApeClient {
       ? GetGemsTokenListIndividualResponse | undefined
       : GetGemsTokenListIndividualResponse;
   }> {
-    console.log('🔗 Fetching token list from GOR chain:', JSON.stringify(req, null, 2));
-    
-    // TODO: Implement GOR chain token list fetching
-    // For now, return empty results as this requires discovering all tokens on your chain
     const result: any = {};
-    
+
     if (req.recent) {
-      result.recent = { pools: [] };
+      const response = await ky.get('/api/tokens').json<{ tokens: { mintAddress: string; createdAt: string; name: string; symbol: string; imageUrl: string | null }[] }>();
+
+      const pools = await Promise.all(
+        response.tokens.map(async (token) => {
+          try {
+            const tokenInfo = await ApeClient.getGorTokenInfo(token.mintAddress);
+            const pool = tokenInfo.pools[0];
+            if (pool) {
+              pool.createdAt = token.createdAt;
+              pool.baseAsset.name = token.name || pool.baseAsset.name;
+              pool.baseAsset.symbol = token.symbol || pool.baseAsset.symbol;
+              if (token.imageUrl) {
+                pool.baseAsset.icon = token.imageUrl; // Set icon for UI rendering
+                pool.baseAsset.image = token.imageUrl; // Also set image for completeness
+              }
+            }
+            return pool;
+          } catch (error) {
+            console.error(`Failed to fetch info for token ${token.mintAddress}:`, error);
+            return null;
+          }
+        })
+      );
+
+      result.recent = { pools: pools.filter((p): p is Pool => p !== null) };
     }
+
     if (req.graduated) {
       result.graduated = { pools: [] };
     }
     if (req.aboutToGraduate) {
       result.aboutToGraduate = { pools: [] };
     }
-    
-    console.log('🔗 GOR token list response:', JSON.stringify(result, null, 2));
+
     return result;
   }
   static async getToken(req: GetTokenRequest, _options?: Options): Promise<GetTokenResponse> {
-    // Fetch token data directly from GOR RPC - no Jupiter fallback needed
     console.log('🔗 Fetching token data from GOR RPC for:', req.id);
-    return await ApeClient.getGorTokenInfo(req.id);
+    const tokenInfo = await ApeClient.getGorTokenInfo(req.id);
+    
+    // Fetch from DB
+    try {
+      const dbResponse = await ky.get(`/api/token?mint=${encodeURIComponent(req.id)}`).json<{ token: { name: string; symbol: string; imageUrl: string | null } | null }>();
+      const dbToken = dbResponse.token;
+      if (dbToken) {
+        const pool = tokenInfo.pools[0];
+        if (pool) {
+          pool.baseAsset.name = dbToken.name || pool.baseAsset.name;
+          pool.baseAsset.symbol = dbToken.symbol || pool.baseAsset.symbol;
+          if (dbToken.imageUrl) {
+            pool.baseAsset.icon = dbToken.imageUrl;
+            pool.baseAsset.image = dbToken.imageUrl;
+          }
+        }
+      }
+    } catch (error) {
+      console.error(`Failed to fetch DB info for token ${req.id}:`, error);
+    }
+    
+    return tokenInfo;
   }
 
   static async getGorTokenInfo(tokenMint: string): Promise<GetTokenResponse> {

@@ -10,7 +10,9 @@ import { ReadableNumber } from '@/components/ui/ReadableNumber';
 import { useDBCToken, useSwapQuote } from '@/hooks/use-dbc-pool';
 import { dbcSwapBuilder } from '@/utils/dbc-swap';
 import { GOR_CONFIG } from '@/config/gor-config';
-
+import { LaunchpadIndicator } from '@/components/LaunchpadIndicator/LaunchpadIndicator';
+import { Connection } from '@solana/web3.js';
+import { getAssociatedTokenAddress, getAccount, getMint } from '@solana/spl-token';
 interface QuickTradeSidebarProps {
   tokenId: string;
 }
@@ -24,6 +26,8 @@ export const QuickTradeSidebar = ({ tokenId }: QuickTradeSidebarProps) => {
   const [tokenAmount, setTokenAmount] = useState('');
   const [isBuying, setIsBuying] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
+  const [userGorBalance, setUserGorBalance] = useState(0);
+  const [userTokenBalance, setUserTokenBalance] = useState(0);
 
   // Get swap quote when amounts change (only on client to prevent hydration issues)
   const inputAmount = isBuying ? parseFloat(gorAmount) || 0 : parseFloat(tokenAmount) || 0;
@@ -44,13 +48,52 @@ export const QuickTradeSidebar = ({ tokenId }: QuickTradeSidebarProps) => {
     }
   }, [swapQuote, isBuying, gorAmount, tokenAmount]);
 
+  useEffect(() => {
+    const fetchBalances = async () => {
+      if (!publicKey || !tokenId) {
+        setUserGorBalance(0);
+        setUserTokenBalance(0);
+        return;
+      }
+
+      const connection = new Connection(GOR_CONFIG.RPC_URL, 'confirmed');
+      const quoteMint = new PublicKey(GOR_CONFIG.QUOTE_TOKEN.mint);
+      const tokenMint = new PublicKey(tokenId);
+      const quoteDecimals = GOR_CONFIG.QUOTE_TOKEN.decimals;
+
+      // Fetch quote balance
+      try {
+        const quoteAta = await getAssociatedTokenAddress(quoteMint, publicKey);
+        const quoteAccount = await getAccount(connection, quoteAta);
+        setUserGorBalance(Number(quoteAccount.amount) / Math.pow(10, quoteDecimals));
+      } catch (e) {
+        setUserGorBalance(0);
+      }
+
+      // Fetch token balance
+      try {
+        const mintInfo = await getMint(connection, tokenMint);
+        const tokenDecimals = mintInfo.decimals;
+        const tokenAta = await getAssociatedTokenAddress(tokenMint, publicKey);
+        const tokenAccount = await getAccount(connection, tokenAta);
+        setUserTokenBalance(Number(tokenAccount.amount) / Math.pow(10, tokenDecimals));
+      } catch (e) {
+        setUserTokenBalance(0);
+      }
+    };
+
+    fetchBalances();
+  }, [publicKey, tokenId]);
+
   const handleQuickTrade = async () => {
     if (!publicKey || !signTransaction) {
       toast.error('Please connect your wallet');
       return;
     }
 
-    if (!gorAmount || parseFloat(gorAmount) <= 0) {
+    const inputValue = isBuying ? gorAmount : tokenAmount;
+
+    if (!inputValue || parseFloat(inputValue) <= 0) {
       toast.error('Please enter a valid amount');
       return;
     }
@@ -66,7 +109,7 @@ export const QuickTradeSidebar = ({ tokenId }: QuickTradeSidebarProps) => {
       const tokenMint = new PublicKey(tokenId);
       const quoteMint = new PublicKey(GOR_CONFIG.QUOTE_TOKEN.mint);
       
-      const inputAmount = isBuying ? parseFloat(gorAmount) : parseFloat(tokenAmount);
+      const inputAmount = parseFloat(inputValue);
       const minimumOutputAmount = swapQuote?.minimumReceived || 0;
 
       // Build swap transaction
@@ -104,7 +147,6 @@ export const QuickTradeSidebar = ({ tokenId }: QuickTradeSidebarProps) => {
     }
   };
 
-  const presetAmounts = [0.1, 0.5, 1, 2, 5];
 
   // Show error state if DBC loading failed
   if (dbcError && !tokenInfo) {
@@ -199,45 +241,62 @@ export const QuickTradeSidebar = ({ tokenId }: QuickTradeSidebarProps) => {
         </div>
       )}
 
-      {/* SOL Amount Input */}
-      <div className="mb-4">
-        <Label htmlFor="sol-amount" className="text-sm text-gray-300 mb-2 block">
-          GOR Amount
-        </Label>
-        <div className="relative">
-          <Input
-            id="sol-amount"
-            type="number"
-            step="0.001"
-            placeholder="0.0"
-            value={gorAmount}
-            onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGorAmount(e.target.value)}
-            className="w-full pr-12"
-          />
-          <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-400">
-            GOR
-          </span>
+      {/* GOR Amount Input */}
+      {isBuying && (
+        <div className="mb-4">
+          <div className="flex justify-between items-center mb-2">
+            <Label htmlFor="sol-amount" className="text-sm text-gray-300">
+              GOR Amount
+            </Label>
+            {publicKey && isBuying && (
+              <span className="text-sm text-gray-300">
+                Balance: {userGorBalance.toFixed(4)} GOR
+              </span>
+            )}
+          </div>
+          <div className="relative">
+            <Input
+              id="sol-amount"
+              type="number"
+              step="0.001"
+              placeholder="0.0"
+              value={gorAmount}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setGorAmount(e.target.value)}
+              className="w-full pr-12 bg-transparent border-neutral-700"
+            />
+            <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-400">
+              GOR
+            </span>
+          </div>
+          
+          {isBuying && (
+            <div className="flex flex-wrap gap-2 mt-2">
+              {[0.1, 0.2, 0.5, 1].map((amount) => (
+                <button
+                  key={amount}
+                  onClick={() => setGorAmount(amount.toString())}
+                  className="px-3 py-1 bg-white/10 rounded-md text-sm hover:bg-white/20 transition"
+                >
+                  {amount} GOR
+                </button>
+              ))}
+            </div>
+          )}
         </div>
-        
-        {/* Preset amounts */}
-        <div className="flex flex-wrap gap-2 mt-2">
-          {presetAmounts.map((amount) => (
-            <button
-              key={amount}
-              onClick={() => setGorAmount(amount.toString())}
-              className="px-3 py-1 bg-white/10 rounded-md text-sm hover:bg-white/20 transition"
-            >
-              {amount} GOR
-            </button>
-          ))}
-        </div>
-      </div>
+      )}
 
       {/* Token Amount Input */}
       <div className="mb-6">
-        <Label htmlFor="token-amount" className="text-sm text-gray-300 mb-2 block">
-          Token Amount
-        </Label>
+        <div className="flex justify-between items-center mb-2">
+          <Label htmlFor="token-amount" className="text-sm text-gray-300">
+            Token Amount
+          </Label>
+          {publicKey && !isBuying && (
+            <span className="text-sm text-gray-300">
+              Balance: {userTokenBalance.toFixed(2)} {dbcToken?.metadata?.symbol || tokenInfo?.baseAsset.symbol || 'TOKEN'}
+            </span>
+          )}
+        </div>
         <div className="relative">
           <Input
             id="token-amount"
@@ -246,18 +305,36 @@ export const QuickTradeSidebar = ({ tokenId }: QuickTradeSidebarProps) => {
             placeholder="0.0"
             value={tokenAmount}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setTokenAmount(e.target.value)}
-            className="w-full pr-12"
+            className="w-full pr-12 bg-transparent border-neutral-700"
           />
           <span className="absolute right-3 top-1/2 transform -translate-y-1/2 text-sm text-gray-400">
             {dbcToken?.metadata?.symbol || tokenInfo?.baseAsset.symbol || 'TOKEN'}
           </span>
         </div>
+
+        {!isBuying && (
+          <div className="flex flex-wrap gap-2 mt-2">
+            {['25%', '50%', '75%', 'Max'].map((label) => (
+              <button
+                key={label}
+                onClick={() => {
+                  const percent = label === 'Max' ? 100 : parseFloat(label);
+                  const amount = (percent / 100) * userTokenBalance;
+                  setTokenAmount(amount > 0 ? amount.toFixed(6) : '0');
+                }}
+                className="px-3 py-1 bg-white/10 rounded-md text-sm hover:bg-white/20 transition"
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        )}
       </div>
 
       {/* Trade Button */}
       <Button
         onClick={handleQuickTrade}
-        disabled={isLoading || !gorAmount || !tokenAmount}
+        disabled={isLoading || !(parseFloat(isBuying ? gorAmount : tokenAmount) > 0)}
         className={`w-full ${
           isBuying
             ? 'bg-green-500 hover:bg-green-600'

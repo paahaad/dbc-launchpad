@@ -12,6 +12,7 @@ import { Skeleton } from "@/components/ui/Skeleton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { toast } from "sonner"
 import { Copy, ExternalLink, Wallet, Coins, User, RefreshCw } from "lucide-react"
+import { useRouter } from 'next/navigation';
 
 const RPC_URL = process.env.RPC_URL || "https://rpc.gorbagana.wtf"
 
@@ -72,6 +73,7 @@ export default function Profile() {
   const [loading, setLoading] = useState(true)
   const [updating, setUpdating] = useState(false)
   const [refreshing, setRefreshing] = useState(false)
+  const router = useRouter();
 
   useEffect(() => {
     if (address) {
@@ -271,7 +273,6 @@ export default function Profile() {
             <Card>
               <CardHeader className="flex flex-row items-center space-y-0 pb-2">
                 <CardTitle className="flex items-center gap-2">
-                  <Coins className="h-5 w-5" />
                   Created Tokens
                 </CardTitle>
                 <Badge variant="secondary" className="ml-auto">
@@ -284,7 +285,8 @@ export default function Profile() {
                     {userData.launchedTokens.map((token: any) => (
                       <div
                         key={token.id}
-                        className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors"
+                        className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                        onClick={() => router.push(`/token/${token.mintAddress}`)}
                       >
                         <div className="space-y-1">
                           <div className="flex items-center gap-2">
@@ -298,7 +300,10 @@ export default function Profile() {
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={() => copyToClipboard(token.mintAddress)}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            copyToClipboard(token.mintAddress);
+                          }}
                           className="h-8 w-8 p-0 bg-transparent hover:bg-muted/50"
                         >
                           <Copy className="h-3 w-3" />

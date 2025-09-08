@@ -70,8 +70,8 @@ export class DBCClient {
   public poolAuthorityPDA: PublicKey;
   public poolAuthorityBump: number;
 
-  constructor(connection?: Connection) {
-    this.connection = connection || getGorConnection();
+  constructor() {
+    this.connection = new Connection(GOR_CONFIG.RPC_URL, 'confirmed');
     this.programId = getDynamicBondingCurveProgramId();
     
     // Pre-computed pool authority PDA (matches const_pda.rs)
@@ -481,6 +481,35 @@ export class DBCClient {
       console.error('Error parsing metadata safely:', error);
       return {};
     }
+  }
+
+  public async buy(tokenMint: PublicKey, quoteAmount: BN, user: PublicKey): Promise<Transaction> {
+    // Implement buy logic using program instructions
+    // Example placeholder - replace with actual program call
+    const ix = await this.program.methods.buy(quoteAmount)
+      .accounts({
+        user,
+        tokenMint,
+        // Add other required accounts
+      })
+      .instruction();
+    
+    const tx = new Transaction().add(ix);
+    return tx;
+  }
+
+  public async sell(tokenMint: PublicKey, baseAmount: BN, user: PublicKey): Promise<Transaction> {
+    // Implement sell logic
+    const ix = await this.program.methods.sell(baseAmount)
+      .accounts({
+        user,
+        tokenMint,
+        // Add other required accounts
+      })
+      .instruction();
+    
+    const tx = new Transaction().add(ix);
+    return tx;
   }
 }
 

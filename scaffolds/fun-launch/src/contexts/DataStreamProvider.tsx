@@ -1,18 +1,12 @@
-import { ApeQueries, QueryData } from '@/components/Explore/queries';
 import { atomMsgWithListeners } from '@/lib/jotai';
-import { InfiniteData, useQueryClient } from '@tanstack/react-query';
 import { useSetAtom } from 'jotai';
-import { createContext, useCallback, useContext, useEffect, useMemo, useRef } from 'react';
-import { StreamRequest, StreamResponse } from './TokenChart/msg';
-import { delay } from '@/lib/utils';
+import { createContext, useCallback, useContext, useEffect, useRef } from 'react';
+import { StreamResponse } from './TokenChart/msg'; // Keep if needed for types
+import ky from 'ky';
+import { Pool } from '@/components/Explore/types';
+import { ApeClient } from '@/components/Explore/client';
 
-const WS_URL = 'wss://trench-stream.jup.ag/ws';
-
-const RECONNECT_DELAY_MILLIS = 2_500;
-
-const [dataStreamMsgAtom, useDataStreamListener] = atomMsgWithListeners<StreamResponse | null>(
-  null
-);
+const [dataStreamMsgAtom, useDataStreamListener] = atomMsgWithListeners<StreamResponse | null>(null);
 export { useDataStreamListener };
 
 type DataStreamContextType = {
@@ -27,49 +21,24 @@ type DataStreamContextType = {
 const DataStreamContext = createContext<DataStreamContextType | null>(null);
 
 export const DataStreamProvider = ({ children }: { children: React.ReactNode }) => {
-  const queryClient = useQueryClient();
-  const partnerConfigs = useMemo(
-    () => process.env.POOL_CONFIG_KEY?.split(',') || [],
-    []
-  );
   const setDataStreamMsg = useSetAtom(dataStreamMsgAtom);
 
-  const ws = useRef<WebSocket | null>(null);
-  const shouldReconnect = useRef(true);
   const subRecentTokenList = useRef(false);
   const subPools = useRef<Set<string>>(new Set());
   const subTxnsAssets = useRef<Set<string>>(new Set());
+  const lastFetched = useRef(new Date(0));
 
   const subscribeRecentTokenList = useCallback(() => {
     subRecentTokenList.current = true;
-
-    if (ws?.current?.readyState === WebSocket.OPEN) {
-      ws.current.send(
-        createRequest({
-          type: 'subscribe:recent',
-          filters: {
-            partnerConfigs,
-          },
-        })
-      );
-    }
-  }, [partnerConfigs]);
+  }, []);
 
   const unsubscribeRecentTokenList = useCallback(() => {
     subRecentTokenList.current = false;
-
-    if (ws?.current?.readyState === WebSocket.OPEN) {
-      ws.current.send(createRequest({ type: 'unsubscribe:recent' }));
-    }
   }, []);
 
   const subscribePools = useCallback((pools: string[]) => {
     for (const pool of pools) {
       subPools.current.add(pool);
-    }
-
-    if (ws?.current?.readyState === WebSocket.OPEN) {
-      ws.current.send(createRequest({ type: 'subscribe:pool', pools: pools }));
     }
   }, []);
 
@@ -77,17 +46,11 @@ export const DataStreamProvider = ({ children }: { children: React.ReactNode }) 
     for (const pool of pools) {
       subPools.current.delete(pool);
     }
-    if (ws?.current?.readyState === WebSocket.OPEN) {
-      ws.current.send(createRequest({ type: 'unsubscribe:pool', pools: pools }));
-    }
   }, []);
 
   const subscribeTxns = useCallback((assets: string[]) => {
     for (const asset of assets) {
       subTxnsAssets.current.add(asset);
-    }
-    if (ws?.current?.readyState === WebSocket.OPEN) {
-      ws.current.send(createRequest({ type: 'subscribe:txns', assets: assets }));
     }
   }, []);
 
@@ -95,123 +58,55 @@ export const DataStreamProvider = ({ children }: { children: React.ReactNode }) 
     for (const asset of assets) {
       subTxnsAssets.current.delete(asset);
     }
-    if (ws?.current?.readyState === WebSocket.OPEN) {
-      ws.current.send(createRequest({ type: 'unsubscribe:txns', assets: assets }));
-    }
   }, []);
 
-  // const subscribePrices = useCallback((assets: string[]) => {
-  //   for (const asset of assets) {
-  //     subPricesAssets.current.add(asset);
-  //     // TODO: refactor stream context to support decoupling this logic
-  //     // Garbage collect unsubscribed asset prices
-  //     assetPricesFamily.remove(asset);
-  //   }
-  //   if (ws?.current?.readyState === WebSocket.OPEN) {
-  //     ws.current.send(createRequest({ type: 'subscribe:prices', assets: assets }));
-  //   }
-  // }, []);
-
-  // const unsubscribePrices = useCallback((assets: string[]) => {
-  //   for (const asset of assets) {
-  //     subPricesAssets.current.delete(asset);
-  //   }
-  //   if (ws?.current?.readyState === WebSocket.OPEN) {
-  //     ws.current.send(createRequest({ type: 'unsubscribe:prices', assets: assets }));
-  //   }
-  // }, []);
-
-  const init = useCallback(() => {
-    const initws = new WebSocket(WS_URL);
-    ws.current = initws;
-
-    // Resubscribe to existing
-    initws.onopen = () => {
-      if (subRecentTokenList.current) {
-        subscribeRecentTokenList();
-      }
-      if (subPools.current) {
-        subscribePools(Array.from(subPools.current));
-      }
-      if (subTxnsAssets.current) {
-        subscribeTxns(Array.from(subTxnsAssets.current));
-      }
-      // if (subPricesAssets.current) {
-      //   subscribePrices(Array.from(subPricesAssets.current));
-      // }
-    };
-
-    initws.onmessage = (event) => {
-      const msg: StreamResponse = JSON.parse(event.data);
-
-      setDataStreamMsg(msg);
-
-      // We assume all actions are related to the subscribed token-tx-table
-      if (msg.type === 'actions') {
-        const tokenId = msg.data?.[0]?.asset;
-        if (!tokenId) {
-          return;
-        }
-        // Update token tx
-        queryClient.setQueriesData(
-          {
-            type: 'active',
-            queryKey: ApeQueries.tokenTxs({ id: tokenId }).queryKey,
-          },
-          (prev?: InfiniteData<QueryData<typeof ApeQueries.tokenTxs>>) => {
-            if (!prev?.pages || prev.pages.length === 0) {
-              return;
-            }
-            const firstPage = prev.pages[0];
-            if (!firstPage) {
-              return;
-            }
-            const next = firstPage.next;
-
-            // Update first page data
-            const firstPageTxs = firstPage ? [...firstPage.txs] : [];
-            firstPageTxs.unshift(...msg.data);
-
-            // Overwrite previous first page
-            const newPages = prev.pages.slice(1);
-            newPages.unshift({
-              txs: firstPageTxs,
-              next,
-              args: { ...firstPage.args },
-            });
-
-            return {
-              pages: newPages,
-              pageParams: prev.pageParams,
-            };
-          }
-        );
-      }
-    };
-
-    initws.onerror = (err) => {
-      console.error('WebSocket error:', err);
-      initws.close();
-    };
-
-    initws.onclose = async () => {
-      if (!shouldReconnect.current) return;
-      await delay(RECONNECT_DELAY_MILLIS);
-      init();
-    };
-
-    return () => {
-      initws?.close();
-    };
-  }, [queryClient, setDataStreamMsg, subscribePools, subscribeRecentTokenList, subscribeTxns]);
-
   useEffect(() => {
-    const cleanup = init();
-    return () => {
-      shouldReconnect.current = false;
-      cleanup();
-    };
-  }, [init]);
+    const interval = setInterval(async () => {
+      if (!subRecentTokenList.current) return;
+
+      const since = lastFetched.current.toISOString();
+      try {
+        const response = await ky.get(`/api/tokens?since=${encodeURIComponent(since)}`).json<{ tokens: { mintAddress: string; createdAt: string; name: string; symbol: string; imageUrl: string | null }[] }>();
+
+        if (response.tokens.length > 0) {
+          const newPools = await Promise.all(
+            response.tokens.map(async (token) => {
+              try {
+                const tokenInfo = await ApeClient.getGorTokenInfo(token.mintAddress);
+                const pool = tokenInfo.pools[0];
+                if (pool) {
+                  pool.createdAt = token.createdAt;
+                  pool.baseAsset.name = token.name || pool.baseAsset.name;
+                  pool.baseAsset.symbol = token.symbol || pool.baseAsset.symbol;
+                  if (token.imageUrl) {
+                    pool.baseAsset.icon = token.imageUrl; // Set icon for UI rendering
+                    pool.baseAsset.image = token.imageUrl; // Also set image for completeness
+                  }
+                  return { type: 'new' as const, pool };
+                }
+                return null;
+              } catch (error) {
+                console.error(`Failed to process new token ${token.mintAddress}:`, error);
+                return null;
+              }
+            })
+          );
+
+          const validUpdates = newPools.filter((u): u is { type: 'new'; pool: Pool } => u !== null);
+
+          if (validUpdates.length > 0) {
+            const msg = { type: 'updates' as const, data: validUpdates };
+            setDataStreamMsg(msg);
+            lastFetched.current = new Date();
+          }
+        }
+      } catch (error) {
+        console.error('Polling error:', error);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, [setDataStreamMsg]);
 
   return (
     <DataStreamContext.Provider
@@ -236,7 +131,3 @@ export const useDataStream = () => {
   }
   return context;
 };
-
-function createRequest(req: StreamRequest): string {
-  return JSON.stringify({ ...req });
-}

@@ -19,6 +19,9 @@ export const TokenHeader: React.FC<TokenHeaderProps> = memo(({ className }) => {
   const { data: minimalTokenInfo, isLoading: minimalLoading, error: minimalError } = useMinimalTokenInfo();
   const { data: dbcToken, isLoading: dbcLoading } = useDBCToken(tokenId);
 
+  // No major changes, but add a console log for debugging
+  console.log('Token info:', minimalTokenInfo);
+
   const pctChange =
     pool?.baseAsset.stats24h?.priceChange === undefined
       ? undefined
