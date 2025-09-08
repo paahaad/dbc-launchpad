@@ -10,6 +10,9 @@ import { Keypair, Transaction } from '@solana/web3.js';
 import { useUnifiedWalletContext, useWallet } from '@jup-ag/wallet-adapter';
 import { toast } from 'sonner';
 
+// Add import for Copy icon at the top
+import { Copy } from "lucide-react";
+
 // Configuration
 const VANITY_SUFFIX = 'gor';
 const MAX_VANITY_ATTEMPTS = 100000;
@@ -132,8 +135,11 @@ export default function CreatePool() {
         });
 
         if (!uploadResponse.ok) {
+          if (uploadResponse.status === 413) {
+            throw new Error('File too large. Maximum upload size is 1MB. Please choose a smaller image.');
+          }
           const error = await uploadResponse.json();
-          throw new Error(error.error);
+          throw new Error(error.error || 'Upload failed');
         }
 
         const { poolTx, mintAddress, imageUrl, metadataUrl } = await uploadResponse.json();
@@ -193,7 +199,7 @@ export default function CreatePool() {
           
           // Redirect to market page after a short delay
           setTimeout(() => {
-            router.push(`/market/${mintAddress}`);
+            router.push(`/token/${mintAddress}`);
           }, 2000);
         }
       } catch (error) {
@@ -631,6 +637,15 @@ const SubmitButton = ({ isSubmitting }: { isSubmitting: boolean }) => {
   );
 };
 
+const copyToClipboard = async (text: string) => {
+  try {
+    await navigator.clipboard.writeText(text);
+    toast.success("Copied to clipboard");
+  } catch (error) {
+    toast.error("Failed to copy");
+  }
+};
+
 const PoolCreationSuccess = ({ mintAddress }: { mintAddress: string | null }) => {
   return (
     <>
@@ -646,7 +661,17 @@ const PoolCreationSuccess = ({ mintAddress }: { mintAddress: string | null }) =>
         {mintAddress && (
           <div className="bg-white/10 rounded-lg p-4 mb-6 max-w-lg mx-auto">
             <p className="text-sm text-gray-300 mb-2">Token Mint Address:</p>
-            <p className="text-white font-mono text-sm break-all">{mintAddress}</p>
+            <div className="flex items-center justify-between">
+              <p className="text-white font-mono text-sm break-all flex-1 mr-2">{mintAddress}</p>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => copyToClipboard(mintAddress)}
+                className="h-8 w-8 p-0 bg-transparent hover:bg-white/20"
+              >
+                <Copy className="h-4 w-4" />
+              </Button>
+            </div>
           </div>
         )}
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
