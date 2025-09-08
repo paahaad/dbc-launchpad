@@ -36,9 +36,9 @@
     "name": "Test Token", // token name
     "symbol": "TT", // token symbol
     "authorities": {
-      "mint": "YOUR_MINT_AUTHORITY_ADDRESS", // token mint authority address
-      "freeze": "YOUR_FREEZE_AUTHORITY_ADDRESS", // token freeze authority address
-      "update": "YOUR_UPDATE_AUTHORITY_ADDRESS" // token update authority address
+      "mint": "YOUR_MINT_AUTHORITY_ADDRESS", // token mint authority address. <PublicKey | null>
+      "freeze": "YOUR_FREEZE_AUTHORITY_ADDRESS", // token freeze authority address. <PublicKey | null>
+      "update": "YOUR_UPDATE_AUTHORITY_ADDRESS" // token update authority address. <PublicKey | null>
     },
     /* Optional Metaplex Token Metadata Properties
     * Read more about the properties here: https://developers.metaplex.com/token-metadata

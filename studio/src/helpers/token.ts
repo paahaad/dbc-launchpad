@@ -91,7 +91,7 @@ async function createAndMintToken(
   if (tokenConfig?.authorities.update) {
     updateAuthority = new PublicKey(tokenConfig.authorities.update);
   } else {
-    updateAuthority = null;
+    updateAuthority = new PublicKey('11111111111111111111111111111111');
   }
 
   const mint = await createMintWithPriorityFee(
