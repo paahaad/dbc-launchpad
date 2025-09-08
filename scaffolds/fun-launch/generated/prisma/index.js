@@ -182,6 +182,10 @@ const config = {
         "fromEnvVar": null,
         "value": "darwin-arm64",
         "native": true
+      },
+      {
+        "fromEnvVar": null,
+        "value": "rhel-openssl-3.0.x"
       }
     ],
     "previewFeatures": [],
@@ -199,6 +203,7 @@ const config = {
     "db"
   ],
   "activeProvider": "postgresql",
+  "postinstall": false,
   "inlineDatasources": {
     "db": {
       "url": {
@@ -207,8 +212,8 @@ const config = {
       }
     }
   },
-  "inlineSchema": "generator client {\n  provider = \"prisma-client-js\"\n  output   = \"../generated/prisma\"\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id        String   @id @default(cuid())\n  name      String?\n  address   String   @unique\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  launchedTokens Token[]         @relation(\"UserLaunchedTokens\")\n  purchases      TokenPurchase[] @relation(\"UserPurchases\")\n\n  @@map(\"users\")\n}\n\nmodel Token {\n  id          String @id @default(cuid())\n  name        String\n  symbol      String\n  url         String\n  mintAddress String @unique\n\n  userId String\n  user   User   @relation(\"UserLaunchedTokens\", fields: [userId], references: [id])\n\n  website String?\n  twitter String?\n  supply  String?\n\n  bondingCurveSlope Float?\n  metadataUrl       String?\n  imageUrl          String?\n\n  description     String?\n  contractAddress String? @unique\n  decimals        Int     @default(18)\n\n  marketCap   String?\n  totalRaised String  @default(\"0\")\n\n  launchDate DateTime?\n\n  telegram String?\n  discord  String?\n\n  holders Int @default(0)\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  purchases TokenPurchase[] @relation(\"TokenPurchases\")\n}\n\nmodel TokenPurchase {\n  id            String   @id @default(cuid())\n  userId        String\n  user          User     @relation(\"UserPurchases\", fields: [userId], references: [id])\n  tokenId       String\n  token         Token    @relation(\"TokenPurchases\", fields: [tokenId], references: [id])\n  quantity      Int\n  pricePerToken String\n  totalPrice    String\n  purchaseDate  DateTime @default(now())\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n",
-  "inlineSchemaHash": "3604365626774abb69ac7e00e6e38af738d061b9ba1eb9e0bc746fa6910b0edb",
+  "inlineSchema": "generator client {\n  provider      = \"prisma-client-js\"\n  output        = \"../generated/prisma\"\n  binaryTargets = [\"native\", \"rhel-openssl-3.0.x\"]\n}\n\ndatasource db {\n  provider = \"postgresql\"\n  url      = env(\"DATABASE_URL\")\n}\n\nmodel User {\n  id        String   @id @default(cuid())\n  name      String?\n  address   String   @unique\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  launchedTokens Token[]         @relation(\"UserLaunchedTokens\")\n  purchases      TokenPurchase[] @relation(\"UserPurchases\")\n\n  @@map(\"users\")\n}\n\nmodel Token {\n  id          String @id @default(cuid())\n  name        String\n  symbol      String\n  url         String\n  mintAddress String @unique\n\n  userId String\n  user   User   @relation(\"UserLaunchedTokens\", fields: [userId], references: [id])\n\n  website String?\n  twitter String?\n  supply  String?\n\n  bondingCurveSlope Float?\n  metadataUrl       String?\n  imageUrl          String?\n\n  description     String?\n  contractAddress String? @unique\n  decimals        Int     @default(18)\n\n  marketCap   String?\n  totalRaised String  @default(\"0\")\n\n  launchDate DateTime?\n\n  telegram String?\n  discord  String?\n\n  holders Int @default(0)\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n\n  purchases TokenPurchase[] @relation(\"TokenPurchases\")\n}\n\nmodel TokenPurchase {\n  id            String   @id @default(cuid())\n  userId        String\n  user          User     @relation(\"UserPurchases\", fields: [userId], references: [id])\n  tokenId       String\n  token         Token    @relation(\"TokenPurchases\", fields: [tokenId], references: [id])\n  quantity      Int\n  pricePerToken String\n  totalPrice    String\n  purchaseDate  DateTime @default(now())\n\n  createdAt DateTime @default(now())\n  updatedAt DateTime @updatedAt\n}\n",
+  "inlineSchemaHash": "c67a74da4d1f78b96c91892ff6071a54976e006e4cc03962908863f3692ae058",
   "copyEngine": true
 }
 
@@ -249,6 +254,10 @@ Object.assign(exports, Prisma)
 // file annotations for bundling tools to include these files
 path.join(__dirname, "libquery_engine-darwin-arm64.dylib.node");
 path.join(process.cwd(), "generated/prisma/libquery_engine-darwin-arm64.dylib.node")
+
+// file annotations for bundling tools to include these files
+path.join(__dirname, "libquery_engine-rhel-openssl-3.0.x.so.node");
+path.join(process.cwd(), "generated/prisma/libquery_engine-rhel-openssl-3.0.x.so.node")
 // file annotations for bundling tools to include these files
 path.join(__dirname, "schema.prisma");
 path.join(process.cwd(), "generated/prisma/schema.prisma")
