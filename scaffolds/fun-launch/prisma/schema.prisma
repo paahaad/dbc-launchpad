@@ -16,8 +16,8 @@ datasource db {
 
 model User {
   id Int             @id @default(autoincrement())
-  name String
-  pubkey String
+  name String?
+  pubkey String      @unique
   
   Token Token[]
 }
