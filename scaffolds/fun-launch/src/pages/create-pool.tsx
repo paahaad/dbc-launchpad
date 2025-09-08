@@ -240,7 +240,7 @@ export default function CreatePool() {
         />
       </Head>
 
-      <div className="min-h-screen bg-gradient-to-b text-white">
+      <div className="min-h-screen bg-black text-white">
         {/* Header */}
         <Header />
 
