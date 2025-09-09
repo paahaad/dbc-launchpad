@@ -7,7 +7,7 @@ import {
 } from '@meteora-ag/dynamic-amm-sdk/dist/cjs/src/amm/utils';
 import { deriveCustomizablePoolAddress } from '@meteora-ag/cp-amm-sdk';
 import { AlphaVaultConfig, PoolTypeConfig } from '../../utils/types';
-import { getAlphaVaultConfig, safeParseKeypairFromFile } from '../../helpers';
+import { getAlphaVaultConfig, parseCliArguments, safeParseKeypairFromFile } from '../../helpers';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 import { createAlphaVault } from '../../lib/alpha_vault';
 
@@ -26,10 +26,11 @@ async function main() {
 
   const wallet = new Wallet(keypair);
 
-  if (!config.baseMint) {
-    throw new Error('Missing baseMint in configuration');
+  // parse baseMint
+  const baseMint = new PublicKey(parseCliArguments().baseMint);
+  if (!baseMint) {
+    throw new Error('Please provide --baseMint flag to do this action');
   }
-  const baseMint = new PublicKey(config.baseMint);
 
   if (!config.quoteMint) {
     throw new Error('Missing quoteMint in configuration');

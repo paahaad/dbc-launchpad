@@ -1,5 +1,5 @@
 import { Connection, PublicKey } from '@solana/web3.js';
-import { getDammV1Config, safeParseKeypairFromFile } from '../../helpers';
+import { getDammV1Config, parseCliArguments, safeParseKeypairFromFile } from '../../helpers';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 import { lockLiquidityStake2Earn } from '../../lib/damm_v1/stake2earn';
 
@@ -16,10 +16,12 @@ async function main() {
 
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
 
-  if (!config.baseMint) {
-    throw new Error('Missing baseMint in configuration');
+  // parse baseMint
+  const baseMint = new PublicKey(parseCliArguments().baseMint);
+  if (!baseMint) {
+    throw new Error('Please provide --baseMint flag to do this action');
   }
-  const baseMint = new PublicKey(config.baseMint);
+
   if (!config.quoteMint) {
     throw new Error('Missing quoteMint in configuration');
   }

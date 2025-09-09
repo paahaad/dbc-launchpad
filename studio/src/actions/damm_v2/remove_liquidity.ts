@@ -1,7 +1,7 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import { Wallet } from '@coral-xyz/anchor';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
-import { getDammV2Config, safeParseKeypairFromFile } from '../../helpers';
+import { getDammV2Config, parseCliArguments, safeParseKeypairFromFile } from '../../helpers';
 import { removeLiquidity } from '../../lib/damm_v2';
 
 async function main() {
@@ -18,10 +18,11 @@ async function main() {
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
   const wallet = new Wallet(keypair);
 
-  if (!config.poolAddress) {
-    throw new Error('Missing pool address in configuration');
+  // parse poolAddress
+  const poolAddress = new PublicKey(parseCliArguments().poolAddress);
+  if (!poolAddress) {
+    throw new Error('Please provide --poolAddress flag to do this action');
   }
-  const poolAddress = new PublicKey(config.poolAddress);
 
   console.log(`- Using pool address ${poolAddress.toString()}`);
 

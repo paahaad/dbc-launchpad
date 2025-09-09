@@ -18,12 +18,9 @@
    */
   "quoteMint": "So11111111111111111111111111111111111111112",
 
-  /* Either use baseMint or createBaseToken, but not both.
-   * baseMint is required for the following actions:
-   * 1. damm-v1-create-pool
-   * 2. damm-v1-lock-liquidity
+  /* If you have a baseMint already created, you can specify it in the cli command via --baseMint flag. If you don't have a baseMint, you can create a new one using createBaseToken.
+   * Either use --baseMint flag or createBaseToken, but not both.
    */
-  // "baseMint": "YOUR_BASE_MINT_ADDRESS",
   "createBaseToken": {
     "supply": 1000000000, // total amount of base token to be minted
     "decimals": 6, // decimals of the base token

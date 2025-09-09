@@ -1,7 +1,7 @@
 import { Wallet } from '@coral-xyz/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
-import { safeParseKeypairFromFile, getDammV1Config } from '../../helpers';
+import { safeParseKeypairFromFile, getDammV1Config, parseCliArguments } from '../../helpers';
 import {
   createProgram,
   deriveCustomizablePermissionlessConstantProductPoolAddress,
@@ -22,14 +22,17 @@ async function main() {
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
   const wallet = new Wallet(keypair);
 
-  if (!config.baseMint) {
-    throw new Error('Missing baseMint in configuration');
+  // parse baseMint
+  const baseMint = new PublicKey(parseCliArguments().baseMint);
+  if (!baseMint) {
+    throw new Error('Please provide --baseMint flag to do this action');
   }
-  const baseMint = new PublicKey(config.baseMint);
+
   if (!config.quoteMint) {
     throw new Error('Missing quoteMint in configuration');
   }
   const quoteMint = new PublicKey(config.quoteMint);
+
   const ammProgram = createProgram(connection as any).ammProgram;
   const poolKey = deriveCustomizablePermissionlessConstantProductPoolAddress(
     baseMint,

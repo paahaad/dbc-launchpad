@@ -20,15 +20,9 @@
    */
   "quoteMint": "So11111111111111111111111111111111111111112",
 
-  /* If you have a baseMint already created, you can specify it in `baseMint`. If you don't have a baseMint, you can create a new one using `createBaseToken`.
-   * Either use baseMint or createBaseToken, but not both.
-   * baseMint is required for the following actions:
-   * 1. dlmm-create-pool
-   * 2. dlmm-seed-liquidity-lfg
-   * 3. dlmm-seed-liquidity-single-bins
-   * 4. dlmm-set-pool-status
+  /* If you have a baseMint already created, you can specify it in the cli command via --baseMint flag. If you don't have a baseMint, you can create a new one using createBaseToken.
+   * Either use --baseMint flag or createBaseToken, but not both.
    */
-  // "baseMint": "YOUR_BASE_MINT_ADDRESS",
   "createBaseToken": {
     "supply": 1000000000, // total amount of base token to be minted
     "decimals": 6, // decimals of the base token
@@ -109,7 +103,6 @@
    * 1. dlmm-set-pool-status
    */
   "setDlmmPoolStatus": {
-    "poolAddress": "YOUR_POOL_ADDRESS", // pool address of the dlmm pool
     "enabled": true // true = enable trading | false = disable trading
   },
 

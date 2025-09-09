@@ -123,10 +123,6 @@ export const CONFIG_SCHEMA = {
       ],
       additionalProperties: false,
     },
-    baseMint: {
-      type: 'string',
-      nullable: true,
-    },
     quoteSymbol: {
       type: 'string',
       nullable: true,
@@ -296,10 +292,6 @@ export const CONFIG_SCHEMA = {
       },
       required: ['activationType', 'hasAlphaVault', 'collectFeeMode', 'poolFees'],
       additionalProperties: false,
-    },
-    poolAddress: {
-      type: 'string',
-      nullable: true,
     },
     addLiquidity: {
       type: 'object',
@@ -539,10 +531,9 @@ export const CONFIG_SCHEMA = {
       type: 'object',
       nullable: true,
       properties: {
-        poolAddress: { type: 'string' },
         enabled: { type: 'boolean' },
       },
-      required: ['poolAddress', 'enabled'],
+      required: ['enabled'],
     },
   },
   required: ['rpcUrl', 'dryRun', 'keypairFilePath', 'computeUnitPriceMicroLamports'],

@@ -1,5 +1,10 @@
 import { Connection, PublicKey } from '@solana/web3.js';
-import { safeParseKeypairFromFile, createTokenMint, getDammV1Config } from '../../helpers';
+import {
+  safeParseKeypairFromFile,
+  createTokenMint,
+  getDammV1Config,
+  parseCliArguments,
+} from '../../helpers';
 import { Wallet } from '@coral-xyz/anchor';
 import { createDammV1Pool } from '../../lib/damm_v1';
 import { AlphaVaultConfig } from '../../utils/types';
@@ -24,12 +29,12 @@ async function main() {
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
   const wallet = new Wallet(keypair);
 
-  let baseMint: PublicKey;
   if (!config.quoteMint) {
     throw new Error('Missing quoteMint in configuration');
   }
   const quoteMint = new PublicKey(config.quoteMint);
 
+  let baseMint: PublicKey;
   if (config.createBaseToken) {
     baseMint = await createTokenMint(connection, wallet, {
       dryRun: config.dryRun,
@@ -37,10 +42,11 @@ async function main() {
       tokenConfig: config.createBaseToken,
     });
   } else {
-    if (!config.baseMint) {
-      throw new Error('Missing baseMint in configuration');
+    // parse baseMint
+    baseMint = new PublicKey(parseCliArguments().baseMint);
+    if (!baseMint) {
+      throw new Error('Please provide --baseMint flag to do this action');
     }
-    baseMint = new PublicKey(config.baseMint);
   }
 
   console.log(`- Using base token mint ${baseMint.toString()}`);
@@ -51,7 +57,7 @@ async function main() {
     await createDammV1Pool(config, connection, wallet, baseMint, quoteMint);
 
     if (config.dammV1Config?.hasAlphaVault && config.alphaVault) {
-      console.log('\n> Alpha vault is enabled, creating alpha vault automatically...');
+      console.log('\n> Alpha vault is enabled, creating alpha vault...');
 
       const poolAddress = deriveCustomizablePermissionlessConstantProductPoolAddress(
         baseMint,

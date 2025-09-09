@@ -4,6 +4,7 @@ import {
   modifyComputeUnitPriceIx,
   runSimulateTransaction,
   getDlmmConfig,
+  parseCliArguments,
 } from '../../helpers';
 import { Wallet } from '@coral-xyz/anchor';
 import DLMM from '@meteora-ag/dlmm';
@@ -26,7 +27,12 @@ async function main() {
   if (!config.setDlmmPoolStatus) {
     throw new Error('Missing setDlmmPoolStatus in configuration');
   }
-  const poolAddress = new PublicKey(config.setDlmmPoolStatus.poolAddress);
+
+  const poolAddress = new PublicKey(parseCliArguments().poolAddress);
+  if (!poolAddress) {
+    throw new Error('Please provide --poolAddress flag to do this action');
+  }
+
   const enabled = config.setDlmmPoolStatus.enabled;
 
   console.log(`- Using pool address ${poolAddress.toString()}`);

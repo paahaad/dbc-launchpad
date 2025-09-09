@@ -2,7 +2,12 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { Wallet } from '@coral-xyz/anchor';
 import { AlphaVaultConfig } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
-import { createTokenMint, getDammV2Config, safeParseKeypairFromFile } from '../../helpers';
+import {
+  createTokenMint,
+  getDammV2Config,
+  parseCliArguments,
+  safeParseKeypairFromFile,
+} from '../../helpers';
 import { createDammV2OneSidedPool } from '../../lib/damm_v2';
 import { createAlphaVault } from '../../lib/alpha_vault';
 import { deriveCustomizablePoolAddress } from '@meteora-ag/cp-amm-sdk';
@@ -34,10 +39,11 @@ async function main() {
       tokenConfig: config.createBaseToken,
     });
   } else {
-    if (!config.baseMint) {
-      throw new Error('Missing baseMint in configuration');
+    // parse baseMint
+    baseMint = new PublicKey(parseCliArguments().baseMint);
+    if (!baseMint) {
+      throw new Error('Please provide --baseMint flag to do this action');
     }
-    baseMint = new PublicKey(config.baseMint);
   }
 
   console.log(`- Using base token mint ${baseMint.toString()}`);

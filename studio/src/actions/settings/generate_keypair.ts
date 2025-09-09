@@ -10,7 +10,7 @@ config();
 
 async function main() {
   try {
-    // parse network flag from cli arguments
+    // parse network flag
     const network = parseCliArguments().network;
     if (!network) {
       throw new Error('Please provide --network flag (devnet or localnet)');
@@ -27,13 +27,11 @@ async function main() {
     }
 
     const secretKey = bs58.decode(privateKeyString);
-
     const keypair = Keypair.fromSecretKey(secretKey);
 
     console.log('Public Key:', keypair.publicKey.toString());
 
     const keypairArray = Array.from(keypair.secretKey);
-
     const outputPath = path.join(__dirname, '../../../keypair.json');
     fs.writeFileSync(outputPath, JSON.stringify(keypairArray, null, 4));
 

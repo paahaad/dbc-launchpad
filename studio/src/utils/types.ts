@@ -6,6 +6,7 @@ export interface CliArguments {
   config?: string | undefined;
   network?: string | undefined;
   baseMint?: string | undefined;
+  poolAddress?: string | undefined;
 }
 
 /* COMMON */
@@ -105,7 +106,6 @@ export interface Stake2EarnFarmConfig {
 
 export type DammV2Config = MeteoraConfigBase & {
   createBaseToken: TokenConfig | null;
-  poolAddress: string | null;
   dammV2Config: DynamicAmmV2Config | null;
   addLiquidity: AddLiquidityConfig | null;
   splitPosition: SplitPositionConfig | null;
@@ -203,7 +203,6 @@ export interface SingleBinSeedLiquidityConfig {
 }
 
 export interface SetDlmmPoolStatusConfig {
-  poolAddress: string;
   enabled: boolean;
 }
 

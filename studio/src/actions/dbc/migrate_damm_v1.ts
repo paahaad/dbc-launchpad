@@ -1,5 +1,5 @@
 import { Connection, PublicKey } from '@solana/web3.js';
-import { safeParseKeypairFromFile, getDbcConfig } from '../../helpers';
+import { safeParseKeypairFromFile, getDbcConfig, parseCliArguments } from '../../helpers';
 import { Wallet } from '@coral-xyz/anchor';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 import { migrateDammV1 } from '../../lib/dbc';
@@ -22,10 +22,12 @@ async function main() {
     throw new Error('Missing quoteMint in configuration');
   }
   const quoteMint = new PublicKey(config.quoteMint);
-  if (!config.baseMint) {
-    throw new Error('Missing baseMint in configuration');
+
+  // parse baseMint
+  const baseMint = new PublicKey(parseCliArguments().baseMint);
+  if (!baseMint) {
+    throw new Error('Please provide --baseMint flag to do this action');
   }
-  const baseMint = new PublicKey(config.baseMint);
 
   console.log(`- Using quote token mint ${quoteMint.toString()}`);
   console.log(`- Using base token mint ${baseMint.toString()}`);

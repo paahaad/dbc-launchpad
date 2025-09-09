@@ -1,5 +1,10 @@
 import { Connection, Keypair, PublicKey } from '@solana/web3.js';
-import { getAmountInLamports, safeParseKeypairFromFile, getDlmmConfig } from '../../helpers';
+import {
+  getAmountInLamports,
+  safeParseKeypairFromFile,
+  getDlmmConfig,
+  parseCliArguments,
+} from '../../helpers';
 import { BN } from 'bn.js';
 import DLMM, { LBCLMM_PROGRAM_IDS, deriveCustomizablePermissionlessLbPair } from '@meteora-ag/dlmm';
 import { unpackMint } from '@solana/spl-token';
@@ -19,14 +24,17 @@ async function main() {
 
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
 
-  if (!config.baseMint) {
-    throw new Error('Missing baseMint in configuration');
+  // parse baseMint
+  const baseMint = new PublicKey(parseCliArguments().baseMint);
+  if (!baseMint) {
+    throw new Error('Please provide --baseMint flag to do this action');
   }
-  const baseMint = new PublicKey(config.baseMint);
+
   const baseMintAccount = await connection.getAccountInfo(baseMint, connection.commitment);
   if (!baseMintAccount) {
     throw new Error(`Base mint account not found: ${baseMint}`);
   }
+
   const baseMintState = unpackMint(baseMint, baseMintAccount, baseMintAccount.owner);
   const baseDecimals = baseMintState.decimals;
 

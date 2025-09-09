@@ -9,7 +9,7 @@ config();
 
 async function main() {
   try {
-    // Parse network flag
+    // parse network flag
     const network = parseCliArguments().network;
     if (!network) {
       throw new Error('Please provide --network flag (devnet or localnet)');

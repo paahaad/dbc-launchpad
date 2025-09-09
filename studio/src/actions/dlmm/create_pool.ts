@@ -1,5 +1,10 @@
 import { Connection, PublicKey } from '@solana/web3.js';
-import { safeParseKeypairFromFile, createTokenMint, getDlmmConfig } from '../../helpers';
+import {
+  safeParseKeypairFromFile,
+  createTokenMint,
+  getDlmmConfig,
+  parseCliArguments,
+} from '../../helpers';
 import { Wallet } from '@coral-xyz/anchor';
 import { createPermissionlessDlmmPool } from '../../lib/dlmm';
 import { AlphaVaultConfig } from '../../utils/types';
@@ -35,10 +40,11 @@ async function main() {
       tokenConfig: config.createBaseToken,
     });
   } else {
-    if (!config.baseMint) {
-      throw new Error('Missing baseMint in configuration');
+    // parse baseMint
+    baseMint = new PublicKey(parseCliArguments().baseMint);
+    if (!baseMint) {
+      throw new Error('Please provide --baseMint flag to do this action');
     }
-    baseMint = new PublicKey(config.baseMint);
   }
 
   console.log(`- Using base token mint ${baseMint.toString()}`);

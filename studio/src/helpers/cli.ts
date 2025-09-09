@@ -25,6 +25,9 @@ export function parseCliArguments(): CliArguments {
       baseMint: {
         type: 'string',
       },
+      poolAddress: {
+        type: 'string',
+      },
     },
     strict: true,
     allowPositionals: true,
