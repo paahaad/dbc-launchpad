@@ -181,7 +181,13 @@ async function createMintWithPriorityFee(
       metadataUri = await uploadTokenMetadata(
         connection.rpcEndpoint,
         wallet.payer as Keypair,
-        tokenConfig
+        tokenConfig.name,
+        tokenConfig.symbol,
+        tokenConfig.metadata.image,
+        tokenConfig.metadata.description,
+        tokenConfig.metadata.website,
+        tokenConfig.metadata.twitter,
+        tokenConfig.metadata.telegram
       );
     }
 

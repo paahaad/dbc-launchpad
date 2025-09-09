@@ -6,7 +6,7 @@ import {
   createGenericFile,
 } from '@metaplex-foundation/umi';
 import { Keypair } from '@solana/web3.js';
-import { TokenConfig, TokenMetadata } from '../utils/types';
+import { TokenMetadata } from '../utils/types';
 import * as fs from 'fs';
 import * as path from 'path';
 
@@ -22,15 +22,24 @@ export function createUmiInstance(rpcUrl: string, payerKeypair: Keypair) {
 }
 
 // create metadata JSON from token config
-export function createMetadataJson(config: TokenConfig, imageUri?: string): TokenMetadata {
+export function createMetadataJson(
+  name: string,
+  symbol: string,
+  description: string,
+  image: string,
+  website: string,
+  twitter: string,
+  telegram: string,
+  imageUri?: string
+): TokenMetadata {
   const metadata = {
-    name: config.name,
-    symbol: config.symbol,
-    description: config.metadata?.description,
-    image: imageUri || config.metadata?.image,
-    website: config.metadata?.website,
-    twitter: config.metadata?.twitter,
-    telegram: config.metadata?.telegram,
+    name: name,
+    symbol: symbol,
+    description: description,
+    image: imageUri || image,
+    website: website,
+    twitter: twitter,
+    telegram: telegram,
   };
 
   return metadata;
@@ -40,24 +49,33 @@ export function createMetadataJson(config: TokenConfig, imageUri?: string): Toke
 export async function uploadTokenMetadata(
   rpcUrl: string,
   payerKeypair: Keypair,
-  config: TokenConfig
+  name: string,
+  symbol: string,
+  image: string,
+  description: string,
+  website: string,
+  twitter: string,
+  telegram: string
 ): Promise<string> {
-  // if URI is already provided, return it
-  if (config.metadata?.uri) {
-    console.log('Using existing metadata URI:', config.metadata.uri);
-    return config.metadata.uri;
-  }
-
   let imageUri: string | undefined;
 
   // handle image upload if image is a file path
-  if (config.metadata?.image && !config.metadata?.image.startsWith('http')) {
+  if (image && !image.startsWith('http')) {
     console.log('Image file path provided, uploading image first...');
-    imageUri = await destructureImageFilePath(rpcUrl, payerKeypair, config.metadata.image);
+    imageUri = await destructureImageFilePath(rpcUrl, payerKeypair, image);
   }
 
   const umi = createUmiInstance(rpcUrl, payerKeypair);
-  const metadataJson = createMetadataJson(config, imageUri);
+  const metadataJson = createMetadataJson(
+    name,
+    symbol,
+    description,
+    image,
+    website,
+    twitter,
+    telegram,
+    imageUri
+  );
 
   console.log('Metadata JSON:', JSON.stringify(metadataJson, null, 2));
 

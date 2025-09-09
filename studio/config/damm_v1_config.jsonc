@@ -51,8 +51,8 @@
       "image": "./data/test-token.jpg", // this can be a URL of the image address (e.g. https://example.com/token-image.png) or the image file path (e.g. ./data/test-token.jpg)
       "description": "YOUR_TOKEN_DESCRIPTION", // token description
       "website": "https://example.com", // project website
-      "twitter": "https://x.com/yourproject", // twitter URL (optional)
-      "telegram": "https://t.me/yourproject" // telegram URL (optional)
+      "twitter": "https://x.com/yourproject", // twitter URL 
+      "telegram": "https://t.me/yourproject" // telegram URL
     }
   },
 

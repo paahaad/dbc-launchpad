@@ -51,8 +51,8 @@
       "image": "./data/test-token.jpg", // this can be a URL of the image address (e.g. https://example.com/token-image.png) or the image file path (e.g. ./data/test-token.jpg)
       "description": "YOUR_TOKEN_DESCRIPTION", // token description
       "website": "https://example.com", // project website
-      "twitter": "https://x.com/yourproject", // twitter URL (optional)
-      "telegram": "https://t.me/yourproject" // telegram URL (optional)
+      "twitter": "https://x.com/yourproject", // twitter URL 
+      "telegram": "https://t.me/yourproject" // telegram URL
     }
   },
 
@@ -111,7 +111,7 @@
    * 1. damm-v2-split-position
    */
   "splitPosition": {
-    "newPositionOwner": "Dc85YcHkAWs62ndssWcGN5V4xYaQzPzgUDiRGtvnZas6", // this is the address that will receive the new DAMM v2 NFT position
+    "newPositionOwner": "YOUR_NEW_POSITION_OWNER_ADDRESS", // this is the address that will receive the new DAMM v2 NFT position
     "unlockedLiquidityPercentage": 50, // this is the percentage of unlocked liquidity that will be split and transferred to the newPositionOwner's position
     "permanentLockedLiquidityPercentage": 50, // this is the percentage of permanent locked liquidity that will be split and transferred to the newPositionOwner's position
     "feeAPercentage": 50, // this is the percentage of unclaimed fee that will be transferred to the newPositionOwner's position

@@ -41,9 +41,6 @@ export const CONFIG_SCHEMA = {
             image: {
               type: 'string',
             },
-            imageFilePath: {
-              type: 'string',
-            },
             description: {
               type: 'string',
             },

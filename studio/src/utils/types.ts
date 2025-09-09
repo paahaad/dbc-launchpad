@@ -39,7 +39,6 @@ export interface TokenConfig {
 export interface TokenMetadata {
   uri?: string;
   image?: string;
-  imageFilePath?: string;
   description?: string;
   website?: string;
   twitter?: string;
@@ -312,7 +311,7 @@ export type DbcPool = {
   baseMintKeypairFilepath?: string;
   name: string;
   symbol: string;
-  uri: string;
+  metadata: TokenMetadata;
 };
 
 export type DbcSwap = {

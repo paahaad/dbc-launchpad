@@ -24,6 +24,7 @@ import {
   DynamicBondingCurveClient,
 } from '@meteora-ag/dynamic-bonding-curve-sdk';
 import BN from 'bn.js';
+import { uploadTokenMetadata } from '../../helpers/metadata';
 
 /**
  * Create a DBC config
@@ -144,6 +145,25 @@ export async function createDbcPool(
 
   const dbcInstance = new DynamicBondingCurveClient(connection, 'confirmed');
 
+  let metadataUri: string;
+  if (config.dbcPool.metadata.uri) {
+    console.log('Using existing metadata URI:', config.dbcPool.metadata.uri);
+    metadataUri = config.dbcPool.metadata.uri;
+  } else {
+    console.log('Uploading metadata to Irys...');
+    metadataUri = await uploadTokenMetadata(
+      connection.rpcEndpoint,
+      wallet.payer as Keypair,
+      config.dbcPool.name,
+      config.dbcPool.symbol,
+      config.dbcPool.metadata.image,
+      config.dbcPool.metadata.description,
+      config.dbcPool.metadata.website,
+      config.dbcPool.metadata.twitter,
+      config.dbcPool.metadata.telegram
+    );
+  }
+
   if (config.dryRun) {
     console.log(
       `> Simulating create pool tx (note: this may fail in dry-run mode due to missing config state)...`
@@ -154,7 +174,7 @@ export async function createDbcPool(
         config: configPublicKey,
         name: config.dbcPool.name,
         symbol: config.dbcPool.symbol,
-        uri: config.dbcPool.uri,
+        uri: metadataUri,
         payer: wallet.publicKey,
         poolCreator: wallet.publicKey,
       });
@@ -177,7 +197,7 @@ export async function createDbcPool(
       config: configPublicKey,
       name: config.dbcPool.name,
       symbol: config.dbcPool.symbol,
-      uri: config.dbcPool.uri,
+      uri: metadataUri,
       payer: wallet.publicKey,
       poolCreator: wallet.publicKey,
     });

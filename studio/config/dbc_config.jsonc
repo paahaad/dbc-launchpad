@@ -123,10 +123,21 @@
    * 1. dbc-create-pool
    */
   "dbcPool": {
-    "baseMintKeypairFilepath": "./baseMintKeypair.json", // optional base mint keypair file path
-    "name": "DBC Pool", // token name
-    "symbol": "DBC", // token symbol
-    "uri": "https://example.com" // metaplex token metadata format for the token - https://developers.metaplex.com/core/json-schema
+    "baseMintKeypairFilepath": "./mint-keypair.json", // optional base mint keypair file path
+    "name": "Test Token", // token name
+    "symbol": "TEST", // token symbol
+    "metadata": {
+      // "uri": "https://gateway.irys.xyz/123456789", // if you already have a metadata URI created, you can specify it here
+      
+      /* Only use the following parameters for createBaseToken if you don't have an existing metadata uri
+      * This will create an image uri and a new metadata uri and upload everything to Irys
+      */
+      "image": "./data/test-token.jpg", // this can be a URL of the image address (e.g. https://example.com/token-image.png) or the image file path (e.g. ./data/test-token.jpg)
+      "description": "YOUR_TOKEN_DESCRIPTION", // token description
+      "website": "https://example.com", // project website
+      "twitter": "https://x.com/yourproject", // twitter URL 
+      "telegram": "https://t.me/yourproject" // telegram URL
+    }
   },
 
   /* dbcSwap is only used in the following actions:
