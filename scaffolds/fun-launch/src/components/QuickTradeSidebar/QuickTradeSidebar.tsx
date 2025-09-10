@@ -1,16 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useWallet } from '@jup-ag/wallet-adapter';
-import { PublicKey } from '@solana/web3.js';
+import { PublicKey, LAMPORTS_PER_SOL } from '@solana/web3.js';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
 import { useTokenInfo } from '@/hooks/queries';
-import { ReadableNumber } from '@/components/ui/ReadableNumber';
 import { GOR_CONFIG } from '@/config/gor-config';
 import { Connection } from '@solana/web3.js';
 import { getAssociatedTokenAddress, getAccount, getMint } from '@solana/spl-token';
-import { DynamicBondingCurveClient, TradeDirection } from '@meteora-ag/dynamic-bonding-curve-sdk';
+import { DynamicBondingCurveClient } from '@meteora-ag/dynamic-bonding-curve-sdk';
 import BN from 'bn.js';
 import { NATIVE_MINT } from '@solana/spl-token';
 
@@ -20,6 +19,15 @@ interface QuickTradeSidebarProps {
 
 // Add PDA derivation functions (adapted from test-pda-derivation.mjs)
 const DYNAMIC_BONDING_CURVE_PROGRAM_ID = new PublicKey('dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN');
+
+// Utility function to convert decimal amount to lamports/smallest unit
+function getAmountInLamports(amount: number | string, decimals: number): BN {
+  const amountStr = amount.toString();
+  const [integerPart, decimalPart = ''] = amountStr.split('.');
+  const paddedDecimal = decimalPart.padEnd(decimals, '0').slice(0, decimals);
+  const lamportsStr = integerPart + paddedDecimal;
+  return new BN(lamportsStr);
+}
 
 function derivePoolAccount(configAccount: string, tokenMint: string) {
   const config = new PublicKey(configAccount);
@@ -87,7 +95,7 @@ export const QuickTradeSidebar = ({ tokenId }: QuickTradeSidebarProps) => {
       // Fetch quote balance
       try {
         const nativeBalance = await connection.getBalance(publicKey);
-        setUserGorBalance(nativeBalance / 1e9); // Assuming 9 decimals like SOL
+        setUserGorBalance(nativeBalance / LAMPORTS_PER_SOL); // Use standard constant
       } catch (e) {
         setUserGorBalance(0);
       }
@@ -126,10 +134,7 @@ export const QuickTradeSidebar = ({ tokenId }: QuickTradeSidebarProps) => {
  
         const inputDecimals = isBuying ? await getMint(connection, poolConfig.quoteMint).then(m => m.decimals) 
           : await getMint(connection, poolStateLocal.baseMint).then(m => m.decimals);
-        const [integerPart, decimalPart = ''] = inputAmount.toString().split('.');
-        const paddedDecimal = decimalPart.padEnd(inputDecimals, '0').slice(0, inputDecimals);
-        const amountStr = integerPart + paddedDecimal;
-        const amountIn = new BN(amountStr);
+        const amountIn = getAmountInLamports(inputAmount, inputDecimals);
  
         let currentPoint;
         if (poolConfig.activationType === 0) {
@@ -207,7 +212,9 @@ export const QuickTradeSidebar = ({ tokenId }: QuickTradeSidebarProps) => {
       const quoteMintDecimals = await getMint(connection, poolConfig.quoteMint).then(m => m.decimals);
       const baseMintDecimals = await getMint(connection, poolStateLocal.baseMint).then(m => m.decimals);
       const inputDecimals = isBuying ? quoteMintDecimals : baseMintDecimals;
-      const amountIn = new BN(inputValue.replace('.', '').padEnd(inputDecimals, '0'));
+      
+      // Use standard utility function for amount conversion
+      const amountIn = getAmountInLamports(inputValue, inputDecimals);
 
       // Get current point
       let currentPoint;
@@ -257,6 +264,10 @@ export const QuickTradeSidebar = ({ tokenId }: QuickTradeSidebarProps) => {
 
       toast.success(`${isBuying ? 'Buy' : 'Sell'} order executed successfully!`, {
         description: `Transaction: ${txId.slice(0, 8)}...`,
+        action: {
+          label: 'View on Explorer',
+          onClick: () => window.open(`https://trashscan.xyz/tx/${txId}`, '_blank')
+        },
         duration: 5000,
       });
 
