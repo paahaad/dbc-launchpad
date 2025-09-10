@@ -14,7 +14,9 @@ import {
 } from './types';
 // Only using GOR RPC - no external API calls needed
 import { Connection, PublicKey } from '@solana/web3.js';
-import { GOR_CONFIG, getDynamicBondingCurveProgramId, getMetadataProgramId } from '@/config/gor-config';
+import { DynamicBondingCurveClient } from '@meteora-ag/dynamic-bonding-curve-sdk';
+import { NATIVE_MINT, getMint } from '@solana/spl-token';
+import { GOR_CONFIG } from '@/config/gor-config';
 
 // All data fetched from GOR chain - no external APIs needed
 
@@ -94,51 +96,76 @@ export class ApeClient {
 
   static async getGorTokenInfo(tokenMint: string): Promise<GetTokenResponse> {
     const connection = new Connection(GOR_CONFIG.RPC_URL, 'confirmed');
+    const dbcInstance = new DynamicBondingCurveClient(connection, 'confirmed');
     
     try {
       // Get token account info from GOR RPC
       const tokenPubkey = new PublicKey(tokenMint);
-      const tokenAccountInfo = await connection.getAccountInfo(tokenPubkey);
       
-      if (!tokenAccountInfo) {
-        throw new Error('Token account not found on GOR chain');
+      // Derive pool address
+      const configAccount = GOR_CONFIG.POOL_CONFIG_KEY;
+      const config = new PublicKey(configAccount);
+      const baseMint = tokenPubkey;
+      const quoteMint = NATIVE_MINT;
+      const poolAddress = PublicKey.findProgramAddressSync(
+        [
+          Buffer.from('pool'),
+          config.toBuffer(),
+          getFirstKey(baseMint, quoteMint),
+          getSecondKey(baseMint, quoteMint),
+        ],
+        new PublicKey('dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN')
+      )[0];
+
+      // Fetch pool state
+      const poolState = await dbcInstance.state.getPool(poolAddress);
+      if (!poolState) {
+        console.warn(`Pool not found for token: ${tokenMint}`);
+        return { pools: [] };
       }
 
-      // Fetch token metadata using Metaplex standard
-      const tokenMetadata = await ApeClient.getGorTokenMetadata(connection, tokenPubkey);
+      // Fetch config
+      const poolConfig = await dbcInstance.state.getPoolConfig(poolState.config);
+      if (!poolConfig) {
+        throw new Error('Pool config not found');
+      }
+
+      const mintAccount = await connection.getAccountInfo(baseMint);
+      const tokenProgram = mintAccount?.owner.toString() || '';
+
+      // Fetch mint info
+      const mintInfo = await getMint(connection, baseMint);
+      const totalSupply = Number(mintInfo.supply) / Math.pow(10, mintInfo.decimals);
       
-      // Find associated bonding curve pool
-      const poolInfo = await ApeClient.findGorBondingCurvePool(connection, tokenPubkey);
-      
-      // Get token supply info
-      const supplyInfo = await connection.getTokenSupply(tokenPubkey);
-      
+      // TODO: Fetch metadata properly using metaplex
+      const tokenMetadata: { name: string; symbol: string; image: string | null } = { name: 'Unknown', symbol: 'UNK', image: null }; // Placeholder
+        
       const pool: Pool = {
-        id: `gor-${tokenMint}`,
+        id: `${tokenMint}`,
         chain: 'gor',
         dex: 'meteora-dbc',
         type: 'bonding-curve',
-        createdAt: poolInfo?.createdAt || '2024-01-01T00:00:00.000Z',
-        bondingCurve: poolInfo?.currentPrice || 0,
-        volume24h: poolInfo?.volume24h || 0,
+        createdAt: '2024-01-01T00:00:00.000Z', // TODO: Get actual createdAt
+        bondingCurve: 0, // TODO: Calculate from poolState
+        volume24h: 0, // TODO: Implement
         isUnreliable: false,
         updatedAt: '2024-01-01T00:00:00.000Z',
         baseAsset: {
           id: tokenMint,
-          name: tokenMetadata?.name || `Token ${tokenMint.slice(0, 4)}...${tokenMint.slice(-4)}`,
-          symbol: tokenMetadata?.symbol || `TKN${tokenMint.slice(0, 3).toUpperCase()}`,
-          decimals: supplyInfo.value.decimals,
-          circSupply: parseInt(supplyInfo.value.amount) / Math.pow(10, supplyInfo.value.decimals),
-          totalSupply: parseInt(supplyInfo.value.amount) / Math.pow(10, supplyInfo.value.decimals),
-          tokenProgram: tokenAccountInfo.owner.toString(),
-          usdPrice: poolInfo?.usdPrice || 0,
-          mcap: (poolInfo?.usdPrice || 0) * (parseInt(supplyInfo.value.amount) / Math.pow(10, supplyInfo.value.decimals)),
-          liquidity: poolInfo?.liquidity || 0,
+          name: tokenMetadata.name,
+          symbol: tokenMetadata.symbol,
+          decimals: mintInfo.decimals,
+          circSupply: totalSupply,
+          totalSupply: totalSupply,
+          tokenProgram,
+          usdPrice: 0, // TODO: Calculate from poolState
+          mcap: 0, // TODO: Calculate
+          liquidity: 0, // TODO: From poolState
           stats24h: {
-            priceChange: poolInfo?.priceChange24h || 0
+            priceChange: 0 // TODO: Implement
           },
           organicScoreLabel: 'medium' as const,
-          image: tokenMetadata?.image
+          image: tokenMetadata.image
         }
       };
 
@@ -148,187 +175,6 @@ export class ApeClient {
     } catch (error) {
       console.error('Error fetching GOR token info:', error);
       throw error;
-    }
-  }
-
-  static async getGorTokenMetadata(connection: Connection, tokenMint: PublicKey): Promise<{
-    name?: string;
-    symbol?: string;
-    description?: string;
-    image?: string;
-  } | null> {
-    try {
-      // Try to find Metaplex metadata account
-      const METADATA_PROGRAM_ID = getMetadataProgramId();
-      
-      const [metadataPDA] = PublicKey.findProgramAddressSync(
-        [
-          Buffer.from('metadata'),
-          METADATA_PROGRAM_ID.toBuffer(),
-          tokenMint.toBuffer(),
-        ],
-        METADATA_PROGRAM_ID
-      );
-
-      const metadataAccount = await connection.getAccountInfo(metadataPDA);
-      if (metadataAccount) {
-        // Parse metadata account (simplified)
-        // In production, you'd use @metaplex-foundation/mpl-token-metadata
-        const data = metadataAccount.data;
-        
-        // This is a simplified parser - in production use proper metadata parsing
-        try {
-          const nameLength = data.readUInt32LE(69);
-          const name = data.slice(73, 73 + nameLength).toString('utf8').replace(/\0/g, '');
-          
-          const symbolStart = 73 + nameLength + 4;
-          const symbolLength = data.readUInt32LE(symbolStart - 4);
-          const symbol = data.slice(symbolStart, symbolStart + symbolLength).toString('utf8').replace(/\0/g, '');
-          
-          const uriStart = symbolStart + symbolLength + 4;
-          const uriLength = data.readUInt32LE(uriStart - 4);
-          const uri = data.slice(uriStart, uriStart + uriLength).toString('utf8').replace(/\0/g, '');
-          
-          // Fetch off-chain metadata if URI exists
-          let offChainMetadata = null;
-          if (uri && uri.trim()) {
-            try {
-              offChainMetadata = await ky.get(uri.trim()).json() as any;
-            } catch (e) {
-              console.log('Failed to fetch off-chain metadata:', e);
-            }
-          }
-          
-          return {
-            name: name || offChainMetadata?.name,
-            symbol: symbol || offChainMetadata?.symbol,
-            description: offChainMetadata?.description,
-            image: offChainMetadata?.image
-          };
-        } catch (parseError) {
-          console.log('Failed to parse metadata:', parseError);
-          return null;
-        }
-      }
-      
-      return null;
-    } catch (error) {
-      console.log('Error fetching token metadata:', error);
-      return null;
-    }
-  }
-
-  static async findGorBondingCurvePool(connection: Connection, tokenMint: PublicKey): Promise<{
-    poolAddress?: string;
-    currentPrice?: number;
-    liquidity?: number;
-    volume24h?: number;
-    priceChange24h?: number;
-    usdPrice?: number;
-    createdAt?: string;
-    baseReserve?: number;
-    quoteReserve?: number;
-  } | null> {
-    try {
-      // Find bonding curve pool accounts that reference this token mint
-      // This uses getProgramAccounts to find pools with the specific base_mint
-      
-      // Dynamic Bonding Curve Program ID from configuration
-      const DBC_PROGRAM_ID = getDynamicBondingCurveProgramId();
-      
-      // Filter for VirtualPool accounts that have this token as base_mint
-      // The offset is calculated from the VirtualPool struct layout
-      const pools = await connection.getProgramAccounts(DBC_PROGRAM_ID, {
-        filters: [
-          {
-            memcmp: {
-              offset: GOR_CONFIG.VIRTUAL_POOL_OFFSETS.BASE_MINT, // Use configured offset for base_mint
-              bytes: tokenMint.toBase58(),
-            },
-          },
-        ],
-      });
-
-      if (pools.length === 0) {
-        console.log('No bonding curve pool found for token:', tokenMint.toString());
-        return null;
-      }
-
-      // Take the first pool found
-      const poolAccount = pools[0];
-      const poolData = poolAccount.account.data;
-
-      // Parse VirtualPool data structure
-      // This is a simplified parser based on the Rust struct
-      try {
-        let offset = 0;
-        
-        // Skip volatility_tracker (varies in size, need to check actual implementation)
-        offset += GOR_CONFIG.VIRTUAL_POOL_OFFSETS.CONFIG; // Use config offset
-        
-        // config: Pubkey (32 bytes)
-        offset += 32;
-        
-        // creator: Pubkey (32 bytes)  
-        offset += 32;
-        
-        // base_mint: Pubkey (32 bytes) - verify this matches our token
-        offset += 32;
-        
-        // base_vault: Pubkey (32 bytes)
-        offset += 32;
-        
-        // quote_vault: Pubkey (32 bytes)
-        offset += 32;
-        
-        // base_reserve: u64 (8 bytes)
-        const baseReserve = poolData.readBigUInt64LE(offset);
-        offset += 8;
-        
-        // quote_reserve: u64 (8 bytes)
-        const quoteReserve = poolData.readBigUInt64LE(offset);
-        offset += 8;
-        
-        // Skip protocol fees (4 * 8 = 32 bytes)
-        offset += 32;
-        
-        // current price (sqrt_price): u128 (16 bytes)
-        const sqrtPriceLo = poolData.readBigUInt64LE(offset);
-        // Note: For full u128 support, we'd need to handle the high 64 bits properly
-        offset += 16;
-        
-        // Convert sqrt price to actual price (simplified)
-        const sqrtPrice = Number(sqrtPriceLo); // This is simplified, proper u128 handling needed
-        const currentPrice = (sqrtPrice / Math.pow(2, 64)) ** 2; // Approximate conversion
-        
-        // Calculate USD price (assuming quote token is USDC with 6 decimals)
-        const quoteDecimals = 6; // USDC decimals
-        const baseDecimals = 9; // Typical token decimals
-        
-        const baseReserveNumber = Number(baseReserve) / Math.pow(10, baseDecimals);
-        const quoteReserveNumber = Number(quoteReserve) / Math.pow(10, quoteDecimals);
-        
-        const usdPrice = baseReserveNumber > 0 ? quoteReserveNumber / baseReserveNumber : 0;
-        const liquidity = quoteReserveNumber; // Total liquidity approximation
-        
-        return {
-          poolAddress: poolAccount.pubkey.toString(),
-          currentPrice,
-          liquidity,
-          volume24h: 0, // Would need additional tracking
-          priceChange24h: 0, // Would need historical data
-          usdPrice,
-          createdAt: '2024-01-01T00:00:00.000Z',
-          baseReserve: baseReserveNumber,
-          quoteReserve: quoteReserveNumber,
-        };
-      } catch (parseError) {
-        console.error('Error parsing pool data:', parseError);
-        return null;
-      }
-    } catch (error) {
-      console.error('Error finding bonding curve pool:', error);
-      return null;
     }
   }
 
@@ -391,8 +237,8 @@ export class ApeClient {
     try {
       const connection = new Connection(GOR_CONFIG.RPC_URL, 'confirmed');
       const tokenMint = new PublicKey(assetId);
-      const metadata = await ApeClient.getGorTokenMetadata(connection, tokenMint);
-      
+      // TODO: Implement proper metadata fetching
+      const metadata = { description: '' };
       return {
         description: metadata?.description
       };
@@ -401,4 +247,17 @@ export class ApeClient {
       return { description: undefined };
     }
   }
+}
+
+// Add helper functions from QuickTradeSidebar
+function getFirstKey(key1: PublicKey, key2: PublicKey) {
+  const buf1 = key1.toBuffer();
+  const buf2 = key2.toBuffer();
+  return Buffer.compare(buf1, buf2) === 1 ? buf1 : buf2;
+}
+ 
+function getSecondKey(key1: PublicKey, key2: PublicKey) {
+  const buf1 = key1.toBuffer();
+  const buf2 = key2.toBuffer();
+  return Buffer.compare(buf1, buf2) === 1 ? buf2 : buf1;
 }

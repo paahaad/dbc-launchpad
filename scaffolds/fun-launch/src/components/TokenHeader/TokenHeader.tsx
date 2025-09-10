@@ -1,5 +1,4 @@
 import { useMinimalTokenInfo, useTokenInfo, useTokenAddress } from '@/hooks/queries';
-import { useDBCToken } from '@/hooks/use-dbc-pool';
 import { cn } from '@/lib/utils';
 import { memo } from 'react';
 import { getNumberColorCn, ReadableNumber } from '../ui/ReadableNumber';
@@ -17,10 +16,6 @@ export const TokenHeader: React.FC<TokenHeaderProps> = memo(({ className }) => {
   const tokenId = useTokenAddress();
   const { data: pool, isLoading: poolLoading, error: poolError } = useTokenInfo();
   const { data: minimalTokenInfo, isLoading: minimalLoading, error: minimalError } = useMinimalTokenInfo();
-  const { data: dbcToken, isLoading: dbcLoading } = useDBCToken(tokenId);
-
-  // No major changes, but add a console log for debugging
-  console.log('Token info:', minimalTokenInfo);
 
   const pctChange =
     pool?.baseAsset.stats24h?.priceChange === undefined
@@ -28,7 +23,7 @@ export const TokenHeader: React.FC<TokenHeaderProps> = memo(({ className }) => {
       : pool.baseAsset.stats24h.priceChange / 100;
 
   // Show loading state
-  if (poolLoading || minimalLoading || dbcLoading) {
+  if (poolLoading || minimalLoading /* || dbcLoading */) {
     return (
       <div className={cn('flex items-center overflow-hidden w-full', className)}>
         <div className="relative mr-2 flex shrink-0 items-center rounded-lg bg-neutral-850">
@@ -60,7 +55,7 @@ export const TokenHeader: React.FC<TokenHeaderProps> = memo(({ className }) => {
   }
 
   // Show empty state if no data
-  if (!pool && !dbcToken && !minimalTokenInfo) {
+  if (!pool && !minimalTokenInfo) {
     return (
       <div className={cn('flex items-center overflow-hidden w-full', className)}>
         <div className="text-neutral-500 text-sm">No token data available</div>
@@ -69,11 +64,11 @@ export const TokenHeader: React.FC<TokenHeaderProps> = memo(({ className }) => {
   }
 
   // Use DBC data if available, fallback to original data
-  const tokenData = dbcToken || pool;
-  const tokenSymbol = dbcToken?.metadata?.symbol || minimalTokenInfo?.symbol || pool?.baseAsset.symbol || 'Unknown Token';
-  const tokenPrice = dbcToken?.price || pool?.baseAsset.usdPrice || 0;
-  const tokenMarketCap = dbcToken?.marketCap || pool?.baseAsset.mcap || 0;
-  const priceChange = dbcToken?.priceChange24h || pctChange || 0;
+  const tokenData = pool;
+  const tokenSymbol = minimalTokenInfo?.symbol || pool?.baseAsset.symbol || 'Unknown Token';
+  const tokenPrice = pool?.baseAsset.usdPrice || 0;
+  const tokenMarketCap = pool?.baseAsset.mcap || 0;
+  const priceChange = pctChange || 0;
 
   return (
     <div className={cn('flex items-center overflow-hidden w-full', className)}>

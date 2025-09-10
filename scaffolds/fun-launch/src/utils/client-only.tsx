@@ -1,4 +1,3 @@
-// Client-only wrapper to prevent hydration mismatches
 import { useEffect, useState } from 'react';
 
 interface ClientOnlyProps {
