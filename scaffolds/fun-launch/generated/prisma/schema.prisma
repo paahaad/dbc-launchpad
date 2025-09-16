@@ -9,6 +9,15 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// use this for latest price of gor -> prisma.gor.findFirst({ orderBy: { fetchedAt: "desc" } })
+model Gor {
+  id        String   @id @default(cuid()) // Review with 10x -> @default(1) i.e alwasy one row just update latest price, can't make graph
+  priceUsd  String
+  fetchedAt DateTime @default(now())
+
+  @@index([fetchedAt(sort: Desc)])
+}
+
 model User {
   id        String   @id @default(cuid())
   name      String?
@@ -23,41 +32,43 @@ model User {
 }
 
 model Token {
-  id          String @id @default(cuid())
+  id          String  @id @default(cuid())
+  address     String? @unique
   name        String
   symbol      String
   url         String
-  mintAddress String @unique
+  mintAddress String  @unique
+  userId      String
+  user        User    @relation("UserLaunchedTokens", fields: [userId], references: [id])
 
-  userId String
-  user   User   @relation("UserLaunchedTokens", fields: [userId], references: [id])
-
-  website String?
-  twitter String?
-  supply  String?
-
+  website           String?
+  twitter           String?
+  supply            String?
+  decimals          Int       @default(6)
   bondingCurveSlope Float?
   metadataUrl       String?
   imageUrl          String?
-
-  description     String?
-  contractAddress String? @unique
-  decimals        Int     @default(18)
-
-  marketCap   String?
-  totalRaised String  @default("0")
-
-  launchDate DateTime?
-
-  telegram String?
-  discord  String?
-
-  holders Int @default(0)
+  description       String?
+  contractAddress   String?   @unique
+  marketCap         String?
+  totalRaised       String    @default("0")
+  launchDate        DateTime?
+  telegram          String?
+  discord           String?
+  holders           Int       @default(0)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  purchases TokenPurchase[] @relation("TokenPurchases")
+  basePools    Pool[]          @relation("BaseToken")
+  quotePools   Pool[]          @relation("QuoteToken")
+  launches     TokenLaunch[]
+  tokenHolders TokenHolder[]
+  transactions Transaction[]
+  priceHistory PriceHistory[]
+  purchases    TokenPurchase[] @relation("TokenPurchases")
+
+  @@map("tokens")
 }
 
 model TokenPurchase {
@@ -73,4 +84,149 @@ model TokenPurchase {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  @@map("token_purchases")
+}
+
+model PoolConfig {
+  id          String   @id @default(cuid())
+  address     String   @unique
+  tradeFee    String // Fee as string for precision
+  protocolFee String // Fee as string for precision
+  referralFee String // Fee as string for precision
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  pools Pool[]
+
+  @@map("pool_configs")
+}
+
+model Pool {
+  id           String   @id @default(cuid())
+  address      String   @unique
+  baseTokenId  String
+  quoteTokenId String
+  configId     String
+  creator      String // Creator wallet address
+  isActive     Boolean  @default(true)
+  totalVolume  String   @default("0") // Total trading volume
+  totalTrades  Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  baseToken    Token          @relation("BaseToken", fields: [baseTokenId], references: [id])
+  quoteToken   Token          @relation("QuoteToken", fields: [quoteTokenId], references: [id])
+  config       PoolConfig     @relation(fields: [configId], references: [id])
+  states       PoolState[]
+  transactions Transaction[]
+  launches     TokenLaunch[]
+  priceHistory PriceHistory[]
+
+  @@map("pools")
+}
+
+model PoolState {
+  id                    String   @id @default(cuid())
+  poolId                String
+  lastUpdateTimestamp   BigInt
+  sqrtPriceReference    String
+  volatilityAccumulator String
+  volatilityReference   String
+  baseReserve           String   @default("0")
+  quoteReserve          String   @default("0")
+  currentPrice          String?
+  rawData               String?
+  createdAt             DateTime @default(now())
+
+  pool Pool @relation(fields: [poolId], references: [id])
+
+  @@unique([poolId, lastUpdateTimestamp])
+  @@map("pool_states")
+}
+
+model TokenLaunch {
+  id            String   @id @default(cuid())
+  tokenId       String
+  poolId        String
+  launchPrice   String
+  initialSupply String
+  launchTxHash  String?
+  launchedAt    DateTime @default(now())
+
+  token Token @relation(fields: [tokenId], references: [id])
+  pool  Pool  @relation(fields: [poolId], references: [id])
+
+  @@unique([tokenId, poolId])
+  @@map("token_launches")
+}
+
+model TokenHolder {
+  id         String   @id @default(cuid())
+  tokenId    String
+  holder     String
+  balance    String
+  percentage Float?
+  acquiredAt DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  token Token @relation(fields: [tokenId], references: [id])
+
+  @@unique([tokenId, holder])
+  @@map("token_holders")
+}
+
+model Transaction {
+  id          String   @id @default(cuid())
+  poolId      String
+  tokenId     String?
+  txHash      String   @unique
+  txType      TxType
+  wallet      String
+  amountIn    String
+  amountOut   String
+  fee         String
+  price       String
+  timestamp   BigInt
+  blockNumber BigInt
+  gasUsed     String?
+  createdAt   DateTime @default(now())
+
+  pool  Pool   @relation(fields: [poolId], references: [id])
+  token Token? @relation(fields: [tokenId], references: [id])
+
+  @@index([poolId, timestamp])
+  @@index([wallet, timestamp])
+  @@map("transactions")
+}
+
+model PriceHistory {
+  id         String   @id @default(cuid())
+  poolId     String
+  tokenId    String
+  price      String
+  volume     String   @default("0")
+  timestamp  BigInt
+  interval   String // '1m', '5m', '1h', '1d', etc.
+  openPrice  String? // OHLC data
+  highPrice  String?
+  lowPrice   String?
+  closePrice String?
+  createdAt  DateTime @default(now())
+
+  pool  Pool  @relation(fields: [poolId], references: [id])
+  token Token @relation(fields: [tokenId], references: [id])
+
+  @@unique([poolId, timestamp, interval])
+  @@index([poolId, interval, timestamp])
+  @@map("price_history")
+}
+
+enum TxType {
+  BUY
+  SELL
+  CREATE_POOL
+  ADD_LIQUIDITY
+  REMOVE_LIQUIDITY
+  CLAIM_FEES
 }

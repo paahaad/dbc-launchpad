@@ -2,8 +2,14 @@ import { useWallet } from '@jup-ag/wallet-adapter';
 import { useUnifiedWalletContext } from '@jup-ag/wallet-adapter';
 import Link from 'next/link';
 import { useState, useRef, useEffect } from 'react';
+import { Bars3Icon, MagnifyingGlassIcon, PlusIcon } from '@heroicons/react/24/outline';
 
-export const Header = () => {
+interface HeaderProps {
+  sidebarCollapsed?: boolean;
+  onToggleSidebar?: () => void;
+}
+
+export const Header = ({ sidebarCollapsed = false, onToggleSidebar }: HeaderProps) => {
   const { publicKey, disconnect } = useWallet();
   const { setShowModal } = useUnifiedWalletContext();
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -42,29 +48,58 @@ export const Header = () => {
   }, []);
 
   return (
-    <header className="bg-white/5 backdrop-blur-sm border-b border-white/10">
-      <div className="container mx-auto px-4 py-4">
-        <div className="flex items-center justify-between">
-          <Link href="/" className="flex items-center space-x-3">
-            <div className="w-8 h-8 flex items-center justify-center">
-              <img
-                src="https://gorbagana.wtf/images/gorb-logo.avif"
-                alt="GOR Logo"
-                className="w-8 h-8 rounded-lg object-contain"
-              />
-            </div>
-            <span className="text-xl font-bold text-white">Dumpster</span>
-          </Link>
-
+    <header className="bg-black">
+      <div className="px-2 py-2">
+        <div className="grid grid-cols-3 items-center w-full">
+          {/* Left Section - Toggle + Logo */}
           <div className="flex items-center space-x-4">
-            <Link href="/create-pool" className="bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-lg text-white font-medium transition">
-              Launch Token
+            <button
+              onClick={onToggleSidebar}
+              className="text-gray-400 hover:text-white p-2 flex-shrink-0 rounded-full hover:bg-gray-800"
+            >
+              <Bars3Icon className="w-6 h-6" />
+            </button>
+            
+            <Link href="/" className="flex items-center space-x-2 flex-shrink-0">
+              <div className="w-8 h-8 flex items-center justify-center">
+                <img
+                  src="https://gorbagana.wtf/images/gorb-logo.avif"
+                  alt="GOR Logo"
+                  className="w-8 h-8 rounded-lg object-contain"
+                />
+              </div>
+              <span className="text-xl font-bold text-white">Dumpster</span>
+            </Link>
+          </div>
+
+          {/* Center Section - Search Bar */}
+          <div className="flex justify-center">
+            <div className="relative max-w-xl w-full">
+              <input
+                type="text"
+                placeholder="Search tokens, pools..."
+                className="w-full bg-gray-900/50 border border-gray-600 rounded-xl px-4 py-2 pl-4 pr-12 text-white placeholder-gray-400 focus:outline-none focus:border-green-500 focus:bg-gray-900 transition-all duration-200"
+              />
+              <button className="absolute right-0 top-0 h-full px-4 bg-green-600 hover:bg-green-700 rounded-r-xl border-l-0 transition-all duration-200 shadow-inner">
+                <MagnifyingGlassIcon className="w-4 h-4 text-white" />
+              </button>
+            </div>
+          </div>
+
+          {/* Right Section - Actions + Wallet */}
+          <div className="flex items-center justify-end space-x-4">
+            <Link 
+              href="/create-pool" 
+              className="flex items-center space-x-2 bg-green-600 hover:bg-green-700 px-4 py-2 rounded-xl text-white font-medium transition-all duration-200 shadow-lg hover:shadow-green-500/25"
+            >
+              <PlusIcon className="w-4 h-4" />
+              <span>Create</span>
             </Link>
             {publicKey ? (
               <div className="relative" ref={dropdownRef}>
                 <button
                   onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                  className="flex items-center space-x-2 bg-white/10 hover:bg-white/20 px-3 py-2 rounded-lg transition-colors"
+                  className="flex items-center space-x-2 bg-gray-800 hover:bg-gray-700 px-4 py-2 rounded-xl transition-all duration-200 border border-gray-600"
                 >
                   <span className="text-gray-300 text-sm">
                     {publicKey.toBase58().slice(0, 4)}...{publicKey.toBase58().slice(-4)}
@@ -115,7 +150,7 @@ export const Header = () => {
             ) : (
               <button
                 onClick={handleConnectWallet}
-                className="bg-green-600 hover:bg-green-700 px-3 py-1.5 rounded-lg text-white font-medium transition"
+                className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-xl text-white font-medium transition-all duration-200 shadow-lg hover:shadow-green-500/25"
               >
                 Connect Wallet
               </button>

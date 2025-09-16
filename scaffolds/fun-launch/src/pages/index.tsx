@@ -1,4 +1,3 @@
-import Explore from '@/components/Explore';
 import Page from '@/components/ui/Page/Page';
 
 export default function Index() {
@@ -10,7 +9,7 @@ export default function Index() {
           Where Trash Tokens Moon 🚀♻️
         </p>
       </div>
-      <Explore />
+      {/* Content to be added later */}
     </Page>
   );
 }

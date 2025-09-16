@@ -17,6 +17,8 @@ import { Connection, PublicKey } from '@solana/web3.js';
 import { DynamicBondingCurveClient } from '@meteora-ag/dynamic-bonding-curve-sdk';
 import { NATIVE_MINT, getMint } from '@solana/spl-token';
 import { GOR_CONFIG } from '@/config/gor-config';
+import { getBondingCurveStatus, calculateTokenPrice, calculateMarketCap, calculateLiquidity } from '@/utils/bondingCurveHelpers';
+import { debugAllTokenStatuses, logMigrationProgressMapping } from '@/utils/debugTokenStatus';
 
 // All data fetched from GOR chain - no external APIs needed
 
@@ -31,39 +33,64 @@ export class ApeClient {
   }> {
     const result: any = {};
 
-    if (req.recent) {
-      const response = await ky.get('/api/tokens').json<{ tokens: { mintAddress: string; createdAt: string; name: string; symbol: string; imageUrl: string | null }[] }>();
+    // Get all tokens from database
+    const response = await ky.get('/api/tokens').json<{ tokens: { mintAddress: string; createdAt: string; name: string; symbol: string; imageUrl: string | null }[] }>();
 
-      const pools = await Promise.all(
-        response.tokens.map(async (token) => {
-          try {
-            const tokenInfo = await ApeClient.getGorTokenInfo(token.mintAddress);
-            const pool = tokenInfo.pools[0];
-            if (pool) {
-              pool.createdAt = token.createdAt;
-              pool.baseAsset.name = token.name || pool.baseAsset.name;
-              pool.baseAsset.symbol = token.symbol || pool.baseAsset.symbol;
-              if (token.imageUrl) {
-                pool.baseAsset.icon = token.imageUrl; // Set icon for UI rendering
-                pool.baseAsset.image = token.imageUrl; // Also set image for completeness
-              }
+    // Fetch all token info with bonding status
+    const allPoolsWithInfo = await Promise.all(
+      response.tokens.map(async (token) => {
+        try {
+          const tokenInfo = await ApeClient.getGorTokenInfo(token.mintAddress);
+          const pool = tokenInfo.pools[0];
+          if (pool) {
+            pool.createdAt = token.createdAt;
+            pool.baseAsset.name = token.name || pool.baseAsset.name;
+            pool.baseAsset.symbol = token.symbol || pool.baseAsset.symbol;
+            if (token.imageUrl) {
+              pool.baseAsset.icon = token.imageUrl;
+              pool.baseAsset.image = token.imageUrl;
             }
-            return pool;
-          } catch (error) {
-            console.error(`Failed to fetch info for token ${token.mintAddress}:`, error);
-            return null;
           }
-        })
-      );
+          return pool;
+        } catch (error) {
+          console.error(`Failed to fetch info for token ${token.mintAddress}:`, error);
+          return null;
+        }
+      })
+    );
 
-      result.recent = { pools: pools.filter((p): p is Pool => p !== null) };
+    const validPools = allPoolsWithInfo.filter((p): p is Pool => p !== null);
+
+    // Debug logging to help troubleshoot token visibility
+    console.log('🔍 Debug: Token filtering started');
+    logMigrationProgressMapping();
+    debugAllTokenStatuses(validPools);
+
+    if (req.recent) {
+      // Filter for actively bonding tokens (PreBondingCurve)
+      const recentPools = validPools.filter(pool => 
+        pool.baseAsset.isBonding === true
+      );
+      console.log(`📝 Recent tokens filtered: ${recentPools.length}/${validPools.length}`);
+      result.recent = { pools: recentPools };
     }
 
     if (req.graduated) {
-      result.graduated = { pools: [] };
+      // Filter for graduated tokens (CreatedPool)
+      const graduatedPools = validPools.filter(pool => 
+        pool.baseAsset.isGraduated === true
+      );
+      console.log(`🎓 Graduated tokens filtered: ${graduatedPools.length}/${validPools.length}`);
+      result.graduated = { pools: graduatedPools };
     }
+
     if (req.aboutToGraduate) {
-      result.aboutToGraduate = { pools: [] };
+      // Filter for tokens about to graduate (PostBondingCurve or LockedVesting)
+      const aboutToGraduatePools = validPools.filter(pool => 
+        pool.baseAsset.isAboutToGraduate === true
+      );
+      console.log(`🚀 About to graduate tokens filtered: ${aboutToGraduatePools.length}/${validPools.length}`);
+      result.aboutToGraduate = { pools: aboutToGraduatePools };
     }
 
     return result;
@@ -137,19 +164,38 @@ export class ApeClient {
       const mintInfo = await getMint(connection, baseMint);
       const totalSupply = Number(mintInfo.supply) / Math.pow(10, mintInfo.decimals);
       
+      // Get migration progress and bonding curve status
+      const migrationProgress = poolState.migrationProgress;
+      const quoteReserve = Number(poolState.quoteReserve);
+      const migrationThreshold = Number(poolConfig.migrationQuoteThreshold);
+      
+      // Use helper to get comprehensive status
+      const bondingStatus = getBondingCurveStatus(migrationProgress, quoteReserve, migrationThreshold);
+      
+      // Calculate pricing using helper functions
+      const solPriceInUSD = 150; // TODO: Fetch real SOL price from oracle
+      const currentPrice = calculateTokenPrice(quoteReserve, totalSupply, bondingStatus.completionPercentage, solPriceInUSD);
+      const marketCap = calculateMarketCap(currentPrice, totalSupply);
+      const liquidity = calculateLiquidity(quoteReserve, solPriceInUSD);
+      
       // TODO: Fetch metadata properly using metaplex
       const tokenMetadata: { name: string; symbol: string; image: string | null } = { name: 'Unknown', symbol: 'UNK', image: null }; // Placeholder
+      
+      // Determine graduation timestamp
+      const graduatedAt = bondingStatus.isGraduated && poolState.finishCurveTimestamp 
+        ? new Date(Number(poolState.finishCurveTimestamp) * 1000).toISOString()
+        : undefined;
         
       const pool: Pool = {
         id: `${tokenMint}`,
         chain: 'gor',
         dex: 'meteora-dbc',
         type: 'bonding-curve',
-        createdAt: '2024-01-01T00:00:00.000Z', // TODO: Get actual createdAt
-        bondingCurve: 0, // TODO: Calculate from poolState
-        volume24h: 0, // TODO: Implement
+        createdAt: '2024-01-01T00:00:00.000Z', // TODO: Get actual createdAt from pool creation
+        bondingCurve: bondingStatus.completionPercentage,
+        volume24h: 0, // TODO: Implement from transaction history
         isUnreliable: false,
-        updatedAt: '2024-01-01T00:00:00.000Z',
+        updatedAt: new Date().toISOString(),
         baseAsset: {
           id: tokenMint,
           name: tokenMetadata.name,
@@ -158,14 +204,21 @@ export class ApeClient {
           circSupply: totalSupply,
           totalSupply: totalSupply,
           tokenProgram,
-          usdPrice: 0, // TODO: Calculate from poolState
-          mcap: 0, // TODO: Calculate
-          liquidity: 0, // TODO: From poolState
+          usdPrice: currentPrice,
+          mcap: marketCap,
+          liquidity: liquidity,
+          graduatedAt: graduatedAt,
           stats24h: {
-            priceChange: 0 // TODO: Implement
+            priceChange: 0 // TODO: Implement from historical data
           },
           organicScoreLabel: 'medium' as const,
-          image: tokenMetadata.image
+          image: tokenMetadata.image,
+          // Add migration status info using helper
+          migrationProgress: migrationProgress,
+          isBonding: bondingStatus.isBonding,
+          isAboutToGraduate: bondingStatus.isAboutToGraduate,
+          isGraduated: bondingStatus.isGraduated,
+          canTrade: bondingStatus.canTrade
         }
       };
 
@@ -235,9 +288,9 @@ export class ApeClient {
     
     // Get description from metadata
     try {
-      const connection = new Connection(GOR_CONFIG.RPC_URL, 'confirmed');
-      const tokenMint = new PublicKey(assetId);
-      // TODO: Implement proper metadata fetching
+      // TODO: Implement proper metadata fetching using connection and tokenMint
+      // const connection = new Connection(GOR_CONFIG.RPC_URL, 'confirmed');
+      // const tokenMint = new PublicKey(assetId);
       const metadata = { description: '' };
       return {
         description: metadata?.description

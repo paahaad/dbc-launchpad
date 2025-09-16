@@ -23,7 +23,7 @@
    * 2. dbc-migrate-damm-v1
    * 3. dbc-migrate-damm-v2
    */
-  "baseMint": "YOUR_BASE_MINT_ADDRESS",
+  "baseMint": "GYUpPVftPnSmbpHRNPKrc2yvpq5MUzUbCBfwP5hijgor",
 
   /* Either use dbcConfigAddress or dbcConfig, but not both.
    *

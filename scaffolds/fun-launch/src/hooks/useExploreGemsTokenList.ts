@@ -10,7 +10,7 @@ export function useExploreGemsTokenList<T = QueryData<typeof ApeQueries.gemsToke
   return useQuery({
     ...ApeQueries.gemsTokenList(request),
     select,
-    refetchInterval: 5000, // Changed to 5 seconds
+    refetchInterval: 100000, // Changed to 5 seconds
     // TODO: set time, we dont want to keep inactive tabs in cache at all
   });
 }

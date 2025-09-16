@@ -7,7 +7,6 @@ type StoreTokenRequest = {
   tokenName: string;
   tokenSymbol: string;
   totalSupply: number;
-  bondingCurveSlope: number;
   website?: string;
   twitter?: string;
   description?: string;
@@ -43,7 +42,6 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
         twitter: tokenData.twitter,
         supply: tokenData.totalSupply.toString(),
         description: tokenData.description,
-        bondingCurveSlope: tokenData.bondingCurveSlope,
         metadataUrl: tokenData.metadataUrl,
         imageUrl: tokenData.imageUrl,
         contractAddress: tokenData.mintAddress,

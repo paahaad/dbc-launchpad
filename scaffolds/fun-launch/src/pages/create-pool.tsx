@@ -41,8 +41,6 @@ const dbcTokenSchema = z.object({
   tokenSymbol: z.string().min(1, 'Token symbol is required').max(10, 'Token symbol must be 10 characters or less'),
   tokenLogo: z.instanceof(File, { message: 'Token logo is required' }),
   totalSupply: z.number().min(1000, 'Total supply must be at least 1,000'),
-  initialPrice: z.number().min(0.000001, 'Initial price must be at least 0.000001'),
-  bondingCurveSlope: z.number().min(0.1, 'Bonding curve slope must be at least 0.1'),
   website: z.string().url({ message: 'Please enter a valid URL' }).optional().or(z.literal('')),
   twitter: z.string().url({ message: 'Please enter a valid URL' }).optional().or(z.literal('')),
   description: z.string().max(500, 'Description must be 500 characters or less').optional(),
@@ -53,8 +51,6 @@ interface DBCFormValues {
   tokenSymbol: string;
   tokenLogo: File;
   totalSupply: number;
-  initialPrice: number;
-  bondingCurveSlope: number;
   website?: string;
   twitter?: string;
   description?: string;
@@ -77,8 +73,6 @@ export default function CreatePool() {
       tokenSymbol: '',
       tokenLogo: undefined as File | undefined,
       totalSupply: 1000000,
-      initialPrice: 0.001,
-      bondingCurveSlope: 1.0,
       website: '',
       twitter: '',
       description: '',
@@ -127,8 +121,6 @@ export default function CreatePool() {
             tokenName: value.tokenName,
             tokenSymbol: value.tokenSymbol,
             totalSupply: value.totalSupply,
-            initialPrice: value.initialPrice,
-            bondingCurveSlope: value.bondingCurveSlope,
             description: value.description,
             userWallet: address,
           }),
@@ -193,7 +185,7 @@ export default function CreatePool() {
 
           setPoolCreated(true);
           setCreatedMintAddress(mintAddress);
-          toast.success(`DBC Token Pool created successfully! Mint: ${mintAddress}`, {
+          toast.success(`Token created successfully! Mint: ${mintAddress}`, {
             duration: 5000,
           });
           
@@ -203,7 +195,7 @@ export default function CreatePool() {
           }, 2000);
         }
       } catch (error) {
-        console.error('Error creating DBC pool:', error);
+        console.error('Error creating token:', error);
         
         // Handle specific wallet transaction errors
         if (error instanceof Error) {
@@ -219,7 +211,7 @@ export default function CreatePool() {
             toast.error(error.message);
           }
         } else {
-          toast.error('Failed to create DBC pool. Please try again.');
+          toast.error('Failed to create token pool. Please try again.');
         }
       } finally {
         setIsLoading(false);
@@ -242,20 +234,17 @@ export default function CreatePool() {
         <title>Launch Another Trash - Gorbagana Launchpad</title>
         <meta
           name="description"
-          content="Launch your trash token on the Gorbagana chain with Dynamic Bonding Curve for fair price discovery."
+          content="Launch your trash token on the Gorbagana chain for fair price discovery."
         />
       </Head>
 
       <div className="min-h-screen bg-black text-white">
-        {/* Header */}
-        <Header />
-
         {/* Page Content */}
         <main className="container mx-auto px-4 py-10">
           <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-10">
             <div>
-              <h1 className="text-4xl font-bold mb-2">Launch Another Trash</h1>
-              <p className="text-gray-300">Create your trash token on Gorbagana chain with Dynamic Bonding Curve</p>
+              <h1 className="text-xl font-bold mb-2">Launch Another Trash</h1>
+              <p className="text-gray-400">Create your trash token on Gorbagana chain</p>
             </div>
           </div>
 
@@ -388,71 +377,11 @@ export default function CreatePool() {
                 </div>
               </div>
 
-              {/* DBC Parameters Section */}
+              {/* Token Description Section */}
               <div className="bg-white/5 rounded-xl p-8 backdrop-blur-sm border border-white/10">
-                <h2 className="text-2xl font-bold mb-6">Dynamic Bonding Curve Parameters</h2>
+                <h2 className="text-2xl font-bold mb-6">Token Description</h2>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                  <div className="mb-4">
-                    <label
-                      htmlFor="initialPrice"
-                      className="block text-sm font-medium text-gray-300 mb-1"
-                    >
-                      Initial Price (SOL)*
-                    </label>
-                    {form.Field({
-                      name: 'initialPrice',
-                      children: (field) => (
-                        <input
-                          id="initialPrice"
-                          name={field.name}
-                          type="number"
-                          step="0.000001"
-                          className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white"
-                          placeholder="0.001"
-                          value={field.state.value}
-                          onChange={(e) => field.handleChange(Number(e.target.value))}
-                          required
-                          min={0.000001}
-                        />
-                      ),
-                    })}
-                    <p className="text-xs text-gray-400 mt-1">
-                      Starting price per token in SOL
-                    </p>
-                  </div>
-
-                  <div className="mb-4">
-                    <label
-                      htmlFor="bondingCurveSlope"
-                      className="block text-sm font-medium text-gray-300 mb-1"
-                    >
-                      Bonding Curve Slope*
-                    </label>
-                    {form.Field({
-                      name: 'bondingCurveSlope',
-                      children: (field) => (
-                        <input
-                          id="bondingCurveSlope"
-                          name={field.name}
-                          type="number"
-                          step="0.1"
-                          className="w-full p-3 bg-white/5 border border-white/10 rounded-lg text-white"
-                          placeholder="1.0"
-                          value={field.state.value}
-                          onChange={(e) => field.handleChange(Number(e.target.value))}
-                          required
-                          min={0.1}
-                        />
-                      ),
-                    })}
-                    <p className="text-xs text-gray-400 mt-1">
-                      Controls how quickly price increases with demand
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-6">
+                <div>
                   <label
                     htmlFor="description"
                     className="block text-sm font-medium text-gray-300 mb-1"
@@ -653,9 +582,9 @@ const PoolCreationSuccess = ({ mintAddress }: { mintAddress: string | null }) =>
         <div className="bg-green-500/20 p-4 rounded-full inline-flex mb-6">
           <span className="iconify ph--check-bold w-12 h-12 text-green-500" />
         </div>
-        <h2 className="text-3xl font-bold mb-4">DBC Token Launched Successfully!</h2>
+        <h2 className="text-3xl font-bold mb-4">Token Launched Successfully!</h2>
         <p className="text-gray-300 mb-4 max-w-lg mx-auto">
-          Your token with Dynamic Bonding Curve has been created and is now live on the DBC Launchpad. 
+          Your token has been created and is now live on the Gorbagana Launchpad. 
           Users can now discover and trade your tokens with fair price discovery.
         </p>
         {mintAddress && (

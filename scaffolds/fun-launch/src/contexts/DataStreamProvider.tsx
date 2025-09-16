@@ -72,8 +72,8 @@ export const DataStreamProvider = ({ children }: { children: React.ReactNode }) 
           const newPools = await Promise.all(
             response.tokens.map(async (token) => {
               try {
-                const tokenInfo = await ApeClient.getGorTokenInfo(token.mintAddress);
-                const pool = tokenInfo.pools[0];
+                // const tokenInfo = await ApeClient.getGorTokenInfo(token.mintAddress);
+                let pool: Pool | null = null;
                 if (pool) {
                   pool.createdAt = token.createdAt;
                   pool.baseAsset.name = token.name || pool.baseAsset.name;

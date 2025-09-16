@@ -120,6 +120,12 @@ exports.Prisma.TransactionIsolationLevel = makeStrictEnum({
   Serializable: 'Serializable'
 });
 
+exports.Prisma.GorScalarFieldEnum = {
+  id: 'id',
+  priceUsd: 'priceUsd',
+  fetchedAt: 'fetchedAt'
+};
+
 exports.Prisma.UserScalarFieldEnum = {
   id: 'id',
   name: 'name',
@@ -130,6 +136,7 @@ exports.Prisma.UserScalarFieldEnum = {
 
 exports.Prisma.TokenScalarFieldEnum = {
   id: 'id',
+  address: 'address',
   name: 'name',
   symbol: 'symbol',
   url: 'url',
@@ -138,12 +145,12 @@ exports.Prisma.TokenScalarFieldEnum = {
   website: 'website',
   twitter: 'twitter',
   supply: 'supply',
+  decimals: 'decimals',
   bondingCurveSlope: 'bondingCurveSlope',
   metadataUrl: 'metadataUrl',
   imageUrl: 'imageUrl',
   description: 'description',
   contractAddress: 'contractAddress',
-  decimals: 'decimals',
   marketCap: 'marketCap',
   totalRaised: 'totalRaised',
   launchDate: 'launchDate',
@@ -166,6 +173,96 @@ exports.Prisma.TokenPurchaseScalarFieldEnum = {
   updatedAt: 'updatedAt'
 };
 
+exports.Prisma.PoolConfigScalarFieldEnum = {
+  id: 'id',
+  address: 'address',
+  tradeFee: 'tradeFee',
+  protocolFee: 'protocolFee',
+  referralFee: 'referralFee',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PoolScalarFieldEnum = {
+  id: 'id',
+  address: 'address',
+  baseTokenId: 'baseTokenId',
+  quoteTokenId: 'quoteTokenId',
+  configId: 'configId',
+  creator: 'creator',
+  isActive: 'isActive',
+  totalVolume: 'totalVolume',
+  totalTrades: 'totalTrades',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.PoolStateScalarFieldEnum = {
+  id: 'id',
+  poolId: 'poolId',
+  lastUpdateTimestamp: 'lastUpdateTimestamp',
+  sqrtPriceReference: 'sqrtPriceReference',
+  volatilityAccumulator: 'volatilityAccumulator',
+  volatilityReference: 'volatilityReference',
+  baseReserve: 'baseReserve',
+  quoteReserve: 'quoteReserve',
+  currentPrice: 'currentPrice',
+  rawData: 'rawData',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.TokenLaunchScalarFieldEnum = {
+  id: 'id',
+  tokenId: 'tokenId',
+  poolId: 'poolId',
+  launchPrice: 'launchPrice',
+  initialSupply: 'initialSupply',
+  launchTxHash: 'launchTxHash',
+  launchedAt: 'launchedAt'
+};
+
+exports.Prisma.TokenHolderScalarFieldEnum = {
+  id: 'id',
+  tokenId: 'tokenId',
+  holder: 'holder',
+  balance: 'balance',
+  percentage: 'percentage',
+  acquiredAt: 'acquiredAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.TransactionScalarFieldEnum = {
+  id: 'id',
+  poolId: 'poolId',
+  tokenId: 'tokenId',
+  txHash: 'txHash',
+  txType: 'txType',
+  wallet: 'wallet',
+  amountIn: 'amountIn',
+  amountOut: 'amountOut',
+  fee: 'fee',
+  price: 'price',
+  timestamp: 'timestamp',
+  blockNumber: 'blockNumber',
+  gasUsed: 'gasUsed',
+  createdAt: 'createdAt'
+};
+
+exports.Prisma.PriceHistoryScalarFieldEnum = {
+  id: 'id',
+  poolId: 'poolId',
+  tokenId: 'tokenId',
+  price: 'price',
+  volume: 'volume',
+  timestamp: 'timestamp',
+  interval: 'interval',
+  openPrice: 'openPrice',
+  highPrice: 'highPrice',
+  lowPrice: 'lowPrice',
+  closePrice: 'closePrice',
+  createdAt: 'createdAt'
+};
+
 exports.Prisma.SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -180,12 +277,27 @@ exports.Prisma.NullsOrder = {
   first: 'first',
   last: 'last'
 };
-
+exports.TxType = exports.$Enums.TxType = {
+  BUY: 'BUY',
+  SELL: 'SELL',
+  CREATE_POOL: 'CREATE_POOL',
+  ADD_LIQUIDITY: 'ADD_LIQUIDITY',
+  REMOVE_LIQUIDITY: 'REMOVE_LIQUIDITY',
+  CLAIM_FEES: 'CLAIM_FEES'
+};
 
 exports.Prisma.ModelName = {
+  Gor: 'Gor',
   User: 'User',
   Token: 'Token',
-  TokenPurchase: 'TokenPurchase'
+  TokenPurchase: 'TokenPurchase',
+  PoolConfig: 'PoolConfig',
+  Pool: 'Pool',
+  PoolState: 'PoolState',
+  TokenLaunch: 'TokenLaunch',
+  TokenHolder: 'TokenHolder',
+  Transaction: 'Transaction',
+  PriceHistory: 'PriceHistory'
 };
 
 /**

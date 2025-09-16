@@ -7,6 +7,7 @@ import { useMemo, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useWindowWidthListener } from '@/lib/device';
 import { useWallet } from '@jup-ag/wallet-adapter';
+import { Layout } from '@/components/Layout';
 
 export default function App({ Component, pageProps }: AppProps) {
   const wallets: Adapter[] = useMemo(() => {
@@ -67,7 +68,9 @@ export default function App({ Component, pageProps }: AppProps) {
       >
         <UserCreator>
           <Toaster />
-          <Component {...pageProps} />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
         </UserCreator>
       </UnifiedWalletProvider>
     </QueryClientProvider>
