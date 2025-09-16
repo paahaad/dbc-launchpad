@@ -182,7 +182,7 @@ export default function Profile() {
           <ProfileSkeleton />
         ) : (
           <div className="space-y-6">
-            <Card>
+            <Card className="border-neutral-800 bg-neutral-900/50">
               <CardContent className="pt-6">
                 <div className="flex flex-col items-center space-y-4">
                   <Avatar className="h-24 w-24">
@@ -223,7 +223,7 @@ export default function Profile() {
             </Card>
 
             <div className="grid gap-6 md:grid-cols-2">
-              <Card>
+              <Card className="border-neutral-800 bg-neutral-900/50">
                 <CardHeader className="flex flex-row items-center space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium flex items-center gap-2">
                     <Wallet className="h-4 w-4" />
@@ -236,7 +236,7 @@ export default function Profile() {
                 </CardContent>
               </Card>
 
-              <Card>
+              <Card className="border-neutral-800 bg-neutral-900/50">
                 <CardHeader className="flex flex-row items-center space-y-0 pb-2">
                   <CardTitle className="text-sm font-medium">Wallet Address</CardTitle>
                 </CardHeader>
@@ -268,7 +268,7 @@ export default function Profile() {
               </Card>
             </div>
 
-            <Card>
+            <Card className="border-neutral-800 bg-neutral-900/50">
               <CardHeader className="flex flex-row items-center space-y-0 pb-2">
                 <CardTitle className="flex items-center gap-2">
                   Created Tokens
@@ -283,7 +283,7 @@ export default function Profile() {
                     {userData.launchedTokens.map((token: any) => (
                       <div
                         key={token.id}
-                        className="flex items-center justify-between p-3 border rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
+                        className="flex items-center justify-between p-3 border border-neutral-800 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
                         onClick={() => router.push(`/token/${token.mintAddress}`)}
                       >
                         <div className="space-y-1">

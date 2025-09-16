@@ -1789,11 +1789,13 @@ export namespace Prisma {
   export type UserCountOutputType = {
     launchedTokens: number
     purchases: number
+    watchlist: number
   }
 
   export type UserCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     launchedTokens?: boolean | UserCountOutputTypeCountLaunchedTokensArgs
     purchases?: boolean | UserCountOutputTypeCountPurchasesArgs
+    watchlist?: boolean | UserCountOutputTypeCountWatchlistArgs
   }
 
   // Custom InputTypes
@@ -1821,6 +1823,13 @@ export namespace Prisma {
     where?: TokenPurchaseWhereInput
   }
 
+  /**
+   * UserCountOutputType without action
+   */
+  export type UserCountOutputTypeCountWatchlistArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: TokenWhereInput
+  }
+
 
   /**
    * Count Type TokenCountOutputType
@@ -1834,6 +1843,7 @@ export namespace Prisma {
     transactions: number
     priceHistory: number
     purchases: number
+    watchedBy: number
   }
 
   export type TokenCountOutputTypeSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -1844,6 +1854,7 @@ export namespace Prisma {
     transactions?: boolean | TokenCountOutputTypeCountTransactionsArgs
     priceHistory?: boolean | TokenCountOutputTypeCountPriceHistoryArgs
     purchases?: boolean | TokenCountOutputTypeCountPurchasesArgs
+    watchedBy?: boolean | TokenCountOutputTypeCountWatchedByArgs
   }
 
   // Custom InputTypes
@@ -1904,6 +1915,13 @@ export namespace Prisma {
    */
   export type TokenCountOutputTypeCountPurchasesArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     where?: TokenPurchaseWhereInput
+  }
+
+  /**
+   * TokenCountOutputType without action
+   */
+  export type TokenCountOutputTypeCountWatchedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: UserWhereInput
   }
 
 
@@ -3135,6 +3153,7 @@ export namespace Prisma {
     updatedAt?: boolean
     launchedTokens?: boolean | User$launchedTokensArgs<ExtArgs>
     purchases?: boolean | User$purchasesArgs<ExtArgs>
+    watchlist?: boolean | User$watchlistArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["user"]>
 
@@ -3166,6 +3185,7 @@ export namespace Prisma {
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     launchedTokens?: boolean | User$launchedTokensArgs<ExtArgs>
     purchases?: boolean | User$purchasesArgs<ExtArgs>
+    watchlist?: boolean | User$watchlistArgs<ExtArgs>
     _count?: boolean | UserCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type UserIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {}
@@ -3176,6 +3196,7 @@ export namespace Prisma {
     objects: {
       launchedTokens: Prisma.$TokenPayload<ExtArgs>[]
       purchases: Prisma.$TokenPurchasePayload<ExtArgs>[]
+      watchlist: Prisma.$TokenPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
@@ -3579,6 +3600,7 @@ export namespace Prisma {
     readonly [Symbol.toStringTag]: "PrismaPromise"
     launchedTokens<T extends User$launchedTokensArgs<ExtArgs> = {}>(args?: Subset<T, User$launchedTokensArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     purchases<T extends User$purchasesArgs<ExtArgs> = {}>(args?: Subset<T, User$purchasesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenPurchasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    watchlist<T extends User$watchlistArgs<ExtArgs> = {}>(args?: Subset<T, User$watchlistArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4049,6 +4071,30 @@ export namespace Prisma {
   }
 
   /**
+   * User.watchlist
+   */
+  export type User$watchlistArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the Token
+     */
+    select?: TokenSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the Token
+     */
+    omit?: TokenOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: TokenInclude<ExtArgs> | null
+    where?: TokenWhereInput
+    orderBy?: TokenOrderByWithRelationInput | TokenOrderByWithRelationInput[]
+    cursor?: TokenWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: TokenScalarFieldEnum | TokenScalarFieldEnum[]
+  }
+
+  /**
    * User without action
    */
   export type UserDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4081,19 +4127,16 @@ export namespace Prisma {
 
   export type TokenAvgAggregateOutputType = {
     decimals: number | null
-    bondingCurveSlope: number | null
     holders: number | null
   }
 
   export type TokenSumAggregateOutputType = {
     decimals: number | null
-    bondingCurveSlope: number | null
     holders: number | null
   }
 
   export type TokenMinAggregateOutputType = {
     id: string | null
-    address: string | null
     name: string | null
     symbol: string | null
     url: string | null
@@ -4103,14 +4146,10 @@ export namespace Prisma {
     twitter: string | null
     supply: string | null
     decimals: number | null
-    bondingCurveSlope: number | null
     metadataUrl: string | null
     imageUrl: string | null
     description: string | null
-    contractAddress: string | null
     marketCap: string | null
-    totalRaised: string | null
-    launchDate: Date | null
     telegram: string | null
     discord: string | null
     holders: number | null
@@ -4120,7 +4159,6 @@ export namespace Prisma {
 
   export type TokenMaxAggregateOutputType = {
     id: string | null
-    address: string | null
     name: string | null
     symbol: string | null
     url: string | null
@@ -4130,14 +4168,10 @@ export namespace Prisma {
     twitter: string | null
     supply: string | null
     decimals: number | null
-    bondingCurveSlope: number | null
     metadataUrl: string | null
     imageUrl: string | null
     description: string | null
-    contractAddress: string | null
     marketCap: string | null
-    totalRaised: string | null
-    launchDate: Date | null
     telegram: string | null
     discord: string | null
     holders: number | null
@@ -4147,7 +4181,6 @@ export namespace Prisma {
 
   export type TokenCountAggregateOutputType = {
     id: number
-    address: number
     name: number
     symbol: number
     url: number
@@ -4157,14 +4190,10 @@ export namespace Prisma {
     twitter: number
     supply: number
     decimals: number
-    bondingCurveSlope: number
     metadataUrl: number
     imageUrl: number
     description: number
-    contractAddress: number
     marketCap: number
-    totalRaised: number
-    launchDate: number
     telegram: number
     discord: number
     holders: number
@@ -4176,19 +4205,16 @@ export namespace Prisma {
 
   export type TokenAvgAggregateInputType = {
     decimals?: true
-    bondingCurveSlope?: true
     holders?: true
   }
 
   export type TokenSumAggregateInputType = {
     decimals?: true
-    bondingCurveSlope?: true
     holders?: true
   }
 
   export type TokenMinAggregateInputType = {
     id?: true
-    address?: true
     name?: true
     symbol?: true
     url?: true
@@ -4198,14 +4224,10 @@ export namespace Prisma {
     twitter?: true
     supply?: true
     decimals?: true
-    bondingCurveSlope?: true
     metadataUrl?: true
     imageUrl?: true
     description?: true
-    contractAddress?: true
     marketCap?: true
-    totalRaised?: true
-    launchDate?: true
     telegram?: true
     discord?: true
     holders?: true
@@ -4215,7 +4237,6 @@ export namespace Prisma {
 
   export type TokenMaxAggregateInputType = {
     id?: true
-    address?: true
     name?: true
     symbol?: true
     url?: true
@@ -4225,14 +4246,10 @@ export namespace Prisma {
     twitter?: true
     supply?: true
     decimals?: true
-    bondingCurveSlope?: true
     metadataUrl?: true
     imageUrl?: true
     description?: true
-    contractAddress?: true
     marketCap?: true
-    totalRaised?: true
-    launchDate?: true
     telegram?: true
     discord?: true
     holders?: true
@@ -4242,7 +4259,6 @@ export namespace Prisma {
 
   export type TokenCountAggregateInputType = {
     id?: true
-    address?: true
     name?: true
     symbol?: true
     url?: true
@@ -4252,14 +4268,10 @@ export namespace Prisma {
     twitter?: true
     supply?: true
     decimals?: true
-    bondingCurveSlope?: true
     metadataUrl?: true
     imageUrl?: true
     description?: true
-    contractAddress?: true
     marketCap?: true
-    totalRaised?: true
-    launchDate?: true
     telegram?: true
     discord?: true
     holders?: true
@@ -4356,7 +4368,6 @@ export namespace Prisma {
 
   export type TokenGroupByOutputType = {
     id: string
-    address: string | null
     name: string
     symbol: string
     url: string
@@ -4364,16 +4375,12 @@ export namespace Prisma {
     userId: string
     website: string | null
     twitter: string | null
-    supply: string | null
+    supply: string
     decimals: number
-    bondingCurveSlope: number | null
-    metadataUrl: string | null
-    imageUrl: string | null
+    metadataUrl: string
+    imageUrl: string
     description: string | null
-    contractAddress: string | null
     marketCap: string | null
-    totalRaised: string
-    launchDate: Date | null
     telegram: string | null
     discord: string | null
     holders: number
@@ -4402,7 +4409,6 @@ export namespace Prisma {
 
   export type TokenSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    address?: boolean
     name?: boolean
     symbol?: boolean
     url?: boolean
@@ -4412,14 +4418,10 @@ export namespace Prisma {
     twitter?: boolean
     supply?: boolean
     decimals?: boolean
-    bondingCurveSlope?: boolean
     metadataUrl?: boolean
     imageUrl?: boolean
     description?: boolean
-    contractAddress?: boolean
     marketCap?: boolean
-    totalRaised?: boolean
-    launchDate?: boolean
     telegram?: boolean
     discord?: boolean
     holders?: boolean
@@ -4433,12 +4435,12 @@ export namespace Prisma {
     transactions?: boolean | Token$transactionsArgs<ExtArgs>
     priceHistory?: boolean | Token$priceHistoryArgs<ExtArgs>
     purchases?: boolean | Token$purchasesArgs<ExtArgs>
+    watchedBy?: boolean | Token$watchedByArgs<ExtArgs>
     _count?: boolean | TokenCountOutputTypeDefaultArgs<ExtArgs>
   }, ExtArgs["result"]["token"]>
 
   export type TokenSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    address?: boolean
     name?: boolean
     symbol?: boolean
     url?: boolean
@@ -4448,14 +4450,10 @@ export namespace Prisma {
     twitter?: boolean
     supply?: boolean
     decimals?: boolean
-    bondingCurveSlope?: boolean
     metadataUrl?: boolean
     imageUrl?: boolean
     description?: boolean
-    contractAddress?: boolean
     marketCap?: boolean
-    totalRaised?: boolean
-    launchDate?: boolean
     telegram?: boolean
     discord?: boolean
     holders?: boolean
@@ -4466,7 +4464,6 @@ export namespace Prisma {
 
   export type TokenSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
     id?: boolean
-    address?: boolean
     name?: boolean
     symbol?: boolean
     url?: boolean
@@ -4476,14 +4473,10 @@ export namespace Prisma {
     twitter?: boolean
     supply?: boolean
     decimals?: boolean
-    bondingCurveSlope?: boolean
     metadataUrl?: boolean
     imageUrl?: boolean
     description?: boolean
-    contractAddress?: boolean
     marketCap?: boolean
-    totalRaised?: boolean
-    launchDate?: boolean
     telegram?: boolean
     discord?: boolean
     holders?: boolean
@@ -4494,7 +4487,6 @@ export namespace Prisma {
 
   export type TokenSelectScalar = {
     id?: boolean
-    address?: boolean
     name?: boolean
     symbol?: boolean
     url?: boolean
@@ -4504,14 +4496,10 @@ export namespace Prisma {
     twitter?: boolean
     supply?: boolean
     decimals?: boolean
-    bondingCurveSlope?: boolean
     metadataUrl?: boolean
     imageUrl?: boolean
     description?: boolean
-    contractAddress?: boolean
     marketCap?: boolean
-    totalRaised?: boolean
-    launchDate?: boolean
     telegram?: boolean
     discord?: boolean
     holders?: boolean
@@ -4519,7 +4507,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type TokenOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "address" | "name" | "symbol" | "url" | "mintAddress" | "userId" | "website" | "twitter" | "supply" | "decimals" | "bondingCurveSlope" | "metadataUrl" | "imageUrl" | "description" | "contractAddress" | "marketCap" | "totalRaised" | "launchDate" | "telegram" | "discord" | "holders" | "createdAt" | "updatedAt", ExtArgs["result"]["token"]>
+  export type TokenOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "name" | "symbol" | "url" | "mintAddress" | "userId" | "website" | "twitter" | "supply" | "decimals" | "metadataUrl" | "imageUrl" | "description" | "marketCap" | "telegram" | "discord" | "holders" | "createdAt" | "updatedAt", ExtArgs["result"]["token"]>
   export type TokenInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     basePools?: boolean | Token$basePoolsArgs<ExtArgs>
@@ -4529,6 +4517,7 @@ export namespace Prisma {
     transactions?: boolean | Token$transactionsArgs<ExtArgs>
     priceHistory?: boolean | Token$priceHistoryArgs<ExtArgs>
     purchases?: boolean | Token$purchasesArgs<ExtArgs>
+    watchedBy?: boolean | Token$watchedByArgs<ExtArgs>
     _count?: boolean | TokenCountOutputTypeDefaultArgs<ExtArgs>
   }
   export type TokenIncludeCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
@@ -4549,10 +4538,10 @@ export namespace Prisma {
       transactions: Prisma.$TransactionPayload<ExtArgs>[]
       priceHistory: Prisma.$PriceHistoryPayload<ExtArgs>[]
       purchases: Prisma.$TokenPurchasePayload<ExtArgs>[]
+      watchedBy: Prisma.$UserPayload<ExtArgs>[]
     }
     scalars: $Extensions.GetPayloadResult<{
       id: string
-      address: string | null
       name: string
       symbol: string
       url: string
@@ -4560,16 +4549,12 @@ export namespace Prisma {
       userId: string
       website: string | null
       twitter: string | null
-      supply: string | null
+      supply: string
       decimals: number
-      bondingCurveSlope: number | null
-      metadataUrl: string | null
-      imageUrl: string | null
+      metadataUrl: string
+      imageUrl: string
       description: string | null
-      contractAddress: string | null
       marketCap: string | null
-      totalRaised: string
-      launchDate: Date | null
       telegram: string | null
       discord: string | null
       holders: number
@@ -4977,6 +4962,7 @@ export namespace Prisma {
     transactions<T extends Token$transactionsArgs<ExtArgs> = {}>(args?: Subset<T, Token$transactionsArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TransactionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     priceHistory<T extends Token$priceHistoryArgs<ExtArgs> = {}>(args?: Subset<T, Token$priceHistoryArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$PriceHistoryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     purchases<T extends Token$purchasesArgs<ExtArgs> = {}>(args?: Subset<T, Token$purchasesArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$TokenPurchasePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+    watchedBy<T extends Token$watchedByArgs<ExtArgs> = {}>(args?: Subset<T, Token$watchedByArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
     /**
      * Attaches callbacks for the resolution and/or rejection of the Promise.
      * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -5007,7 +4993,6 @@ export namespace Prisma {
    */
   interface TokenFieldRefs {
     readonly id: FieldRef<"Token", 'String'>
-    readonly address: FieldRef<"Token", 'String'>
     readonly name: FieldRef<"Token", 'String'>
     readonly symbol: FieldRef<"Token", 'String'>
     readonly url: FieldRef<"Token", 'String'>
@@ -5017,14 +5002,10 @@ export namespace Prisma {
     readonly twitter: FieldRef<"Token", 'String'>
     readonly supply: FieldRef<"Token", 'String'>
     readonly decimals: FieldRef<"Token", 'Int'>
-    readonly bondingCurveSlope: FieldRef<"Token", 'Float'>
     readonly metadataUrl: FieldRef<"Token", 'String'>
     readonly imageUrl: FieldRef<"Token", 'String'>
     readonly description: FieldRef<"Token", 'String'>
-    readonly contractAddress: FieldRef<"Token", 'String'>
     readonly marketCap: FieldRef<"Token", 'String'>
-    readonly totalRaised: FieldRef<"Token", 'String'>
-    readonly launchDate: FieldRef<"Token", 'DateTime'>
     readonly telegram: FieldRef<"Token", 'String'>
     readonly discord: FieldRef<"Token", 'String'>
     readonly holders: FieldRef<"Token", 'Int'>
@@ -5591,6 +5572,30 @@ export namespace Prisma {
     take?: number
     skip?: number
     distinct?: TokenPurchaseScalarFieldEnum | TokenPurchaseScalarFieldEnum[]
+  }
+
+  /**
+   * Token.watchedBy
+   */
+  export type Token$watchedByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the User
+     */
+    select?: UserSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the User
+     */
+    omit?: UserOmit<ExtArgs> | null
+    /**
+     * Choose, which related nodes to fetch as well
+     */
+    include?: UserInclude<ExtArgs> | null
+    where?: UserWhereInput
+    orderBy?: UserOrderByWithRelationInput | UserOrderByWithRelationInput[]
+    cursor?: UserWhereUniqueInput
+    take?: number
+    skip?: number
+    distinct?: UserScalarFieldEnum | UserScalarFieldEnum[]
   }
 
   /**
@@ -15007,7 +15012,6 @@ export namespace Prisma {
 
   export const TokenScalarFieldEnum: {
     id: 'id',
-    address: 'address',
     name: 'name',
     symbol: 'symbol',
     url: 'url',
@@ -15017,14 +15021,10 @@ export namespace Prisma {
     twitter: 'twitter',
     supply: 'supply',
     decimals: 'decimals',
-    bondingCurveSlope: 'bondingCurveSlope',
     metadataUrl: 'metadataUrl',
     imageUrl: 'imageUrl',
     description: 'description',
-    contractAddress: 'contractAddress',
     marketCap: 'marketCap',
-    totalRaised: 'totalRaised',
-    launchDate: 'launchDate',
     telegram: 'telegram',
     discord: 'discord',
     holders: 'holders',
@@ -15233,20 +15233,6 @@ export namespace Prisma {
 
 
   /**
-   * Reference to a field of type 'Float'
-   */
-  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
-    
-
-
-  /**
-   * Reference to a field of type 'Float[]'
-   */
-  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
-    
-
-
-  /**
    * Reference to a field of type 'Boolean'
    */
   export type BooleanFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Boolean'>
@@ -15264,6 +15250,20 @@ export namespace Prisma {
    * Reference to a field of type 'BigInt[]'
    */
   export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float'
+   */
+  export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
+    
+
+
+  /**
+   * Reference to a field of type 'Float[]'
+   */
+  export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 
@@ -15337,6 +15337,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"User"> | Date | string
     launchedTokens?: TokenListRelationFilter
     purchases?: TokenPurchaseListRelationFilter
+    watchlist?: TokenListRelationFilter
   }
 
   export type UserOrderByWithRelationInput = {
@@ -15347,6 +15348,7 @@ export namespace Prisma {
     updatedAt?: SortOrder
     launchedTokens?: TokenOrderByRelationAggregateInput
     purchases?: TokenPurchaseOrderByRelationAggregateInput
+    watchlist?: TokenOrderByRelationAggregateInput
   }
 
   export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -15360,6 +15362,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"User"> | Date | string
     launchedTokens?: TokenListRelationFilter
     purchases?: TokenPurchaseListRelationFilter
+    watchlist?: TokenListRelationFilter
   }, "id" | "address">
 
   export type UserOrderByWithAggregationInput = {
@@ -15389,7 +15392,6 @@ export namespace Prisma {
     OR?: TokenWhereInput[]
     NOT?: TokenWhereInput | TokenWhereInput[]
     id?: StringFilter<"Token"> | string
-    address?: StringNullableFilter<"Token"> | string | null
     name?: StringFilter<"Token"> | string
     symbol?: StringFilter<"Token"> | string
     url?: StringFilter<"Token"> | string
@@ -15397,16 +15399,12 @@ export namespace Prisma {
     userId?: StringFilter<"Token"> | string
     website?: StringNullableFilter<"Token"> | string | null
     twitter?: StringNullableFilter<"Token"> | string | null
-    supply?: StringNullableFilter<"Token"> | string | null
+    supply?: StringFilter<"Token"> | string
     decimals?: IntFilter<"Token"> | number
-    bondingCurveSlope?: FloatNullableFilter<"Token"> | number | null
-    metadataUrl?: StringNullableFilter<"Token"> | string | null
-    imageUrl?: StringNullableFilter<"Token"> | string | null
+    metadataUrl?: StringFilter<"Token"> | string
+    imageUrl?: StringFilter<"Token"> | string
     description?: StringNullableFilter<"Token"> | string | null
-    contractAddress?: StringNullableFilter<"Token"> | string | null
     marketCap?: StringNullableFilter<"Token"> | string | null
-    totalRaised?: StringFilter<"Token"> | string
-    launchDate?: DateTimeNullableFilter<"Token"> | Date | string | null
     telegram?: StringNullableFilter<"Token"> | string | null
     discord?: StringNullableFilter<"Token"> | string | null
     holders?: IntFilter<"Token"> | number
@@ -15420,11 +15418,11 @@ export namespace Prisma {
     transactions?: TransactionListRelationFilter
     priceHistory?: PriceHistoryListRelationFilter
     purchases?: TokenPurchaseListRelationFilter
+    watchedBy?: UserListRelationFilter
   }
 
   export type TokenOrderByWithRelationInput = {
     id?: SortOrder
-    address?: SortOrderInput | SortOrder
     name?: SortOrder
     symbol?: SortOrder
     url?: SortOrder
@@ -15432,16 +15430,12 @@ export namespace Prisma {
     userId?: SortOrder
     website?: SortOrderInput | SortOrder
     twitter?: SortOrderInput | SortOrder
-    supply?: SortOrderInput | SortOrder
+    supply?: SortOrder
     decimals?: SortOrder
-    bondingCurveSlope?: SortOrderInput | SortOrder
-    metadataUrl?: SortOrderInput | SortOrder
-    imageUrl?: SortOrderInput | SortOrder
+    metadataUrl?: SortOrder
+    imageUrl?: SortOrder
     description?: SortOrderInput | SortOrder
-    contractAddress?: SortOrderInput | SortOrder
     marketCap?: SortOrderInput | SortOrder
-    totalRaised?: SortOrder
-    launchDate?: SortOrderInput | SortOrder
     telegram?: SortOrderInput | SortOrder
     discord?: SortOrderInput | SortOrder
     holders?: SortOrder
@@ -15455,13 +15449,12 @@ export namespace Prisma {
     transactions?: TransactionOrderByRelationAggregateInput
     priceHistory?: PriceHistoryOrderByRelationAggregateInput
     purchases?: TokenPurchaseOrderByRelationAggregateInput
+    watchedBy?: UserOrderByRelationAggregateInput
   }
 
   export type TokenWhereUniqueInput = Prisma.AtLeast<{
     id?: string
-    address?: string
     mintAddress?: string
-    contractAddress?: string
     AND?: TokenWhereInput | TokenWhereInput[]
     OR?: TokenWhereInput[]
     NOT?: TokenWhereInput | TokenWhereInput[]
@@ -15471,15 +15464,12 @@ export namespace Prisma {
     userId?: StringFilter<"Token"> | string
     website?: StringNullableFilter<"Token"> | string | null
     twitter?: StringNullableFilter<"Token"> | string | null
-    supply?: StringNullableFilter<"Token"> | string | null
+    supply?: StringFilter<"Token"> | string
     decimals?: IntFilter<"Token"> | number
-    bondingCurveSlope?: FloatNullableFilter<"Token"> | number | null
-    metadataUrl?: StringNullableFilter<"Token"> | string | null
-    imageUrl?: StringNullableFilter<"Token"> | string | null
+    metadataUrl?: StringFilter<"Token"> | string
+    imageUrl?: StringFilter<"Token"> | string
     description?: StringNullableFilter<"Token"> | string | null
     marketCap?: StringNullableFilter<"Token"> | string | null
-    totalRaised?: StringFilter<"Token"> | string
-    launchDate?: DateTimeNullableFilter<"Token"> | Date | string | null
     telegram?: StringNullableFilter<"Token"> | string | null
     discord?: StringNullableFilter<"Token"> | string | null
     holders?: IntFilter<"Token"> | number
@@ -15493,11 +15483,11 @@ export namespace Prisma {
     transactions?: TransactionListRelationFilter
     priceHistory?: PriceHistoryListRelationFilter
     purchases?: TokenPurchaseListRelationFilter
-  }, "id" | "address" | "mintAddress" | "contractAddress">
+    watchedBy?: UserListRelationFilter
+  }, "id" | "mintAddress">
 
   export type TokenOrderByWithAggregationInput = {
     id?: SortOrder
-    address?: SortOrderInput | SortOrder
     name?: SortOrder
     symbol?: SortOrder
     url?: SortOrder
@@ -15505,16 +15495,12 @@ export namespace Prisma {
     userId?: SortOrder
     website?: SortOrderInput | SortOrder
     twitter?: SortOrderInput | SortOrder
-    supply?: SortOrderInput | SortOrder
+    supply?: SortOrder
     decimals?: SortOrder
-    bondingCurveSlope?: SortOrderInput | SortOrder
-    metadataUrl?: SortOrderInput | SortOrder
-    imageUrl?: SortOrderInput | SortOrder
+    metadataUrl?: SortOrder
+    imageUrl?: SortOrder
     description?: SortOrderInput | SortOrder
-    contractAddress?: SortOrderInput | SortOrder
     marketCap?: SortOrderInput | SortOrder
-    totalRaised?: SortOrder
-    launchDate?: SortOrderInput | SortOrder
     telegram?: SortOrderInput | SortOrder
     discord?: SortOrderInput | SortOrder
     holders?: SortOrder
@@ -15532,7 +15518,6 @@ export namespace Prisma {
     OR?: TokenScalarWhereWithAggregatesInput[]
     NOT?: TokenScalarWhereWithAggregatesInput | TokenScalarWhereWithAggregatesInput[]
     id?: StringWithAggregatesFilter<"Token"> | string
-    address?: StringNullableWithAggregatesFilter<"Token"> | string | null
     name?: StringWithAggregatesFilter<"Token"> | string
     symbol?: StringWithAggregatesFilter<"Token"> | string
     url?: StringWithAggregatesFilter<"Token"> | string
@@ -15540,16 +15525,12 @@ export namespace Prisma {
     userId?: StringWithAggregatesFilter<"Token"> | string
     website?: StringNullableWithAggregatesFilter<"Token"> | string | null
     twitter?: StringNullableWithAggregatesFilter<"Token"> | string | null
-    supply?: StringNullableWithAggregatesFilter<"Token"> | string | null
+    supply?: StringWithAggregatesFilter<"Token"> | string
     decimals?: IntWithAggregatesFilter<"Token"> | number
-    bondingCurveSlope?: FloatNullableWithAggregatesFilter<"Token"> | number | null
-    metadataUrl?: StringNullableWithAggregatesFilter<"Token"> | string | null
-    imageUrl?: StringNullableWithAggregatesFilter<"Token"> | string | null
+    metadataUrl?: StringWithAggregatesFilter<"Token"> | string
+    imageUrl?: StringWithAggregatesFilter<"Token"> | string
     description?: StringNullableWithAggregatesFilter<"Token"> | string | null
-    contractAddress?: StringNullableWithAggregatesFilter<"Token"> | string | null
     marketCap?: StringNullableWithAggregatesFilter<"Token"> | string | null
-    totalRaised?: StringWithAggregatesFilter<"Token"> | string
-    launchDate?: DateTimeNullableWithAggregatesFilter<"Token"> | Date | string | null
     telegram?: StringNullableWithAggregatesFilter<"Token"> | string | null
     discord?: StringNullableWithAggregatesFilter<"Token"> | string | null
     holders?: IntWithAggregatesFilter<"Token"> | number
@@ -16283,6 +16264,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     launchedTokens?: TokenCreateNestedManyWithoutUserInput
     purchases?: TokenPurchaseCreateNestedManyWithoutUserInput
+    watchlist?: TokenCreateNestedManyWithoutWatchedByInput
   }
 
   export type UserUncheckedCreateInput = {
@@ -16293,6 +16275,7 @@ export namespace Prisma {
     updatedAt?: Date | string
     launchedTokens?: TokenUncheckedCreateNestedManyWithoutUserInput
     purchases?: TokenPurchaseUncheckedCreateNestedManyWithoutUserInput
+    watchlist?: TokenUncheckedCreateNestedManyWithoutWatchedByInput
   }
 
   export type UserUpdateInput = {
@@ -16303,6 +16286,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     launchedTokens?: TokenUpdateManyWithoutUserNestedInput
     purchases?: TokenPurchaseUpdateManyWithoutUserNestedInput
+    watchlist?: TokenUpdateManyWithoutWatchedByNestedInput
   }
 
   export type UserUncheckedUpdateInput = {
@@ -16313,6 +16297,7 @@ export namespace Prisma {
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     launchedTokens?: TokenUncheckedUpdateManyWithoutUserNestedInput
     purchases?: TokenPurchaseUncheckedUpdateManyWithoutUserNestedInput
+    watchlist?: TokenUncheckedUpdateManyWithoutWatchedByNestedInput
   }
 
   export type UserCreateManyInput = {
@@ -16341,23 +16326,18 @@ export namespace Prisma {
 
   export type TokenCreateInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
     mintAddress: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -16371,11 +16351,11 @@ export namespace Prisma {
     transactions?: TransactionCreateNestedManyWithoutTokenInput
     priceHistory?: PriceHistoryCreateNestedManyWithoutTokenInput
     purchases?: TokenPurchaseCreateNestedManyWithoutTokenInput
+    watchedBy?: UserCreateNestedManyWithoutWatchlistInput
   }
 
   export type TokenUncheckedCreateInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
@@ -16383,16 +16363,12 @@ export namespace Prisma {
     userId: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -16405,27 +16381,23 @@ export namespace Prisma {
     transactions?: TransactionUncheckedCreateNestedManyWithoutTokenInput
     priceHistory?: PriceHistoryUncheckedCreateNestedManyWithoutTokenInput
     purchases?: TokenPurchaseUncheckedCreateNestedManyWithoutTokenInput
+    watchedBy?: UserUncheckedCreateNestedManyWithoutWatchlistInput
   }
 
   export type TokenUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     mintAddress?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -16439,11 +16411,11 @@ export namespace Prisma {
     transactions?: TransactionUpdateManyWithoutTokenNestedInput
     priceHistory?: PriceHistoryUpdateManyWithoutTokenNestedInput
     purchases?: TokenPurchaseUpdateManyWithoutTokenNestedInput
+    watchedBy?: UserUpdateManyWithoutWatchlistNestedInput
   }
 
   export type TokenUncheckedUpdateInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
@@ -16451,16 +16423,12 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -16473,11 +16441,11 @@ export namespace Prisma {
     transactions?: TransactionUncheckedUpdateManyWithoutTokenNestedInput
     priceHistory?: PriceHistoryUncheckedUpdateManyWithoutTokenNestedInput
     purchases?: TokenPurchaseUncheckedUpdateManyWithoutTokenNestedInput
+    watchedBy?: UserUncheckedUpdateManyWithoutWatchlistNestedInput
   }
 
   export type TokenCreateManyInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
@@ -16485,16 +16453,12 @@ export namespace Prisma {
     userId: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -16504,23 +16468,18 @@ export namespace Prisma {
 
   export type TokenUpdateManyMutationInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     mintAddress?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -16530,7 +16489,6 @@ export namespace Prisma {
 
   export type TokenUncheckedUpdateManyInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
@@ -16538,16 +16496,12 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -17445,28 +17399,6 @@ export namespace Prisma {
     not?: NestedIntFilter<$PrismaModel> | number
   }
 
-  export type FloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type DateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
   export type UserScalarRelationFilter = {
     is?: UserWhereInput
     isNot?: UserWhereInput
@@ -17502,6 +17434,12 @@ export namespace Prisma {
     none?: PriceHistoryWhereInput
   }
 
+  export type UserListRelationFilter = {
+    every?: UserWhereInput
+    some?: UserWhereInput
+    none?: UserWhereInput
+  }
+
   export type PoolOrderByRelationAggregateInput = {
     _count?: SortOrder
   }
@@ -17522,9 +17460,12 @@ export namespace Prisma {
     _count?: SortOrder
   }
 
+  export type UserOrderByRelationAggregateInput = {
+    _count?: SortOrder
+  }
+
   export type TokenCountOrderByAggregateInput = {
     id?: SortOrder
-    address?: SortOrder
     name?: SortOrder
     symbol?: SortOrder
     url?: SortOrder
@@ -17534,14 +17475,10 @@ export namespace Prisma {
     twitter?: SortOrder
     supply?: SortOrder
     decimals?: SortOrder
-    bondingCurveSlope?: SortOrder
     metadataUrl?: SortOrder
     imageUrl?: SortOrder
     description?: SortOrder
-    contractAddress?: SortOrder
     marketCap?: SortOrder
-    totalRaised?: SortOrder
-    launchDate?: SortOrder
     telegram?: SortOrder
     discord?: SortOrder
     holders?: SortOrder
@@ -17551,13 +17488,11 @@ export namespace Prisma {
 
   export type TokenAvgOrderByAggregateInput = {
     decimals?: SortOrder
-    bondingCurveSlope?: SortOrder
     holders?: SortOrder
   }
 
   export type TokenMaxOrderByAggregateInput = {
     id?: SortOrder
-    address?: SortOrder
     name?: SortOrder
     symbol?: SortOrder
     url?: SortOrder
@@ -17567,14 +17502,10 @@ export namespace Prisma {
     twitter?: SortOrder
     supply?: SortOrder
     decimals?: SortOrder
-    bondingCurveSlope?: SortOrder
     metadataUrl?: SortOrder
     imageUrl?: SortOrder
     description?: SortOrder
-    contractAddress?: SortOrder
     marketCap?: SortOrder
-    totalRaised?: SortOrder
-    launchDate?: SortOrder
     telegram?: SortOrder
     discord?: SortOrder
     holders?: SortOrder
@@ -17584,7 +17515,6 @@ export namespace Prisma {
 
   export type TokenMinOrderByAggregateInput = {
     id?: SortOrder
-    address?: SortOrder
     name?: SortOrder
     symbol?: SortOrder
     url?: SortOrder
@@ -17594,14 +17524,10 @@ export namespace Prisma {
     twitter?: SortOrder
     supply?: SortOrder
     decimals?: SortOrder
-    bondingCurveSlope?: SortOrder
     metadataUrl?: SortOrder
     imageUrl?: SortOrder
     description?: SortOrder
-    contractAddress?: SortOrder
     marketCap?: SortOrder
-    totalRaised?: SortOrder
-    launchDate?: SortOrder
     telegram?: SortOrder
     discord?: SortOrder
     holders?: SortOrder
@@ -17611,7 +17537,6 @@ export namespace Prisma {
 
   export type TokenSumOrderByAggregateInput = {
     decimals?: SortOrder
-    bondingCurveSlope?: SortOrder
     holders?: SortOrder
   }
 
@@ -17629,36 +17554,6 @@ export namespace Prisma {
     _sum?: NestedIntFilter<$PrismaModel>
     _min?: NestedIntFilter<$PrismaModel>
     _max?: NestedIntFilter<$PrismaModel>
-  }
-
-  export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedFloatNullableFilter<$PrismaModel>
-    _min?: NestedFloatNullableFilter<$PrismaModel>
-    _max?: NestedFloatNullableFilter<$PrismaModel>
-  }
-
-  export type DateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type TokenScalarRelationFilter = {
@@ -17940,6 +17835,17 @@ export namespace Prisma {
     launchedAt?: SortOrder
   }
 
+  export type FloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
   export type TokenHolderTokenIdHolderCompoundUniqueInput = {
     tokenId: string
     holder: string
@@ -17981,6 +17887,22 @@ export namespace Prisma {
 
   export type TokenHolderSumOrderByAggregateInput = {
     percentage?: SortOrder
+  }
+
+  export type FloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedFloatNullableFilter<$PrismaModel>
+    _min?: NestedFloatNullableFilter<$PrismaModel>
+    _max?: NestedFloatNullableFilter<$PrismaModel>
   }
 
   export type EnumTxTypeFilter<$PrismaModel = never> = {
@@ -18147,6 +18069,12 @@ export namespace Prisma {
     connect?: TokenPurchaseWhereUniqueInput | TokenPurchaseWhereUniqueInput[]
   }
 
+  export type TokenCreateNestedManyWithoutWatchedByInput = {
+    create?: XOR<TokenCreateWithoutWatchedByInput, TokenUncheckedCreateWithoutWatchedByInput> | TokenCreateWithoutWatchedByInput[] | TokenUncheckedCreateWithoutWatchedByInput[]
+    connectOrCreate?: TokenCreateOrConnectWithoutWatchedByInput | TokenCreateOrConnectWithoutWatchedByInput[]
+    connect?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
+  }
+
   export type TokenUncheckedCreateNestedManyWithoutUserInput = {
     create?: XOR<TokenCreateWithoutUserInput, TokenUncheckedCreateWithoutUserInput> | TokenCreateWithoutUserInput[] | TokenUncheckedCreateWithoutUserInput[]
     connectOrCreate?: TokenCreateOrConnectWithoutUserInput | TokenCreateOrConnectWithoutUserInput[]
@@ -18159,6 +18087,12 @@ export namespace Prisma {
     connectOrCreate?: TokenPurchaseCreateOrConnectWithoutUserInput | TokenPurchaseCreateOrConnectWithoutUserInput[]
     createMany?: TokenPurchaseCreateManyUserInputEnvelope
     connect?: TokenPurchaseWhereUniqueInput | TokenPurchaseWhereUniqueInput[]
+  }
+
+  export type TokenUncheckedCreateNestedManyWithoutWatchedByInput = {
+    create?: XOR<TokenCreateWithoutWatchedByInput, TokenUncheckedCreateWithoutWatchedByInput> | TokenCreateWithoutWatchedByInput[] | TokenUncheckedCreateWithoutWatchedByInput[]
+    connectOrCreate?: TokenCreateOrConnectWithoutWatchedByInput | TokenCreateOrConnectWithoutWatchedByInput[]
+    connect?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
   }
 
   export type NullableStringFieldUpdateOperationsInput = {
@@ -18193,6 +18127,19 @@ export namespace Prisma {
     deleteMany?: TokenPurchaseScalarWhereInput | TokenPurchaseScalarWhereInput[]
   }
 
+  export type TokenUpdateManyWithoutWatchedByNestedInput = {
+    create?: XOR<TokenCreateWithoutWatchedByInput, TokenUncheckedCreateWithoutWatchedByInput> | TokenCreateWithoutWatchedByInput[] | TokenUncheckedCreateWithoutWatchedByInput[]
+    connectOrCreate?: TokenCreateOrConnectWithoutWatchedByInput | TokenCreateOrConnectWithoutWatchedByInput[]
+    upsert?: TokenUpsertWithWhereUniqueWithoutWatchedByInput | TokenUpsertWithWhereUniqueWithoutWatchedByInput[]
+    set?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
+    disconnect?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
+    delete?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
+    connect?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
+    update?: TokenUpdateWithWhereUniqueWithoutWatchedByInput | TokenUpdateWithWhereUniqueWithoutWatchedByInput[]
+    updateMany?: TokenUpdateManyWithWhereWithoutWatchedByInput | TokenUpdateManyWithWhereWithoutWatchedByInput[]
+    deleteMany?: TokenScalarWhereInput | TokenScalarWhereInput[]
+  }
+
   export type TokenUncheckedUpdateManyWithoutUserNestedInput = {
     create?: XOR<TokenCreateWithoutUserInput, TokenUncheckedCreateWithoutUserInput> | TokenCreateWithoutUserInput[] | TokenUncheckedCreateWithoutUserInput[]
     connectOrCreate?: TokenCreateOrConnectWithoutUserInput | TokenCreateOrConnectWithoutUserInput[]
@@ -18219,6 +18166,19 @@ export namespace Prisma {
     update?: TokenPurchaseUpdateWithWhereUniqueWithoutUserInput | TokenPurchaseUpdateWithWhereUniqueWithoutUserInput[]
     updateMany?: TokenPurchaseUpdateManyWithWhereWithoutUserInput | TokenPurchaseUpdateManyWithWhereWithoutUserInput[]
     deleteMany?: TokenPurchaseScalarWhereInput | TokenPurchaseScalarWhereInput[]
+  }
+
+  export type TokenUncheckedUpdateManyWithoutWatchedByNestedInput = {
+    create?: XOR<TokenCreateWithoutWatchedByInput, TokenUncheckedCreateWithoutWatchedByInput> | TokenCreateWithoutWatchedByInput[] | TokenUncheckedCreateWithoutWatchedByInput[]
+    connectOrCreate?: TokenCreateOrConnectWithoutWatchedByInput | TokenCreateOrConnectWithoutWatchedByInput[]
+    upsert?: TokenUpsertWithWhereUniqueWithoutWatchedByInput | TokenUpsertWithWhereUniqueWithoutWatchedByInput[]
+    set?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
+    disconnect?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
+    delete?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
+    connect?: TokenWhereUniqueInput | TokenWhereUniqueInput[]
+    update?: TokenUpdateWithWhereUniqueWithoutWatchedByInput | TokenUpdateWithWhereUniqueWithoutWatchedByInput[]
+    updateMany?: TokenUpdateManyWithWhereWithoutWatchedByInput | TokenUpdateManyWithWhereWithoutWatchedByInput[]
+    deleteMany?: TokenScalarWhereInput | TokenScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutLaunchedTokensInput = {
@@ -18276,6 +18236,12 @@ export namespace Prisma {
     connect?: TokenPurchaseWhereUniqueInput | TokenPurchaseWhereUniqueInput[]
   }
 
+  export type UserCreateNestedManyWithoutWatchlistInput = {
+    create?: XOR<UserCreateWithoutWatchlistInput, UserUncheckedCreateWithoutWatchlistInput> | UserCreateWithoutWatchlistInput[] | UserUncheckedCreateWithoutWatchlistInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutWatchlistInput | UserCreateOrConnectWithoutWatchlistInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
   export type PoolUncheckedCreateNestedManyWithoutBaseTokenInput = {
     create?: XOR<PoolCreateWithoutBaseTokenInput, PoolUncheckedCreateWithoutBaseTokenInput> | PoolCreateWithoutBaseTokenInput[] | PoolUncheckedCreateWithoutBaseTokenInput[]
     connectOrCreate?: PoolCreateOrConnectWithoutBaseTokenInput | PoolCreateOrConnectWithoutBaseTokenInput[]
@@ -18325,24 +18291,18 @@ export namespace Prisma {
     connect?: TokenPurchaseWhereUniqueInput | TokenPurchaseWhereUniqueInput[]
   }
 
+  export type UserUncheckedCreateNestedManyWithoutWatchlistInput = {
+    create?: XOR<UserCreateWithoutWatchlistInput, UserUncheckedCreateWithoutWatchlistInput> | UserCreateWithoutWatchlistInput[] | UserUncheckedCreateWithoutWatchlistInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutWatchlistInput | UserCreateOrConnectWithoutWatchlistInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+  }
+
   export type IntFieldUpdateOperationsInput = {
     set?: number
     increment?: number
     decrement?: number
     multiply?: number
     divide?: number
-  }
-
-  export type NullableFloatFieldUpdateOperationsInput = {
-    set?: number | null
-    increment?: number
-    decrement?: number
-    multiply?: number
-    divide?: number
-  }
-
-  export type NullableDateTimeFieldUpdateOperationsInput = {
-    set?: Date | string | null
   }
 
   export type UserUpdateOneRequiredWithoutLaunchedTokensNestedInput = {
@@ -18451,6 +18411,19 @@ export namespace Prisma {
     deleteMany?: TokenPurchaseScalarWhereInput | TokenPurchaseScalarWhereInput[]
   }
 
+  export type UserUpdateManyWithoutWatchlistNestedInput = {
+    create?: XOR<UserCreateWithoutWatchlistInput, UserUncheckedCreateWithoutWatchlistInput> | UserCreateWithoutWatchlistInput[] | UserUncheckedCreateWithoutWatchlistInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutWatchlistInput | UserCreateOrConnectWithoutWatchlistInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutWatchlistInput | UserUpsertWithWhereUniqueWithoutWatchlistInput[]
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutWatchlistInput | UserUpdateWithWhereUniqueWithoutWatchlistInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutWatchlistInput | UserUpdateManyWithWhereWithoutWatchlistInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
+  }
+
   export type PoolUncheckedUpdateManyWithoutBaseTokenNestedInput = {
     create?: XOR<PoolCreateWithoutBaseTokenInput, PoolUncheckedCreateWithoutBaseTokenInput> | PoolCreateWithoutBaseTokenInput[] | PoolUncheckedCreateWithoutBaseTokenInput[]
     connectOrCreate?: PoolCreateOrConnectWithoutBaseTokenInput | PoolCreateOrConnectWithoutBaseTokenInput[]
@@ -18547,6 +18520,19 @@ export namespace Prisma {
     update?: TokenPurchaseUpdateWithWhereUniqueWithoutTokenInput | TokenPurchaseUpdateWithWhereUniqueWithoutTokenInput[]
     updateMany?: TokenPurchaseUpdateManyWithWhereWithoutTokenInput | TokenPurchaseUpdateManyWithWhereWithoutTokenInput[]
     deleteMany?: TokenPurchaseScalarWhereInput | TokenPurchaseScalarWhereInput[]
+  }
+
+  export type UserUncheckedUpdateManyWithoutWatchlistNestedInput = {
+    create?: XOR<UserCreateWithoutWatchlistInput, UserUncheckedCreateWithoutWatchlistInput> | UserCreateWithoutWatchlistInput[] | UserUncheckedCreateWithoutWatchlistInput[]
+    connectOrCreate?: UserCreateOrConnectWithoutWatchlistInput | UserCreateOrConnectWithoutWatchlistInput[]
+    upsert?: UserUpsertWithWhereUniqueWithoutWatchlistInput | UserUpsertWithWhereUniqueWithoutWatchlistInput[]
+    set?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    disconnect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    delete?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    connect?: UserWhereUniqueInput | UserWhereUniqueInput[]
+    update?: UserUpdateWithWhereUniqueWithoutWatchlistInput | UserUpdateWithWhereUniqueWithoutWatchlistInput[]
+    updateMany?: UserUpdateManyWithWhereWithoutWatchlistInput | UserUpdateManyWithWhereWithoutWatchlistInput[]
+    deleteMany?: UserScalarWhereInput | UserScalarWhereInput[]
   }
 
   export type UserCreateNestedOneWithoutPurchasesInput = {
@@ -18889,6 +18875,14 @@ export namespace Prisma {
     connect?: TokenWhereUniqueInput
   }
 
+  export type NullableFloatFieldUpdateOperationsInput = {
+    set?: number | null
+    increment?: number
+    decrement?: number
+    multiply?: number
+    divide?: number
+  }
+
   export type TokenUpdateOneRequiredWithoutTokenHoldersNestedInput = {
     create?: XOR<TokenCreateWithoutTokenHoldersInput, TokenUncheckedCreateWithoutTokenHoldersInput>
     connectOrCreate?: TokenCreateOrConnectWithoutTokenHoldersInput
@@ -19068,28 +19062,6 @@ export namespace Prisma {
     not?: NestedIntNullableFilter<$PrismaModel> | number | null
   }
 
-  export type NestedFloatNullableFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
-  }
-
-  export type NestedDateTimeNullableFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableFilter<$PrismaModel> | Date | string | null
-  }
-
   export type NestedIntWithAggregatesFilter<$PrismaModel = never> = {
     equals?: number | IntFieldRefInput<$PrismaModel>
     in?: number[] | ListIntFieldRefInput<$PrismaModel>
@@ -19115,36 +19087,6 @@ export namespace Prisma {
     gt?: number | FloatFieldRefInput<$PrismaModel>
     gte?: number | FloatFieldRefInput<$PrismaModel>
     not?: NestedFloatFilter<$PrismaModel> | number
-  }
-
-  export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: number | FloatFieldRefInput<$PrismaModel> | null
-    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
-    lt?: number | FloatFieldRefInput<$PrismaModel>
-    lte?: number | FloatFieldRefInput<$PrismaModel>
-    gt?: number | FloatFieldRefInput<$PrismaModel>
-    gte?: number | FloatFieldRefInput<$PrismaModel>
-    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _avg?: NestedFloatNullableFilter<$PrismaModel>
-    _sum?: NestedFloatNullableFilter<$PrismaModel>
-    _min?: NestedFloatNullableFilter<$PrismaModel>
-    _max?: NestedFloatNullableFilter<$PrismaModel>
-  }
-
-  export type NestedDateTimeNullableWithAggregatesFilter<$PrismaModel = never> = {
-    equals?: Date | string | DateTimeFieldRefInput<$PrismaModel> | null
-    in?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    notIn?: Date[] | string[] | ListDateTimeFieldRefInput<$PrismaModel> | null
-    lt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    lte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gt?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    gte?: Date | string | DateTimeFieldRefInput<$PrismaModel>
-    not?: NestedDateTimeNullableWithAggregatesFilter<$PrismaModel> | Date | string | null
-    _count?: NestedIntNullableFilter<$PrismaModel>
-    _min?: NestedDateTimeNullableFilter<$PrismaModel>
-    _max?: NestedDateTimeNullableFilter<$PrismaModel>
   }
 
   export type NestedBoolFilter<$PrismaModel = never> = {
@@ -19187,6 +19129,33 @@ export namespace Prisma {
     _max?: NestedBigIntFilter<$PrismaModel>
   }
 
+  export type NestedFloatNullableFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableFilter<$PrismaModel> | number | null
+  }
+
+  export type NestedFloatNullableWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: number | FloatFieldRefInput<$PrismaModel> | null
+    in?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    notIn?: number[] | ListFloatFieldRefInput<$PrismaModel> | null
+    lt?: number | FloatFieldRefInput<$PrismaModel>
+    lte?: number | FloatFieldRefInput<$PrismaModel>
+    gt?: number | FloatFieldRefInput<$PrismaModel>
+    gte?: number | FloatFieldRefInput<$PrismaModel>
+    not?: NestedFloatNullableWithAggregatesFilter<$PrismaModel> | number | null
+    _count?: NestedIntNullableFilter<$PrismaModel>
+    _avg?: NestedFloatNullableFilter<$PrismaModel>
+    _sum?: NestedFloatNullableFilter<$PrismaModel>
+    _min?: NestedFloatNullableFilter<$PrismaModel>
+    _max?: NestedFloatNullableFilter<$PrismaModel>
+  }
+
   export type NestedEnumTxTypeFilter<$PrismaModel = never> = {
     equals?: $Enums.TxType | EnumTxTypeFieldRefInput<$PrismaModel>
     in?: $Enums.TxType[] | ListEnumTxTypeFieldRefInput<$PrismaModel>
@@ -19206,23 +19175,18 @@ export namespace Prisma {
 
   export type TokenCreateWithoutUserInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
     mintAddress: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -19235,27 +19199,23 @@ export namespace Prisma {
     transactions?: TransactionCreateNestedManyWithoutTokenInput
     priceHistory?: PriceHistoryCreateNestedManyWithoutTokenInput
     purchases?: TokenPurchaseCreateNestedManyWithoutTokenInput
+    watchedBy?: UserCreateNestedManyWithoutWatchlistInput
   }
 
   export type TokenUncheckedCreateWithoutUserInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
     mintAddress: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -19268,6 +19228,7 @@ export namespace Prisma {
     transactions?: TransactionUncheckedCreateNestedManyWithoutTokenInput
     priceHistory?: PriceHistoryUncheckedCreateNestedManyWithoutTokenInput
     purchases?: TokenPurchaseUncheckedCreateNestedManyWithoutTokenInput
+    watchedBy?: UserUncheckedCreateNestedManyWithoutWatchlistInput
   }
 
   export type TokenCreateOrConnectWithoutUserInput = {
@@ -19312,6 +19273,69 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type TokenCreateWithoutWatchedByInput = {
+    id?: string
+    name: string
+    symbol: string
+    url: string
+    mintAddress: string
+    website?: string | null
+    twitter?: string | null
+    supply: string
+    decimals?: number
+    metadataUrl: string
+    imageUrl: string
+    description?: string | null
+    marketCap?: string | null
+    telegram?: string | null
+    discord?: string | null
+    holders?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    user: UserCreateNestedOneWithoutLaunchedTokensInput
+    basePools?: PoolCreateNestedManyWithoutBaseTokenInput
+    quotePools?: PoolCreateNestedManyWithoutQuoteTokenInput
+    launches?: TokenLaunchCreateNestedManyWithoutTokenInput
+    tokenHolders?: TokenHolderCreateNestedManyWithoutTokenInput
+    transactions?: TransactionCreateNestedManyWithoutTokenInput
+    priceHistory?: PriceHistoryCreateNestedManyWithoutTokenInput
+    purchases?: TokenPurchaseCreateNestedManyWithoutTokenInput
+  }
+
+  export type TokenUncheckedCreateWithoutWatchedByInput = {
+    id?: string
+    name: string
+    symbol: string
+    url: string
+    mintAddress: string
+    userId: string
+    website?: string | null
+    twitter?: string | null
+    supply: string
+    decimals?: number
+    metadataUrl: string
+    imageUrl: string
+    description?: string | null
+    marketCap?: string | null
+    telegram?: string | null
+    discord?: string | null
+    holders?: number
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    basePools?: PoolUncheckedCreateNestedManyWithoutBaseTokenInput
+    quotePools?: PoolUncheckedCreateNestedManyWithoutQuoteTokenInput
+    launches?: TokenLaunchUncheckedCreateNestedManyWithoutTokenInput
+    tokenHolders?: TokenHolderUncheckedCreateNestedManyWithoutTokenInput
+    transactions?: TransactionUncheckedCreateNestedManyWithoutTokenInput
+    priceHistory?: PriceHistoryUncheckedCreateNestedManyWithoutTokenInput
+    purchases?: TokenPurchaseUncheckedCreateNestedManyWithoutTokenInput
+  }
+
+  export type TokenCreateOrConnectWithoutWatchedByInput = {
+    where: TokenWhereUniqueInput
+    create: XOR<TokenCreateWithoutWatchedByInput, TokenUncheckedCreateWithoutWatchedByInput>
+  }
+
   export type TokenUpsertWithWhereUniqueWithoutUserInput = {
     where: TokenWhereUniqueInput
     update: XOR<TokenUpdateWithoutUserInput, TokenUncheckedUpdateWithoutUserInput>
@@ -19333,7 +19357,6 @@ export namespace Prisma {
     OR?: TokenScalarWhereInput[]
     NOT?: TokenScalarWhereInput | TokenScalarWhereInput[]
     id?: StringFilter<"Token"> | string
-    address?: StringNullableFilter<"Token"> | string | null
     name?: StringFilter<"Token"> | string
     symbol?: StringFilter<"Token"> | string
     url?: StringFilter<"Token"> | string
@@ -19341,16 +19364,12 @@ export namespace Prisma {
     userId?: StringFilter<"Token"> | string
     website?: StringNullableFilter<"Token"> | string | null
     twitter?: StringNullableFilter<"Token"> | string | null
-    supply?: StringNullableFilter<"Token"> | string | null
+    supply?: StringFilter<"Token"> | string
     decimals?: IntFilter<"Token"> | number
-    bondingCurveSlope?: FloatNullableFilter<"Token"> | number | null
-    metadataUrl?: StringNullableFilter<"Token"> | string | null
-    imageUrl?: StringNullableFilter<"Token"> | string | null
+    metadataUrl?: StringFilter<"Token"> | string
+    imageUrl?: StringFilter<"Token"> | string
     description?: StringNullableFilter<"Token"> | string | null
-    contractAddress?: StringNullableFilter<"Token"> | string | null
     marketCap?: StringNullableFilter<"Token"> | string | null
-    totalRaised?: StringFilter<"Token"> | string
-    launchDate?: DateTimeNullableFilter<"Token"> | Date | string | null
     telegram?: StringNullableFilter<"Token"> | string | null
     discord?: StringNullableFilter<"Token"> | string | null
     holders?: IntFilter<"Token"> | number
@@ -19389,6 +19408,22 @@ export namespace Prisma {
     updatedAt?: DateTimeFilter<"TokenPurchase"> | Date | string
   }
 
+  export type TokenUpsertWithWhereUniqueWithoutWatchedByInput = {
+    where: TokenWhereUniqueInput
+    update: XOR<TokenUpdateWithoutWatchedByInput, TokenUncheckedUpdateWithoutWatchedByInput>
+    create: XOR<TokenCreateWithoutWatchedByInput, TokenUncheckedCreateWithoutWatchedByInput>
+  }
+
+  export type TokenUpdateWithWhereUniqueWithoutWatchedByInput = {
+    where: TokenWhereUniqueInput
+    data: XOR<TokenUpdateWithoutWatchedByInput, TokenUncheckedUpdateWithoutWatchedByInput>
+  }
+
+  export type TokenUpdateManyWithWhereWithoutWatchedByInput = {
+    where: TokenScalarWhereInput
+    data: XOR<TokenUpdateManyMutationInput, TokenUncheckedUpdateManyWithoutWatchedByInput>
+  }
+
   export type UserCreateWithoutLaunchedTokensInput = {
     id?: string
     name?: string | null
@@ -19396,6 +19431,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     purchases?: TokenPurchaseCreateNestedManyWithoutUserInput
+    watchlist?: TokenCreateNestedManyWithoutWatchedByInput
   }
 
   export type UserUncheckedCreateWithoutLaunchedTokensInput = {
@@ -19405,6 +19441,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     purchases?: TokenPurchaseUncheckedCreateNestedManyWithoutUserInput
+    watchlist?: TokenUncheckedCreateNestedManyWithoutWatchedByInput
   }
 
   export type UserCreateOrConnectWithoutLaunchedTokensInput = {
@@ -19668,6 +19705,31 @@ export namespace Prisma {
     skipDuplicates?: boolean
   }
 
+  export type UserCreateWithoutWatchlistInput = {
+    id?: string
+    name?: string | null
+    address: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    launchedTokens?: TokenCreateNestedManyWithoutUserInput
+    purchases?: TokenPurchaseCreateNestedManyWithoutUserInput
+  }
+
+  export type UserUncheckedCreateWithoutWatchlistInput = {
+    id?: string
+    name?: string | null
+    address: string
+    createdAt?: Date | string
+    updatedAt?: Date | string
+    launchedTokens?: TokenUncheckedCreateNestedManyWithoutUserInput
+    purchases?: TokenPurchaseUncheckedCreateNestedManyWithoutUserInput
+  }
+
+  export type UserCreateOrConnectWithoutWatchlistInput = {
+    where: UserWhereUniqueInput
+    create: XOR<UserCreateWithoutWatchlistInput, UserUncheckedCreateWithoutWatchlistInput>
+  }
+
   export type UserUpsertWithoutLaunchedTokensInput = {
     update: XOR<UserUpdateWithoutLaunchedTokensInput, UserUncheckedUpdateWithoutLaunchedTokensInput>
     create: XOR<UserCreateWithoutLaunchedTokensInput, UserUncheckedCreateWithoutLaunchedTokensInput>
@@ -19686,6 +19748,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     purchases?: TokenPurchaseUpdateManyWithoutUserNestedInput
+    watchlist?: TokenUpdateManyWithoutWatchedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutLaunchedTokensInput = {
@@ -19695,6 +19758,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     purchases?: TokenPurchaseUncheckedUpdateManyWithoutUserNestedInput
+    watchlist?: TokenUncheckedUpdateManyWithoutWatchedByNestedInput
   }
 
   export type PoolUpsertWithWhereUniqueWithoutBaseTokenInput = {
@@ -19890,6 +19954,33 @@ export namespace Prisma {
     data: XOR<TokenPurchaseUpdateManyMutationInput, TokenPurchaseUncheckedUpdateManyWithoutTokenInput>
   }
 
+  export type UserUpsertWithWhereUniqueWithoutWatchlistInput = {
+    where: UserWhereUniqueInput
+    update: XOR<UserUpdateWithoutWatchlistInput, UserUncheckedUpdateWithoutWatchlistInput>
+    create: XOR<UserCreateWithoutWatchlistInput, UserUncheckedCreateWithoutWatchlistInput>
+  }
+
+  export type UserUpdateWithWhereUniqueWithoutWatchlistInput = {
+    where: UserWhereUniqueInput
+    data: XOR<UserUpdateWithoutWatchlistInput, UserUncheckedUpdateWithoutWatchlistInput>
+  }
+
+  export type UserUpdateManyWithWhereWithoutWatchlistInput = {
+    where: UserScalarWhereInput
+    data: XOR<UserUpdateManyMutationInput, UserUncheckedUpdateManyWithoutWatchlistInput>
+  }
+
+  export type UserScalarWhereInput = {
+    AND?: UserScalarWhereInput | UserScalarWhereInput[]
+    OR?: UserScalarWhereInput[]
+    NOT?: UserScalarWhereInput | UserScalarWhereInput[]
+    id?: StringFilter<"User"> | string
+    name?: StringNullableFilter<"User"> | string | null
+    address?: StringFilter<"User"> | string
+    createdAt?: DateTimeFilter<"User"> | Date | string
+    updatedAt?: DateTimeFilter<"User"> | Date | string
+  }
+
   export type UserCreateWithoutPurchasesInput = {
     id?: string
     name?: string | null
@@ -19897,6 +19988,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     launchedTokens?: TokenCreateNestedManyWithoutUserInput
+    watchlist?: TokenCreateNestedManyWithoutWatchedByInput
   }
 
   export type UserUncheckedCreateWithoutPurchasesInput = {
@@ -19906,6 +19998,7 @@ export namespace Prisma {
     createdAt?: Date | string
     updatedAt?: Date | string
     launchedTokens?: TokenUncheckedCreateNestedManyWithoutUserInput
+    watchlist?: TokenUncheckedCreateNestedManyWithoutWatchedByInput
   }
 
   export type UserCreateOrConnectWithoutPurchasesInput = {
@@ -19915,23 +20008,18 @@ export namespace Prisma {
 
   export type TokenCreateWithoutPurchasesInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
     mintAddress: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -19944,11 +20032,11 @@ export namespace Prisma {
     tokenHolders?: TokenHolderCreateNestedManyWithoutTokenInput
     transactions?: TransactionCreateNestedManyWithoutTokenInput
     priceHistory?: PriceHistoryCreateNestedManyWithoutTokenInput
+    watchedBy?: UserCreateNestedManyWithoutWatchlistInput
   }
 
   export type TokenUncheckedCreateWithoutPurchasesInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
@@ -19956,16 +20044,12 @@ export namespace Prisma {
     userId: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -19977,6 +20061,7 @@ export namespace Prisma {
     tokenHolders?: TokenHolderUncheckedCreateNestedManyWithoutTokenInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutTokenInput
     priceHistory?: PriceHistoryUncheckedCreateNestedManyWithoutTokenInput
+    watchedBy?: UserUncheckedCreateNestedManyWithoutWatchlistInput
   }
 
   export type TokenCreateOrConnectWithoutPurchasesInput = {
@@ -20002,6 +20087,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     launchedTokens?: TokenUpdateManyWithoutUserNestedInput
+    watchlist?: TokenUpdateManyWithoutWatchedByNestedInput
   }
 
   export type UserUncheckedUpdateWithoutPurchasesInput = {
@@ -20011,6 +20097,7 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
     launchedTokens?: TokenUncheckedUpdateManyWithoutUserNestedInput
+    watchlist?: TokenUncheckedUpdateManyWithoutWatchedByNestedInput
   }
 
   export type TokenUpsertWithoutPurchasesInput = {
@@ -20026,23 +20113,18 @@ export namespace Prisma {
 
   export type TokenUpdateWithoutPurchasesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     mintAddress?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -20055,11 +20137,11 @@ export namespace Prisma {
     tokenHolders?: TokenHolderUpdateManyWithoutTokenNestedInput
     transactions?: TransactionUpdateManyWithoutTokenNestedInput
     priceHistory?: PriceHistoryUpdateManyWithoutTokenNestedInput
+    watchedBy?: UserUpdateManyWithoutWatchlistNestedInput
   }
 
   export type TokenUncheckedUpdateWithoutPurchasesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
@@ -20067,16 +20149,12 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -20088,6 +20166,7 @@ export namespace Prisma {
     tokenHolders?: TokenHolderUncheckedUpdateManyWithoutTokenNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutTokenNestedInput
     priceHistory?: PriceHistoryUncheckedUpdateManyWithoutTokenNestedInput
+    watchedBy?: UserUncheckedUpdateManyWithoutWatchlistNestedInput
   }
 
   export type PoolCreateWithoutConfigInput = {
@@ -20152,23 +20231,18 @@ export namespace Prisma {
 
   export type TokenCreateWithoutBasePoolsInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
     mintAddress: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -20181,11 +20255,11 @@ export namespace Prisma {
     transactions?: TransactionCreateNestedManyWithoutTokenInput
     priceHistory?: PriceHistoryCreateNestedManyWithoutTokenInput
     purchases?: TokenPurchaseCreateNestedManyWithoutTokenInput
+    watchedBy?: UserCreateNestedManyWithoutWatchlistInput
   }
 
   export type TokenUncheckedCreateWithoutBasePoolsInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
@@ -20193,16 +20267,12 @@ export namespace Prisma {
     userId: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -20214,6 +20284,7 @@ export namespace Prisma {
     transactions?: TransactionUncheckedCreateNestedManyWithoutTokenInput
     priceHistory?: PriceHistoryUncheckedCreateNestedManyWithoutTokenInput
     purchases?: TokenPurchaseUncheckedCreateNestedManyWithoutTokenInput
+    watchedBy?: UserUncheckedCreateNestedManyWithoutWatchlistInput
   }
 
   export type TokenCreateOrConnectWithoutBasePoolsInput = {
@@ -20223,23 +20294,18 @@ export namespace Prisma {
 
   export type TokenCreateWithoutQuotePoolsInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
     mintAddress: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -20252,11 +20318,11 @@ export namespace Prisma {
     transactions?: TransactionCreateNestedManyWithoutTokenInput
     priceHistory?: PriceHistoryCreateNestedManyWithoutTokenInput
     purchases?: TokenPurchaseCreateNestedManyWithoutTokenInput
+    watchedBy?: UserCreateNestedManyWithoutWatchlistInput
   }
 
   export type TokenUncheckedCreateWithoutQuotePoolsInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
@@ -20264,16 +20330,12 @@ export namespace Prisma {
     userId: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -20285,6 +20347,7 @@ export namespace Prisma {
     transactions?: TransactionUncheckedCreateNestedManyWithoutTokenInput
     priceHistory?: PriceHistoryUncheckedCreateNestedManyWithoutTokenInput
     purchases?: TokenPurchaseUncheckedCreateNestedManyWithoutTokenInput
+    watchedBy?: UserUncheckedCreateNestedManyWithoutWatchlistInput
   }
 
   export type TokenCreateOrConnectWithoutQuotePoolsInput = {
@@ -20474,23 +20537,18 @@ export namespace Prisma {
 
   export type TokenUpdateWithoutBasePoolsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     mintAddress?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -20503,11 +20561,11 @@ export namespace Prisma {
     transactions?: TransactionUpdateManyWithoutTokenNestedInput
     priceHistory?: PriceHistoryUpdateManyWithoutTokenNestedInput
     purchases?: TokenPurchaseUpdateManyWithoutTokenNestedInput
+    watchedBy?: UserUpdateManyWithoutWatchlistNestedInput
   }
 
   export type TokenUncheckedUpdateWithoutBasePoolsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
@@ -20515,16 +20573,12 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -20536,6 +20590,7 @@ export namespace Prisma {
     transactions?: TransactionUncheckedUpdateManyWithoutTokenNestedInput
     priceHistory?: PriceHistoryUncheckedUpdateManyWithoutTokenNestedInput
     purchases?: TokenPurchaseUncheckedUpdateManyWithoutTokenNestedInput
+    watchedBy?: UserUncheckedUpdateManyWithoutWatchlistNestedInput
   }
 
   export type TokenUpsertWithoutQuotePoolsInput = {
@@ -20551,23 +20606,18 @@ export namespace Prisma {
 
   export type TokenUpdateWithoutQuotePoolsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     mintAddress?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -20580,11 +20630,11 @@ export namespace Prisma {
     transactions?: TransactionUpdateManyWithoutTokenNestedInput
     priceHistory?: PriceHistoryUpdateManyWithoutTokenNestedInput
     purchases?: TokenPurchaseUpdateManyWithoutTokenNestedInput
+    watchedBy?: UserUpdateManyWithoutWatchlistNestedInput
   }
 
   export type TokenUncheckedUpdateWithoutQuotePoolsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
@@ -20592,16 +20642,12 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -20613,6 +20659,7 @@ export namespace Prisma {
     transactions?: TransactionUncheckedUpdateManyWithoutTokenNestedInput
     priceHistory?: PriceHistoryUncheckedUpdateManyWithoutTokenNestedInput
     purchases?: TokenPurchaseUncheckedUpdateManyWithoutTokenNestedInput
+    watchedBy?: UserUncheckedUpdateManyWithoutWatchlistNestedInput
   }
 
   export type PoolConfigUpsertWithoutPoolsInput = {
@@ -20813,23 +20860,18 @@ export namespace Prisma {
 
   export type TokenCreateWithoutLaunchesInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
     mintAddress: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -20842,11 +20884,11 @@ export namespace Prisma {
     transactions?: TransactionCreateNestedManyWithoutTokenInput
     priceHistory?: PriceHistoryCreateNestedManyWithoutTokenInput
     purchases?: TokenPurchaseCreateNestedManyWithoutTokenInput
+    watchedBy?: UserCreateNestedManyWithoutWatchlistInput
   }
 
   export type TokenUncheckedCreateWithoutLaunchesInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
@@ -20854,16 +20896,12 @@ export namespace Prisma {
     userId: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -20875,6 +20913,7 @@ export namespace Prisma {
     transactions?: TransactionUncheckedCreateNestedManyWithoutTokenInput
     priceHistory?: PriceHistoryUncheckedCreateNestedManyWithoutTokenInput
     purchases?: TokenPurchaseUncheckedCreateNestedManyWithoutTokenInput
+    watchedBy?: UserUncheckedCreateNestedManyWithoutWatchlistInput
   }
 
   export type TokenCreateOrConnectWithoutLaunchesInput = {
@@ -20934,23 +20973,18 @@ export namespace Prisma {
 
   export type TokenUpdateWithoutLaunchesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     mintAddress?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -20963,11 +20997,11 @@ export namespace Prisma {
     transactions?: TransactionUpdateManyWithoutTokenNestedInput
     priceHistory?: PriceHistoryUpdateManyWithoutTokenNestedInput
     purchases?: TokenPurchaseUpdateManyWithoutTokenNestedInput
+    watchedBy?: UserUpdateManyWithoutWatchlistNestedInput
   }
 
   export type TokenUncheckedUpdateWithoutLaunchesInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
@@ -20975,16 +21009,12 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -20996,6 +21026,7 @@ export namespace Prisma {
     transactions?: TransactionUncheckedUpdateManyWithoutTokenNestedInput
     priceHistory?: PriceHistoryUncheckedUpdateManyWithoutTokenNestedInput
     purchases?: TokenPurchaseUncheckedUpdateManyWithoutTokenNestedInput
+    watchedBy?: UserUncheckedUpdateManyWithoutWatchlistNestedInput
   }
 
   export type PoolUpsertWithoutLaunchesInput = {
@@ -21045,23 +21076,18 @@ export namespace Prisma {
 
   export type TokenCreateWithoutTokenHoldersInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
     mintAddress: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -21074,11 +21100,11 @@ export namespace Prisma {
     transactions?: TransactionCreateNestedManyWithoutTokenInput
     priceHistory?: PriceHistoryCreateNestedManyWithoutTokenInput
     purchases?: TokenPurchaseCreateNestedManyWithoutTokenInput
+    watchedBy?: UserCreateNestedManyWithoutWatchlistInput
   }
 
   export type TokenUncheckedCreateWithoutTokenHoldersInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
@@ -21086,16 +21112,12 @@ export namespace Prisma {
     userId: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -21107,6 +21129,7 @@ export namespace Prisma {
     transactions?: TransactionUncheckedCreateNestedManyWithoutTokenInput
     priceHistory?: PriceHistoryUncheckedCreateNestedManyWithoutTokenInput
     purchases?: TokenPurchaseUncheckedCreateNestedManyWithoutTokenInput
+    watchedBy?: UserUncheckedCreateNestedManyWithoutWatchlistInput
   }
 
   export type TokenCreateOrConnectWithoutTokenHoldersInput = {
@@ -21127,23 +21150,18 @@ export namespace Prisma {
 
   export type TokenUpdateWithoutTokenHoldersInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     mintAddress?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -21156,11 +21174,11 @@ export namespace Prisma {
     transactions?: TransactionUpdateManyWithoutTokenNestedInput
     priceHistory?: PriceHistoryUpdateManyWithoutTokenNestedInput
     purchases?: TokenPurchaseUpdateManyWithoutTokenNestedInput
+    watchedBy?: UserUpdateManyWithoutWatchlistNestedInput
   }
 
   export type TokenUncheckedUpdateWithoutTokenHoldersInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
@@ -21168,16 +21186,12 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -21189,6 +21203,7 @@ export namespace Prisma {
     transactions?: TransactionUncheckedUpdateManyWithoutTokenNestedInput
     priceHistory?: PriceHistoryUncheckedUpdateManyWithoutTokenNestedInput
     purchases?: TokenPurchaseUncheckedUpdateManyWithoutTokenNestedInput
+    watchedBy?: UserUncheckedUpdateManyWithoutWatchlistNestedInput
   }
 
   export type PoolCreateWithoutTransactionsInput = {
@@ -21232,23 +21247,18 @@ export namespace Prisma {
 
   export type TokenCreateWithoutTransactionsInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
     mintAddress: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -21261,11 +21271,11 @@ export namespace Prisma {
     tokenHolders?: TokenHolderCreateNestedManyWithoutTokenInput
     priceHistory?: PriceHistoryCreateNestedManyWithoutTokenInput
     purchases?: TokenPurchaseCreateNestedManyWithoutTokenInput
+    watchedBy?: UserCreateNestedManyWithoutWatchlistInput
   }
 
   export type TokenUncheckedCreateWithoutTransactionsInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
@@ -21273,16 +21283,12 @@ export namespace Prisma {
     userId: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -21294,6 +21300,7 @@ export namespace Prisma {
     tokenHolders?: TokenHolderUncheckedCreateNestedManyWithoutTokenInput
     priceHistory?: PriceHistoryUncheckedCreateNestedManyWithoutTokenInput
     purchases?: TokenPurchaseUncheckedCreateNestedManyWithoutTokenInput
+    watchedBy?: UserUncheckedCreateNestedManyWithoutWatchlistInput
   }
 
   export type TokenCreateOrConnectWithoutTransactionsInput = {
@@ -21359,23 +21366,18 @@ export namespace Prisma {
 
   export type TokenUpdateWithoutTransactionsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     mintAddress?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -21388,11 +21390,11 @@ export namespace Prisma {
     tokenHolders?: TokenHolderUpdateManyWithoutTokenNestedInput
     priceHistory?: PriceHistoryUpdateManyWithoutTokenNestedInput
     purchases?: TokenPurchaseUpdateManyWithoutTokenNestedInput
+    watchedBy?: UserUpdateManyWithoutWatchlistNestedInput
   }
 
   export type TokenUncheckedUpdateWithoutTransactionsInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
@@ -21400,16 +21402,12 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -21421,6 +21419,7 @@ export namespace Prisma {
     tokenHolders?: TokenHolderUncheckedUpdateManyWithoutTokenNestedInput
     priceHistory?: PriceHistoryUncheckedUpdateManyWithoutTokenNestedInput
     purchases?: TokenPurchaseUncheckedUpdateManyWithoutTokenNestedInput
+    watchedBy?: UserUncheckedUpdateManyWithoutWatchlistNestedInput
   }
 
   export type PoolCreateWithoutPriceHistoryInput = {
@@ -21464,23 +21463,18 @@ export namespace Prisma {
 
   export type TokenCreateWithoutPriceHistoryInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
     mintAddress: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -21493,11 +21487,11 @@ export namespace Prisma {
     tokenHolders?: TokenHolderCreateNestedManyWithoutTokenInput
     transactions?: TransactionCreateNestedManyWithoutTokenInput
     purchases?: TokenPurchaseCreateNestedManyWithoutTokenInput
+    watchedBy?: UserCreateNestedManyWithoutWatchlistInput
   }
 
   export type TokenUncheckedCreateWithoutPriceHistoryInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
@@ -21505,16 +21499,12 @@ export namespace Prisma {
     userId: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -21526,6 +21516,7 @@ export namespace Prisma {
     tokenHolders?: TokenHolderUncheckedCreateNestedManyWithoutTokenInput
     transactions?: TransactionUncheckedCreateNestedManyWithoutTokenInput
     purchases?: TokenPurchaseUncheckedCreateNestedManyWithoutTokenInput
+    watchedBy?: UserUncheckedCreateNestedManyWithoutWatchlistInput
   }
 
   export type TokenCreateOrConnectWithoutPriceHistoryInput = {
@@ -21591,23 +21582,18 @@ export namespace Prisma {
 
   export type TokenUpdateWithoutPriceHistoryInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     mintAddress?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -21620,11 +21606,11 @@ export namespace Prisma {
     tokenHolders?: TokenHolderUpdateManyWithoutTokenNestedInput
     transactions?: TransactionUpdateManyWithoutTokenNestedInput
     purchases?: TokenPurchaseUpdateManyWithoutTokenNestedInput
+    watchedBy?: UserUpdateManyWithoutWatchlistNestedInput
   }
 
   export type TokenUncheckedUpdateWithoutPriceHistoryInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
@@ -21632,16 +21618,12 @@ export namespace Prisma {
     userId?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -21653,27 +21635,23 @@ export namespace Prisma {
     tokenHolders?: TokenHolderUncheckedUpdateManyWithoutTokenNestedInput
     transactions?: TransactionUncheckedUpdateManyWithoutTokenNestedInput
     purchases?: TokenPurchaseUncheckedUpdateManyWithoutTokenNestedInput
+    watchedBy?: UserUncheckedUpdateManyWithoutWatchlistNestedInput
   }
 
   export type TokenCreateManyUserInput = {
     id?: string
-    address?: string | null
     name: string
     symbol: string
     url: string
     mintAddress: string
     website?: string | null
     twitter?: string | null
-    supply?: string | null
+    supply: string
     decimals?: number
-    bondingCurveSlope?: number | null
-    metadataUrl?: string | null
-    imageUrl?: string | null
+    metadataUrl: string
+    imageUrl: string
     description?: string | null
-    contractAddress?: string | null
     marketCap?: string | null
-    totalRaised?: string
-    launchDate?: Date | string | null
     telegram?: string | null
     discord?: string | null
     holders?: number
@@ -21694,23 +21672,18 @@ export namespace Prisma {
 
   export type TokenUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     mintAddress?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -21723,27 +21696,23 @@ export namespace Prisma {
     transactions?: TransactionUpdateManyWithoutTokenNestedInput
     priceHistory?: PriceHistoryUpdateManyWithoutTokenNestedInput
     purchases?: TokenPurchaseUpdateManyWithoutTokenNestedInput
+    watchedBy?: UserUpdateManyWithoutWatchlistNestedInput
   }
 
   export type TokenUncheckedUpdateWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     mintAddress?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -21756,27 +21725,23 @@ export namespace Prisma {
     transactions?: TransactionUncheckedUpdateManyWithoutTokenNestedInput
     priceHistory?: PriceHistoryUncheckedUpdateManyWithoutTokenNestedInput
     purchases?: TokenPurchaseUncheckedUpdateManyWithoutTokenNestedInput
+    watchedBy?: UserUncheckedUpdateManyWithoutWatchlistNestedInput
   }
 
   export type TokenUncheckedUpdateManyWithoutUserInput = {
     id?: StringFieldUpdateOperationsInput | string
-    address?: NullableStringFieldUpdateOperationsInput | string | null
     name?: StringFieldUpdateOperationsInput | string
     symbol?: StringFieldUpdateOperationsInput | string
     url?: StringFieldUpdateOperationsInput | string
     mintAddress?: StringFieldUpdateOperationsInput | string
     website?: NullableStringFieldUpdateOperationsInput | string | null
     twitter?: NullableStringFieldUpdateOperationsInput | string | null
-    supply?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
     decimals?: IntFieldUpdateOperationsInput | number
-    bondingCurveSlope?: NullableFloatFieldUpdateOperationsInput | number | null
-    metadataUrl?: NullableStringFieldUpdateOperationsInput | string | null
-    imageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
     description?: NullableStringFieldUpdateOperationsInput | string | null
-    contractAddress?: NullableStringFieldUpdateOperationsInput | string | null
     marketCap?: NullableStringFieldUpdateOperationsInput | string | null
-    totalRaised?: StringFieldUpdateOperationsInput | string
-    launchDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     telegram?: NullableStringFieldUpdateOperationsInput | string | null
     discord?: NullableStringFieldUpdateOperationsInput | string | null
     holders?: IntFieldUpdateOperationsInput | number
@@ -21813,6 +21778,86 @@ export namespace Prisma {
     pricePerToken?: StringFieldUpdateOperationsInput | string
     totalPrice?: StringFieldUpdateOperationsInput | string
     purchaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type TokenUpdateWithoutWatchedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    symbol?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    mintAddress?: StringFieldUpdateOperationsInput | string
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
+    decimals?: IntFieldUpdateOperationsInput | number
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    marketCap?: NullableStringFieldUpdateOperationsInput | string | null
+    telegram?: NullableStringFieldUpdateOperationsInput | string | null
+    discord?: NullableStringFieldUpdateOperationsInput | string | null
+    holders?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    user?: UserUpdateOneRequiredWithoutLaunchedTokensNestedInput
+    basePools?: PoolUpdateManyWithoutBaseTokenNestedInput
+    quotePools?: PoolUpdateManyWithoutQuoteTokenNestedInput
+    launches?: TokenLaunchUpdateManyWithoutTokenNestedInput
+    tokenHolders?: TokenHolderUpdateManyWithoutTokenNestedInput
+    transactions?: TransactionUpdateManyWithoutTokenNestedInput
+    priceHistory?: PriceHistoryUpdateManyWithoutTokenNestedInput
+    purchases?: TokenPurchaseUpdateManyWithoutTokenNestedInput
+  }
+
+  export type TokenUncheckedUpdateWithoutWatchedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    symbol?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    mintAddress?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
+    decimals?: IntFieldUpdateOperationsInput | number
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    marketCap?: NullableStringFieldUpdateOperationsInput | string | null
+    telegram?: NullableStringFieldUpdateOperationsInput | string | null
+    discord?: NullableStringFieldUpdateOperationsInput | string | null
+    holders?: IntFieldUpdateOperationsInput | number
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    basePools?: PoolUncheckedUpdateManyWithoutBaseTokenNestedInput
+    quotePools?: PoolUncheckedUpdateManyWithoutQuoteTokenNestedInput
+    launches?: TokenLaunchUncheckedUpdateManyWithoutTokenNestedInput
+    tokenHolders?: TokenHolderUncheckedUpdateManyWithoutTokenNestedInput
+    transactions?: TransactionUncheckedUpdateManyWithoutTokenNestedInput
+    priceHistory?: PriceHistoryUncheckedUpdateManyWithoutTokenNestedInput
+    purchases?: TokenPurchaseUncheckedUpdateManyWithoutTokenNestedInput
+  }
+
+  export type TokenUncheckedUpdateManyWithoutWatchedByInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: StringFieldUpdateOperationsInput | string
+    symbol?: StringFieldUpdateOperationsInput | string
+    url?: StringFieldUpdateOperationsInput | string
+    mintAddress?: StringFieldUpdateOperationsInput | string
+    userId?: StringFieldUpdateOperationsInput | string
+    website?: NullableStringFieldUpdateOperationsInput | string | null
+    twitter?: NullableStringFieldUpdateOperationsInput | string | null
+    supply?: StringFieldUpdateOperationsInput | string
+    decimals?: IntFieldUpdateOperationsInput | number
+    metadataUrl?: StringFieldUpdateOperationsInput | string
+    imageUrl?: StringFieldUpdateOperationsInput | string
+    description?: NullableStringFieldUpdateOperationsInput | string | null
+    marketCap?: NullableStringFieldUpdateOperationsInput | string | null
+    telegram?: NullableStringFieldUpdateOperationsInput | string | null
+    discord?: NullableStringFieldUpdateOperationsInput | string | null
+    holders?: IntFieldUpdateOperationsInput | number
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
@@ -22169,6 +22214,34 @@ export namespace Prisma {
     pricePerToken?: StringFieldUpdateOperationsInput | string
     totalPrice?: StringFieldUpdateOperationsInput | string
     purchaseDate?: DateTimeFieldUpdateOperationsInput | Date | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type UserUpdateWithoutWatchlistInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    launchedTokens?: TokenUpdateManyWithoutUserNestedInput
+    purchases?: TokenPurchaseUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateWithoutWatchlistInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: StringFieldUpdateOperationsInput | string
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    launchedTokens?: TokenUncheckedUpdateManyWithoutUserNestedInput
+    purchases?: TokenPurchaseUncheckedUpdateManyWithoutUserNestedInput
+  }
+
+  export type UserUncheckedUpdateManyWithoutWatchlistInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    name?: NullableStringFieldUpdateOperationsInput | string | null
+    address?: StringFieldUpdateOperationsInput | string
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
     updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }

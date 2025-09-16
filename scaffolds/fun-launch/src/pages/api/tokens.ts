@@ -17,11 +17,16 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
       orderBy: { createdAt: 'desc' },
       take: 30,
       select: {
+        id: true,
         mintAddress: true,
         createdAt: true,
         name: true,
         symbol: true,
-        imageUrl: true
+        imageUrl: true,
+        marketCap: true,
+        supply: true,
+        decimals: true,
+        description: true
       }
     });
 

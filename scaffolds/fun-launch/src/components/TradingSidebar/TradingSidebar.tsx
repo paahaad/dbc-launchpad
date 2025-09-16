@@ -40,7 +40,7 @@ export const TradingSidebar: React.FC<TradingSidebarProps> = ({ collapsed }) => 
 
   return (
     <div className={cn(
-      "bg-black flex flex-col transition-all duration-300 min-h-[calc(100vh-80px)]",
+      "bg-black flex flex-col transition-all duration-300 h-full",
       collapsed ? "w-16" : "w-64"
     )}>
       {/* Navigation Items */}

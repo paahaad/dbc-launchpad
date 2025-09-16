@@ -1,15 +1,15 @@
 import Page from '@/components/ui/Page/Page';
+import { TokenGrid } from '@/components/TokenGrid/TokenGrid';
+import { ScrollingTicker } from '@/components/ScrollingTicker/ScrollingTicker';
 
 export default function Index() {
   return (
     <Page>
-      <div className="text-center mb-8">
-        <h1 className="text-4xl font-bold mb-4">Dumpster Launchpad</h1>
-        <p className="text-xl text-gray-300">
-          Where Trash Tokens Moon 🚀♻️
-        </p>
+      <div className="mb-8">
+        <h2 className="text-xl font-semibold mb-4 text-white">Trending</h2>
+        <ScrollingTicker />
       </div>
-      {/* Content to be added later */}
+      <TokenGrid />
     </Page>
   );
 }

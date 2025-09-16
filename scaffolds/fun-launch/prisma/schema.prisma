@@ -27,6 +27,7 @@ model User {
 
   launchedTokens Token[]           @relation("UserLaunchedTokens")
   purchases     TokenPurchase[]   @relation("UserPurchases")
+  watchlist     Token[]  @relation("UserWatchlist")
 
   @@map("users")
 }
@@ -34,7 +35,6 @@ model User {
 
 model Token {
   id        String   @id @default(cuid())
-  address   String?  @unique
   name      String
   symbol    String
   url       String
@@ -44,16 +44,12 @@ model Token {
 
   website       String?
   twitter       String?
-  supply        String?
+  supply        String
   decimals      Int      @default(6)
-  bondingCurveSlope Float?
-  metadataUrl   String?
-  imageUrl      String?
+  metadataUrl   String
+  imageUrl      String
   description   String?
-  contractAddress String? @unique
   marketCap     String?
-  totalRaised   String   @default("0")
-  launchDate    DateTime?
   telegram      String?
   discord       String?
   holders       Int      @default(0)
@@ -68,6 +64,8 @@ model Token {
   transactions  Transaction[]
   priceHistory  PriceHistory[]
   purchases     TokenPurchase[] @relation("TokenPurchases")
+  watchedBy     User[]           @relation("UserWatchlist")
+
 
   @@map("tokens")
 }

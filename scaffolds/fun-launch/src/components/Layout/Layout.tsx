@@ -25,25 +25,27 @@ export const Layout: React.FC<LayoutProps> = ({ children }) => {
 
   if (!shouldShowSidebar) {
     return (
-      <div className="min-h-screen bg-black text-white">
+      <div className="h-screen bg-black text-white flex flex-col overflow-hidden">
         <Header sidebarCollapsed={false} onToggleSidebar={() => {}} />
-        {children}
+        <div className="flex-1 overflow-y-auto">
+          {children}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-black text-white">
+    <div className="h-screen bg-black text-white flex flex-col overflow-hidden">
       {/* Header - Always at top */}
       <Header sidebarCollapsed={sidebarCollapsed} onToggleSidebar={handleToggleSidebar} />
       
       {/* Main Layout - Sidebar + Content below header */}
-      <div className="flex">
-        {/* Sidebar - Starts below header */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* Sidebar - Fixed height, starts below header */}
         <TradingSidebar collapsed={sidebarCollapsed} />
         
-        {/* Main Content Area */}
-        <div className="flex-1">
+        {/* Main Content Area - Scrollable */}
+        <div className="flex-1 overflow-y-auto">
           {children}
         </div>
       </div>

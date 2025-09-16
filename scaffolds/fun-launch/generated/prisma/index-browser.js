@@ -136,7 +136,6 @@ exports.Prisma.UserScalarFieldEnum = {
 
 exports.Prisma.TokenScalarFieldEnum = {
   id: 'id',
-  address: 'address',
   name: 'name',
   symbol: 'symbol',
   url: 'url',
@@ -146,14 +145,10 @@ exports.Prisma.TokenScalarFieldEnum = {
   twitter: 'twitter',
   supply: 'supply',
   decimals: 'decimals',
-  bondingCurveSlope: 'bondingCurveSlope',
   metadataUrl: 'metadataUrl',
   imageUrl: 'imageUrl',
   description: 'description',
-  contractAddress: 'contractAddress',
   marketCap: 'marketCap',
-  totalRaised: 'totalRaised',
-  launchDate: 'launchDate',
   telegram: 'telegram',
   discord: 'discord',
   holders: 'holders',
