@@ -64,3 +64,4 @@ studio/data/whitelist_wallet.csv
 
 # Prisma
 /generated/prisma
+@generated/
