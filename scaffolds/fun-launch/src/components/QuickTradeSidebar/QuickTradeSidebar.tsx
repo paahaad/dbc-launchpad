@@ -9,7 +9,7 @@ import { useTokenInfo } from '@/hooks/queries';
 import { GOR_CONFIG } from '@/config/gor-config';
 import { Connection } from '@solana/web3.js';
 import { getAssociatedTokenAddress, getAccount, getMint } from '@solana/spl-token';
-import { DynamicBondingCurveClient } from '@meteora-ag/dynamic-bonding-curve-sdk';
+import { DynamicBondingCurveClient, VirtualPool } from '@meteora-ag/dynamic-bonding-curve-sdk';
 import BN from 'bn.js';
 import { NATIVE_MINT } from '@solana/spl-token';
 
@@ -197,7 +197,7 @@ export const QuickTradeSidebar = ({ tokenId }: QuickTradeSidebarProps) => {
 
       // Fetch pool state (use derived if poolAddress is null)
       const effectivePool =  derivedPool;
-      const poolStateLocal = await dbcInstance.state.getPool(effectivePool);
+      const poolStateLocal: VirtualPool = await dbcInstance.state.getPool(effectivePool);
       if (!poolStateLocal) {
         throw new Error('Pool not found');
       }

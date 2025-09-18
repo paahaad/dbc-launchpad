@@ -132,7 +132,11 @@ export default function Watchlist() {
     <div className="flex flex-col items-center justify-center min-h-[60vh] text-center space-y-6">
       {/* Logo */}
       <div className="relative w-24 h-24 mb-4">
-        <div className="w-24 h-24 bg-gradient-to-br from-yellow-400 to-orange-500 rounded-full flex items-center justify-center">
+        <div className={`w-24 h-24 rounded-full flex items-center justify-center ${
+          !walletAddress 
+            ? 'bg-gradient-to-br from-green-400 to-green-600' 
+            : 'bg-gradient-to-br from-yellow-400 to-orange-500'
+        }`}>
           <BookmarkIcon className="w-12 h-12 text-white" />
         </div>
       </div>
@@ -153,7 +157,11 @@ export default function Watchlist() {
       {/* Action Button */}
       <Button 
         onClick={handleExploreClick}
-        className="bg-yellow-500 hover:bg-yellow-600 text-white px-8 py-3 text-lg font-medium"
+        className={`px-8 py-3 text-lg font-medium text-white ${
+          !walletAddress 
+            ? 'bg-green-500 hover:bg-green-600' 
+            : 'bg-yellow-500 hover:bg-yellow-600'
+        }`}
         size="lg"
       >
         {!walletAddress ? 'Connect Wallet' : 'Explore Tokens'}
