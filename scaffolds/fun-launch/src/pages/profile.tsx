@@ -3,16 +3,15 @@
 import { useState, useEffect, useMemo } from "react"
 import { useWallet } from "@jup-ag/wallet-adapter"
 import { Connection } from "@solana/web3.js"
-import { Header } from "../components/Header"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Badge } from "@/components/ui/badge"
 import { Skeleton } from "@/components/ui/Skeleton"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Input } from "@/components/ui/input"
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/Dialog"
 import { toast } from "sonner"
-import { Copy, ExternalLink, Wallet, Coins, User, RefreshCw } from "lucide-react"
-import { useRouter } from 'next/navigation';
+import { Copy, Wallet, Coins, User, Eye, EyeOff, Plus, Edit, Save, X } from "lucide-react"
 
 const RPC_URL = process.env.RPC_URL || "https://rpc.gorbagana.wtf"
 
@@ -30,34 +29,47 @@ const copyToClipboard = async (text: string) => {
 }
 
 const ProfileSkeleton = () => (
-  <div className="space-y-6">
-    <Card>
-      <CardContent className="pt-6">
-        <div className="flex flex-col items-center space-y-4">
-          <Skeleton className="h-24 w-24 rounded-full" />
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-10 w-40" />
+  <div className="space-y-8">
+    {/* Profile Header Skeleton */}
+    <div className="flex items-center justify-between">
+      <div className="flex items-center space-x-4">
+        <Skeleton className="h-16 w-16 rounded-full" />
+        <div className="space-y-2">
+          <Skeleton className="h-6 w-32" />
+          <Skeleton className="h-4 w-24" />
         </div>
-      </CardContent>
-    </Card>
+      </div>
+      <div className="text-right space-y-2">
+        <Skeleton className="h-8 w-24" />
+        <Skeleton className="h-4 w-16" />
+      </div>
+    </div>
 
-    <div className="grid gap-6 md:grid-cols-2">
-      <Card>
-        <CardHeader>
-          <Skeleton className="h-6 w-32" />
-        </CardHeader>
-        <CardContent className="space-y-2">
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-8 w-24" />
-        </CardContent>
-      </Card>
+    {/* Tabs Skeleton */}
+    <div className="space-y-6">
+      <div className="flex space-x-1 bg-neutral-900 border border-neutral-800 rounded-lg p-1">
+        <Skeleton className="h-10 flex-1" />
+        <Skeleton className="h-10 flex-1" />
+      </div>
 
-      <Card>
+
+      {/* Holdings Section Skeleton */}
+      <Card className="border-neutral-800 bg-neutral-900/50">
         <CardHeader>
-          <Skeleton className="h-6 w-32" />
+          <div className="flex items-center justify-between">
+            <Skeleton className="h-6 w-24" />
+            <div className="text-right space-y-1">
+              <Skeleton className="h-8 w-16" />
+              <Skeleton className="h-4 w-20" />
+            </div>
+          </div>
         </CardHeader>
         <CardContent>
-          <Skeleton className="h-4 w-full" />
+          <div className="text-center py-12">
+            <Skeleton className="h-16 w-16 rounded-full mx-auto mb-4" />
+            <Skeleton className="h-6 w-32 mx-auto mb-2" />
+            <Skeleton className="h-4 w-48 mx-auto" />
+          </div>
         </CardContent>
       </Card>
     </div>
@@ -68,12 +80,12 @@ export default function Profile() {
   const { publicKey } = useWallet()
   const address = useMemo(() => publicKey?.toBase58(), [publicKey])
   const [userData, setUserData] = useState<any>(null)
-  const [name, setName] = useState("")
   const [balance, setBalance] = useState(0)
   const [loading, setLoading] = useState(true)
+  const [balanceVisible, setBalanceVisible] = useState(true)
+  const [isEditOpen, setIsEditOpen] = useState(false)
+  const [editName, setEditName] = useState("")
   const [updating, setUpdating] = useState(false)
-  const [refreshing, setRefreshing] = useState(false)
-  const router = useRouter();
 
   useEffect(() => {
     if (address) {
@@ -89,7 +101,7 @@ export default function Profile() {
       if (!res.ok) throw new Error("Failed to fetch user")
       const data = await res.json()
       setUserData(data)
-      setName(data.name || "")
+      setEditName(data.name || "")
     } catch (error) {
       console.error(error)
       toast.error("Failed to load user data")
@@ -110,7 +122,7 @@ export default function Profile() {
   }
 
   const updateName = async () => {
-    if (!name.trim()) {
+    if (!editName.trim()) {
       toast.error("Name cannot be empty")
       return
     }
@@ -120,11 +132,12 @@ export default function Profile() {
       const res = await fetch("/api/user", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address, name: name.trim() }),
+        body: JSON.stringify({ address, name: editName.trim() }),
       })
       if (!res.ok) throw new Error("Failed to update name")
       toast.success("Name updated successfully")
-      fetchUserData()
+      setUserData({ ...userData, name: editName.trim() })
+      setIsEditOpen(false)
     } catch (error) {
       console.error(error)
       toast.error("Failed to update name")
@@ -133,21 +146,15 @@ export default function Profile() {
     }
   }
 
-  const handleRefresh = async () => {
-    setRefreshing(true)
-    await Promise.all([fetchUserData(), fetchBalance()])
-    setRefreshing(false)
-    toast.success("Profile refreshed")
-  }
 
   if (!address) {
     return (
-      <div className="min-h-screen bg-background">
+      <div className="min-h-screen bg-black">
         <main className="container mx-auto px-4 py-10">
-          <Card className="max-w-md mx-auto text-center">
+          <Card className="max-w-md mx-auto text-center border-neutral-800 bg-neutral-900/50">
             <CardContent className="pt-6">
               <Wallet className="h-16 w-16 mx-auto mb-4 text-muted-foreground" />
-              <h2 className="text-xl font-semibold mb-2">Connect Your Wallet</h2>
+              <h2 className="text-xl font-semibold mb-2 text-white">Connect Your Wallet</h2>
               <p className="text-muted-foreground mb-4">
                 Please connect your wallet to view your profile and manage your tokens.
               </p>
@@ -159,167 +166,162 @@ export default function Profile() {
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-black">
       <main className="container mx-auto px-4 py-8 max-w-4xl">
-        <div className="flex items-center justify-between mb-8">
-          <div>
-            <h1 className="text-3xl font-bold text-balance">Hey Gorbagio!</h1>
-            <p className="text-muted-foreground">Launch your next trash and see it becoming something great</p>
-          </div>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleRefresh}
-            disabled={refreshing}
-            className="gap-2 bg-transparent"
-          >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? "animate-spin" : ""}`} />
-            Refresh
-          </Button>
-        </div>
-
         {loading ? (
           <ProfileSkeleton />
         ) : (
-          <div className="space-y-6">
-            <Card className="border-neutral-800 bg-neutral-900/50">
-              <CardContent className="pt-6">
-                <div className="flex flex-col items-center space-y-4">
-                  <Avatar className="h-24 w-24">
-                    <AvatarImage src="https://gorbagana.wtf/images/GOR-HD.avif" alt="Profile" />
-                    <AvatarFallback>
-                      <User className="h-12 w-12" />
-                    </AvatarFallback>
-                  </Avatar>
-
-                  <div className="text-center space-y-2">
-                    <h2 className="text-xl font-semibold">{userData?.name || "Anonymous User"}</h2>
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                      <code className="bg-muted px-2 py-1 rounded text-xs">{truncateAddress(address)}</code>
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(address)}
-                        className="h-6 w-6 p-0 bg-transparent hover:bg-muted/50"
-                      >
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-2 w-full max-w-sm">
-                    <Input
-                      value={name}
-                      onChange={(e) => setName(e.target.value)}
-                      placeholder="Enter your name"
-                      className="flex-1 bg-transparent border-muted text-foreground placeholder:text-muted-foreground"
-                    />
-                    <Button size="sm" onClick={updateName} disabled={updating || !name.trim()} className="gap-2 bg-green-600 hover:bg-green-700 text-white">
-                      {updating ? <RefreshCw className="h-4 w-4 animate-spin" /> : "Update"}
-                    </Button>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <div className="grid gap-6 md:grid-cols-2">
-              <Card className="border-neutral-800 bg-neutral-900/50">
-                <CardHeader className="flex flex-row items-center space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium flex items-center gap-2">
-                    <Wallet className="h-4 w-4" />
-                    Wallet Balance
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="text-2xl font-bold text-primary">{balance.toFixed(4)} SOL</div>
-                  <p className="text-xs text-muted-foreground mt-1">Current wallet balance</p>
-                </CardContent>
-              </Card>
-
-              <Card className="border-neutral-800 bg-neutral-900/50">
-                <CardHeader className="flex flex-row items-center space-y-0 pb-2">
-                  <CardTitle className="text-sm font-medium">Wallet Address</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <div className="flex items-center justify-between">
-                    <code className="text-sm bg-muted px-2 py-1 rounded flex-1 mr-2">
-                      {truncateAddress(address, 8)}
-                    </code>
-                    <div className="flex">
-                      <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => copyToClipboard(address)}
-                        className="h-8 w-8 p-0 bg-transparent hover:bg-muted/50"
-                      >
-                        <Copy className="h-3 w-3" />
-                      </Button>
-                      <Button 
-                        variant="outline" 
-                        size="sm" 
-                        onClick={() => window.open(`https://trashscan.xyz/address/${address}`, '_blank')}
-                        className="h-8 w-8 p-0 bg-transparent hover:bg-muted/50"
-                      >
-                        <ExternalLink className="h-3 w-3" />
-                      </Button>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-
-            <Card className="border-neutral-800 bg-neutral-900/50">
-              <CardHeader className="flex flex-row items-center space-y-0 pb-2">
-                <CardTitle className="flex items-center gap-2">
-                  Created Tokens
-                </CardTitle>
-                <Badge variant="secondary" className="ml-auto">
-                  {userData?.launchedTokens?.length || 0}
-                </Badge>
-              </CardHeader>
-              <CardContent>
-                {userData?.launchedTokens?.length > 0 ? (
-                  <div className="space-y-3">
-                    {userData.launchedTokens.map((token: any) => (
-                      <div
-                        key={token.id}
-                        className="flex items-center justify-between p-3 border border-neutral-800 rounded-lg hover:bg-muted/50 transition-colors cursor-pointer"
-                        onClick={() => router.push(`/token/${token.mintAddress}`)}
-                      >
-                        <div className="space-y-1">
-                          <div className="flex items-center gap-2">
-                            <span className="font-medium">{token.name}</span>
-                            <Badge variant="outline" className="text-xs">
-                              {token.symbol}
-                            </Badge>
-                          </div>
-                          <code className="text-xs text-muted-foreground">{truncateAddress(token.mintAddress, 6)}</code>
-                        </div>
+          <div className="space-y-8">
+            {/* Profile Header */}
+            <div className="flex items-center justify-between">
+              <div className="flex items-center space-x-4">
+                <Avatar className="h-16 w-16 border-2 border-neutral-700">
+                  <AvatarImage src="https://gorbagana.wtf/images/GOR-HD.avif" alt="Profile" />
+                  <AvatarFallback className="bg-neutral-800">
+                    <User className="h-8 w-8 text-neutral-400" />
+                  </AvatarFallback>
+                </Avatar>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h1 className="text-2xl font-bold text-white">{userData?.name || "Paahaad"}</h1>
+                    <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+                      <DialogTrigger asChild>
                         <Button
                           variant="ghost"
                           size="sm"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            copyToClipboard(token.mintAddress);
-                          }}
-                          className="h-8 w-8 p-0 bg-transparent hover:bg-muted/50"
+                          className="h-8 w-8 p-0 bg-transparent hover:bg-neutral-800"
                         >
-                          <Copy className="h-3 w-3" />
+                          <Edit className="h-4 w-4 text-neutral-400" />
                         </Button>
+                      </DialogTrigger>
+                      <DialogContent className="sm:max-w-md bg-neutral-900 border-neutral-800">
+                        <DialogHeader>
+                          <DialogTitle className="text-white">Edit Username</DialogTitle>
+                        </DialogHeader>
+                        <div className="space-y-4">
+                          <div>
+                            <label className="text-sm text-neutral-400 mb-2 block">Username</label>
+                            <Input
+                              value={editName}
+                              onChange={(e) => setEditName(e.target.value)}
+                              placeholder="Enter your username"
+                              className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500"
+                            />
+                          </div>
+                          <div className="flex justify-end space-x-2">
+                            <Button
+                              variant="outline"
+                              onClick={() => setIsEditOpen(false)}
+                              className="border-neutral-700 text-neutral-300 hover:bg-neutral-800"
+                            >
+                              <X className="h-4 w-4 mr-2" />
+                              Cancel
+                            </Button>
+                            <Button
+                              onClick={updateName}
+                              disabled={updating || !editName.trim()}
+                              className="bg-blue-600 hover:bg-blue-700 text-white"
+                            >
+                              {updating ? (
+                                <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                              ) : (
+                                <Save className="h-4 w-4 mr-2" />
+                              )}
+                              {updating ? "Saving..." : "Save"}
+                            </Button>
+                          </div>
+                        </div>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                  <div className="flex items-center gap-2 text-sm text-neutral-400">
+                    <code className="bg-neutral-800 px-2 py-1 rounded text-xs">{truncateAddress(address)}</code>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => copyToClipboard(address)}
+                      className="h-6 w-6 p-0 bg-transparent hover:bg-neutral-800"
+                    >
+                      <Copy className="h-3 w-3" />
+                    </Button>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="text-right">
+                <div className="flex items-center gap-2">
+                  <span className="text-2xl font-bold text-white">
+                    {balanceVisible ? `$${balance.toFixed(2)}` : "••••••"}
+                  </span>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setBalanceVisible(!balanceVisible)}
+                    className="h-8 w-8 p-0 bg-transparent hover:bg-neutral-800"
+                  >
+                    {balanceVisible ? <Eye className="h-4 w-4" /> : <EyeOff className="h-4 w-4" />}
+                  </Button>
+                </div>
+                <p className="text-sm text-neutral-400">~{balance.toFixed(4)} SOL</p>
+              </div>
+            </div>
+
+            {/* Tabs Section */}
+            <Tabs defaultValue="portfolio" className="w-full">
+              <TabsList className="grid w-full grid-cols-2 bg-neutral-900 border border-neutral-800">
+                <TabsTrigger value="portfolio" className="data-[state=active]:bg-neutral-800 data-[state=active]:text-white">
+                  Holdings
+                </TabsTrigger>
+                <TabsTrigger value="activity" className="data-[state=active]:bg-neutral-800 data-[state=active]:text-white">
+                  Token Created
+                </TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="portfolio" className="space-y-6 mt-6">
+                {/* Holdings Section */}
+                <Card className="border-neutral-800 bg-neutral-900/50">
+                  <CardHeader>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-white">Holdings (0)</CardTitle>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-white">$0</p>
+                        <p className="text-sm text-neutral-400">Total Value</p>
                       </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="text-center py-8">
-                    <Coins className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-                    <h3 className="text-lg font-medium mb-2">No Tokens Created</h3>
-                    <p className="text-muted-foreground text-sm">
-                      You haven&apos;t created any tokens yet. Start building your first token!
-                    </p>
-                  </div>
-                )}
-              </CardContent>
-            </Card>
+                    </div>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-12">
+                      <div className="w-16 h-16 mx-auto mb-4 bg-neutral-800 rounded-full flex items-center justify-center">
+                        <Coins className="h-8 w-8 text-neutral-400" />
+                      </div>
+                      <h3 className="text-lg font-medium text-white mb-2">No Holdings</h3>
+                      <p className="text-neutral-400 text-sm">
+                        You don't have any tokens in your portfolio yet.
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+
+              <TabsContent value="activity" className="space-y-6 mt-6">
+                <Card className="border-neutral-800 bg-neutral-900/50">
+                  <CardHeader>
+                    <CardTitle className="text-white">Token Created</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <div className="text-center py-12">
+                      <div className="w-16 h-16 mx-auto mb-4 bg-neutral-800 rounded-full flex items-center justify-center">
+                        <Plus className="h-8 w-8 text-neutral-400" />
+                      </div>
+                      <h3 className="text-lg font-medium text-white mb-2">No Tokens Created</h3>
+                      <p className="text-neutral-400 text-sm">
+                        You haven't created any tokens yet. Start building your first token!
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              </TabsContent>
+            </Tabs>
           </div>
         )}
       </main>
