@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { useWallet } from "@jup-ag/wallet-adapter"
-import { Connection } from "@solana/web3.js"
+import { Connection, PublicKey, Transaction } from "@solana/web3.js"
+import { createTransferInstruction, getAssociatedTokenAddress, getAccount } from "@solana/spl-token"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Skeleton } from "@/components/ui/Skeleton"
@@ -11,7 +12,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/Dialog"
 import { toast } from "sonner"
-import { Copy, Wallet, Coins, User, Eye, EyeOff, Plus, Edit, Save, X, ExternalLink } from "lucide-react"
+import { Copy, Wallet, Coins, User, Eye, EyeOff, Plus, Edit, Save, X, ExternalLink, ArrowRightLeft, Send } from "lucide-react"
 
 const RPC_URL = process.env.RPC_URL || "https://rpc.gorbagana.wtf"
 
@@ -77,7 +78,7 @@ const ProfileSkeleton = () => (
 )
 
 export default function Profile() {
-  const { publicKey } = useWallet()
+  const { publicKey, signTransaction } = useWallet()
   const address = useMemo(() => publicKey?.toBase58(), [publicKey])
   const [userData, setUserData] = useState<any>(null)
   const [balance, setBalance] = useState(0)
@@ -90,6 +91,11 @@ export default function Profile() {
   const [holdingsLoading, setHoldingsLoading] = useState(false)
   const [createdTokens, setCreatedTokens] = useState<any[]>([])
   const [createdTokensLoading, setCreatedTokensLoading] = useState(false)
+  const [transferOpen, setTransferOpen] = useState(false)
+  const [selectedToken, setSelectedToken] = useState<any>(null)
+  const [transferAmount, setTransferAmount] = useState("")
+  const [transferDestination, setTransferDestination] = useState("")
+  const [transferring, setTransferring] = useState(false)
 
   useEffect(() => {
     if (address) {
@@ -154,6 +160,109 @@ export default function Profile() {
       toast.error("Failed to fetch created tokens")
     } finally {
       setCreatedTokensLoading(false)
+    }
+  }
+
+  const handleSwap = (mintAddress: string) => {
+    window.location.href = `/token/${mintAddress}`
+  }
+
+  const handleTransfer = (token: any) => {
+    setSelectedToken(token)
+    setTransferAmount("")
+    setTransferDestination("")
+    setTransferOpen(true)
+  }
+
+  const executeTransfer = async () => {
+    if (!selectedToken || !transferAmount || !transferDestination) {
+      toast.error("Please fill in all fields")
+      return
+    }
+
+    if (!publicKey || !signTransaction) {
+      toast.error("Wallet not connected")
+      return
+    }
+
+    const amount = parseFloat(transferAmount)
+    if (isNaN(amount) || amount <= 0) {
+      toast.error("Please enter a valid amount")
+      return
+    }
+
+    if (amount > selectedToken.balance) {
+      toast.error("Insufficient balance")
+      return
+    }
+
+    setTransferring(true)
+    try {
+      const connection = new Connection(RPC_URL, "confirmed")
+      const mintAddress = new PublicKey(selectedToken.mintAddress)
+      const destinationAddress = new PublicKey(transferDestination)
+
+      // Get source token account
+      const sourceTokenAccount = await getAssociatedTokenAddress(mintAddress, publicKey)
+      
+      // Get or create destination token account
+      const destinationTokenAccount = await getAssociatedTokenAddress(mintAddress, destinationAddress)
+
+      // Check if destination token account exists
+      try {
+        await getAccount(connection, destinationTokenAccount)
+      } catch (error) {
+        toast.error("Destination wallet doesn't have a token account for this token")
+        return
+      }
+
+      // Convert amount to token units (considering decimals)
+      const amountInTokenUnits = Math.floor(amount * Math.pow(10, selectedToken.decimals))
+
+      // Create transfer instruction
+      const transferInstruction = createTransferInstruction(
+        sourceTokenAccount,
+        destinationTokenAccount,
+        publicKey,
+        amountInTokenUnits
+      )
+
+      // Create transaction
+      const transaction = new Transaction()
+      transaction.add(transferInstruction)
+
+      // Get recent blockhash
+      const { blockhash } = await connection.getLatestBlockhash()
+      transaction.recentBlockhash = blockhash
+      transaction.feePayer = publicKey
+
+      // Sign and send transaction
+      const signedTransaction = await signTransaction(transaction)
+      const signature = await connection.sendRawTransaction(signedTransaction.serialize())
+
+      // Confirm transaction
+      await connection.confirmTransaction(signature, "confirmed")
+
+      toast.success(`Transfer successful! ${amount} ${selectedToken.symbol || 'tokens'} sent to ${truncateAddress(transferDestination)}`)
+      
+      // Close dialog and refresh holdings
+      setTransferOpen(false)
+      setTransferAmount("")
+      setTransferDestination("")
+      setSelectedToken(null)
+      
+      // Refresh holdings to show updated balance
+      await fetchHoldings()
+      
+    } catch (error) {
+      console.error("Transfer error:", error)
+      if (error instanceof Error) {
+        toast.error(`Transfer failed: ${error.message}`)
+      } else {
+        toast.error("Transfer failed")
+      }
+    } finally {
+      setTransferring(false)
     }
   }
 
@@ -388,14 +497,35 @@ export default function Profile() {
                                   {holding.symbol || 'tokens'}
                                 </p>
                               </div>
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                onClick={() => copyToClipboard(holding.mintAddress)}
-                                className="h-6 w-6 p-0 bg-transparent hover:bg-neutral-700"
-                              >
-                                <Copy className="h-3 w-3" />
-                              </Button>
+                              <div className="flex items-center space-x-1">
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleSwap(holding.mintAddress)}
+                                  className="h-8 w-8 p-0 bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 hover:text-blue-300"
+                                  title="Swap"
+                                >
+                                  <ArrowRightLeft className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => handleTransfer(holding)}
+                                  className="h-8 w-8 p-0 bg-green-600/20 hover:bg-green-600/30 text-green-400 hover:text-green-300"
+                                  title="Transfer"
+                                >
+                                  <Send className="h-4 w-4" />
+                                </Button>
+                                <Button
+                                  variant="ghost"
+                                  size="sm"
+                                  onClick={() => copyToClipboard(holding.mintAddress)}
+                                  className="h-8 w-8 p-0 bg-transparent hover:bg-neutral-700"
+                                  title="Copy Address"
+                                >
+                                  <Copy className="h-3 w-3" />
+                                </Button>
+                              </div>
                             </div>
                           </div>
                         ))}
@@ -495,6 +625,89 @@ export default function Profile() {
             </Tabs>
           </div>
         )}
+
+        {/* Transfer Dialog */}
+        <Dialog open={transferOpen} onOpenChange={setTransferOpen}>
+          <DialogContent className="sm:max-w-md bg-neutral-900 border-neutral-800">
+            <DialogHeader>
+              <DialogTitle className="text-white">Transfer Tokens</DialogTitle>
+            </DialogHeader>
+            {selectedToken && (
+              <div className="space-y-4">
+                <div className="flex items-center space-x-3 p-3 bg-neutral-800/50 rounded-lg">
+                  <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                    {selectedToken.imageUrl ? (
+                      <img 
+                        src={selectedToken.imageUrl} 
+                        alt={selectedToken.name || selectedToken.symbol || 'Token'}
+                        className="w-10 h-10 rounded-full object-cover"
+                      />
+                    ) : (
+                      <Coins className="h-5 w-5 text-white" />
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-white font-medium">
+                      {selectedToken.name || selectedToken.symbol || truncateAddress(selectedToken.mintAddress, 8)}
+                    </p>
+                    <p className="text-sm text-neutral-400">
+                      Balance: {selectedToken.balance.toLocaleString()} {selectedToken.symbol || 'tokens'}
+                    </p>
+                  </div>
+                </div>
+
+                <div>
+                  <label className="text-sm text-neutral-400 mb-2 block">Destination Address</label>
+                  <Input
+                    value={transferDestination}
+                    onChange={(e) => setTransferDestination(e.target.value)}
+                    placeholder="Enter wallet address"
+                    className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500"
+                  />
+                </div>
+
+                <div>
+                  <label className="text-sm text-neutral-400 mb-2 block">Amount</label>
+                  <Input
+                    type="number"
+                    value={transferAmount}
+                    onChange={(e) => setTransferAmount(e.target.value)}
+                    placeholder="Enter amount to transfer"
+                    className="bg-neutral-800 border-neutral-700 text-white placeholder:text-neutral-500"
+                    max={selectedToken.balance}
+                    step="0.000001"
+                  />
+                  <p className="text-xs text-neutral-500 mt-1">
+                    Max: {selectedToken.balance.toLocaleString()} {selectedToken.symbol || 'tokens'}
+                  </p>
+                </div>
+
+                <div className="flex justify-end space-x-2">
+                  <Button
+                    variant="outline"
+                    onClick={() => setTransferOpen(false)}
+                    className="border-neutral-700 text-neutral-300 hover:bg-neutral-800"
+                  >
+                    <X className="h-4 w-4 mr-2" />
+                    Cancel
+                  </Button>
+                  <Button
+                    onClick={executeTransfer}
+                    disabled={transferring || !transferAmount || !transferDestination}
+                    className="bg-green-600 hover:bg-green-700 text-white"
+                  >
+                    {transferring ? (
+                      <div className="h-4 w-4 mr-2 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                    ) : (
+                      <Send className="h-4 w-4 mr-2" />
+                    )}
+                    {transferring ? "Transferring..." : "Transfer"}
+                  </Button>
+                </div>
+              </div>
+            )}
+          </DialogContent>
+        </Dialog>
       </main>
     </div>
   )
