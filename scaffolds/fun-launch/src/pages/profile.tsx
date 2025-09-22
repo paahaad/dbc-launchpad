@@ -11,7 +11,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Input } from "@/components/ui/input"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/Dialog"
 import { toast } from "sonner"
-import { Copy, Wallet, Coins, User, Eye, EyeOff, Plus, Edit, Save, X } from "lucide-react"
+import { Copy, Wallet, Coins, User, Eye, EyeOff, Plus, Edit, Save, X, ExternalLink } from "lucide-react"
 
 const RPC_URL = process.env.RPC_URL || "https://rpc.gorbagana.wtf"
 
@@ -86,11 +86,17 @@ export default function Profile() {
   const [isEditOpen, setIsEditOpen] = useState(false)
   const [editName, setEditName] = useState("")
   const [updating, setUpdating] = useState(false)
+  const [holdings, setHoldings] = useState<any[]>([])
+  const [holdingsLoading, setHoldingsLoading] = useState(false)
+  const [createdTokens, setCreatedTokens] = useState<any[]>([])
+  const [createdTokensLoading, setCreatedTokensLoading] = useState(false)
 
   useEffect(() => {
     if (address) {
       fetchUserData()
       fetchBalance()
+      fetchHoldings()
+      fetchCreatedTokens()
     }
   }, [address])
 
@@ -118,6 +124,36 @@ export default function Profile() {
     } catch (error) {
       console.error("Error fetching balance:", error)
       toast.error("Failed to fetch balance")
+    }
+  }
+
+  const fetchHoldings = async () => {
+    setHoldingsLoading(true)
+    try {
+      const res = await fetch(`/api/user-holdings?address=${address}`)
+      if (!res.ok) throw new Error("Failed to fetch holdings")
+      const data = await res.json()
+      setHoldings(data.holdings || [])
+    } catch (error) {
+      console.error("Error fetching holdings:", error)
+      toast.error("Failed to fetch token holdings")
+    } finally {
+      setHoldingsLoading(false)
+    }
+  }
+
+  const fetchCreatedTokens = async () => {
+    setCreatedTokensLoading(true)
+    try {
+      const res = await fetch(`/api/user?address=${address}`)
+      if (!res.ok) throw new Error("Failed to fetch created tokens")
+      const data = await res.json()
+      setCreatedTokens(data.launchedTokens || [])
+    } catch (error) {
+      console.error("Error fetching created tokens:", error)
+      toast.error("Failed to fetch created tokens")
+    } finally {
+      setCreatedTokensLoading(false)
     }
   }
 
@@ -282,23 +318,89 @@ export default function Profile() {
                 <Card className="border-neutral-800 bg-neutral-900/50">
                   <CardHeader>
                     <div className="flex items-center justify-between">
-                      <CardTitle className="text-white">Holdings (0)</CardTitle>
+                      <CardTitle className="text-white">
+                        Holdings ({holdings.length})
+                      </CardTitle>
                       <div className="text-right">
-                        <p className="text-2xl font-bold text-white">$0</p>
-                        <p className="text-sm text-neutral-400">Total Value</p>
+                        <p className="text-2xl font-bold text-white">
+                          {holdingsLoading ? "..." : `${holdings.length} tokens`}
+                        </p>
+                        <p className="text-sm text-neutral-400">Total Tokens</p>
                       </div>
                     </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-center py-12">
-                      <div className="w-16 h-16 mx-auto mb-4 bg-neutral-800 rounded-full flex items-center justify-center">
-                        <Coins className="h-8 w-8 text-neutral-400" />
+                    {holdingsLoading ? (
+                      <div className="space-y-4">
+                        {[1, 2, 3].map((i) => (
+                          <div key={i} className="flex items-center space-x-4 p-4 bg-neutral-800/50 rounded-lg">
+                            <Skeleton className="h-10 w-10 rounded-full" />
+                            <div className="flex-1 space-y-2">
+                              <Skeleton className="h-4 w-32" />
+                              <Skeleton className="h-3 w-20" />
+                            </div>
+                            <Skeleton className="h-6 w-16" />
+                          </div>
+                        ))}
                       </div>
-                      <h3 className="text-lg font-medium text-white mb-2">No Holdings</h3>
-                      <p className="text-neutral-400 text-sm">
-                        You don't have any tokens in your portfolio yet.
-                      </p>
-                    </div>
+                    ) : holdings.length === 0 ? (
+                      <div className="text-center py-12">
+                        <div className="w-16 h-16 mx-auto mb-4 bg-neutral-800 rounded-full flex items-center justify-center">
+                          <Coins className="h-8 w-8 text-neutral-400" />
+                        </div>
+                        <h3 className="text-lg font-medium text-white mb-2">No Holdings</h3>
+                        <p className="text-neutral-400 text-sm">
+                          You don't have any tokens in your portfolio yet.
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {holdings.map((holding, index) => (
+                          <div key={index} className="flex items-center justify-between p-4 bg-neutral-800/50 rounded-lg hover:bg-neutral-800/70 transition-colors">
+                            <div className="flex items-center space-x-4">
+                              <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-full flex items-center justify-center">
+                                {holding.imageUrl ? (
+                                  <img 
+                                    src={holding.imageUrl} 
+                                    alt={holding.name || holding.symbol || 'Token'}
+                                    className="w-10 h-10 rounded-full object-cover"
+                                  />
+                                ) : (
+                                  <Coins className="h-5 w-5 text-white" />
+                                )}
+                              </div>
+                              <div>
+                                <p className="text-white font-medium">
+                                  {holding.name || holding.symbol || truncateAddress(holding.mintAddress, 8)}
+                                </p>
+                                <p className="text-sm text-neutral-400">
+                                  {holding.symbol && holding.name ? `${holding.symbol} • ` : ''}
+                                  {holding.balance.toLocaleString()} tokens
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <div className="text-right">
+                                <p className="text-white font-medium">
+                                  {holding.balance.toLocaleString()}
+                                </p>
+                                <p className="text-xs text-neutral-400">
+                                  {holding.symbol || 'tokens'}
+                                </p>
+                              </div>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => copyToClipboard(holding.mintAddress)}
+                                className="h-6 w-6 p-0 bg-transparent hover:bg-neutral-700"
+                              >
+                                <Copy className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
@@ -306,18 +408,87 @@ export default function Profile() {
               <TabsContent value="activity" className="space-y-6 mt-6">
                 <Card className="border-neutral-800 bg-neutral-900/50">
                   <CardHeader>
-                    <CardTitle className="text-white">Token Created</CardTitle>
+                    <div className="flex items-center justify-between">
+                      <CardTitle className="text-white">
+                        Tokens Created ({createdTokens.length})
+                      </CardTitle>
+                      <div className="text-right">
+                        <p className="text-2xl font-bold text-white">
+                          {createdTokensLoading ? "..." : `${createdTokens.length} tokens`}
+                        </p>
+                        <p className="text-sm text-neutral-400">Total Created</p>
+                      </div>
+                    </div>
                   </CardHeader>
                   <CardContent>
-                    <div className="text-center py-12">
-                      <div className="w-16 h-16 mx-auto mb-4 bg-neutral-800 rounded-full flex items-center justify-center">
-                        <Plus className="h-8 w-8 text-neutral-400" />
+                    {createdTokensLoading ? (
+                      <div className="space-y-4">
+                        {[1, 2, 3].map((i) => (
+                          <div key={i} className="flex items-center space-x-4 p-4 bg-neutral-800/50 rounded-lg">
+                            <Skeleton className="h-10 w-10 rounded-full" />
+                            <div className="flex-1 space-y-2">
+                              <Skeleton className="h-4 w-32" />
+                              <Skeleton className="h-3 w-20" />
+                            </div>
+                            <Skeleton className="h-6 w-16" />
+                          </div>
+                        ))}
                       </div>
-                      <h3 className="text-lg font-medium text-white mb-2">No Tokens Created</h3>
-                      <p className="text-neutral-400 text-sm">
-                        You haven't created any tokens yet. Start building your first token!
-                      </p>
-                    </div>
+                    ) : createdTokens.length === 0 ? (
+                      <div className="text-center py-12">
+                        <div className="w-16 h-16 mx-auto mb-4 bg-neutral-800 rounded-full flex items-center justify-center">
+                          <Plus className="h-8 w-8 text-neutral-400" />
+                        </div>
+                        <h3 className="text-lg font-medium text-white mb-2">No Tokens Created</h3>
+                        <p className="text-neutral-400 text-sm">
+                          You haven't created any tokens yet. Start building your first token!
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="space-y-4">
+                        {createdTokens.map((token, index) => (
+                          <div key={index} className="flex items-center justify-between p-4 bg-neutral-800/50 rounded-lg hover:bg-neutral-800/70 transition-colors">
+                            <div className="flex items-center space-x-4">
+                              <div className="w-10 h-10 bg-gradient-to-br from-green-500 to-blue-600 rounded-full flex items-center justify-center">
+                                {token.imageUrl ? (
+                                  <img 
+                                    src={token.imageUrl} 
+                                    alt={token.name}
+                                    className="w-10 h-10 rounded-full object-cover"
+                                  />
+                                ) : (
+                                  <Plus className="h-5 w-5 text-white" />
+                                )}
+                              </div>
+                              <div>
+                                <p className="text-white font-medium">{token.name}</p>
+                                <p className="text-sm text-neutral-400">
+                                  {token.symbol} • {new Date(token.createdAt).toLocaleDateString()}
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex items-center space-x-2">
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => copyToClipboard(token.mintAddress)}
+                                className="h-6 w-6 p-0 bg-transparent hover:bg-neutral-700"
+                              >
+                                <Copy className="h-3 w-3" />
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="sm"
+                                onClick={() => window.open(`https://explorer.solana.com/address/${token.mintAddress}`, '_blank')}
+                                className="h-6 w-6 p-0 bg-transparent hover:bg-neutral-700"
+                              >
+                                <ExternalLink className="h-3 w-3" />
+                              </Button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
               </TabsContent>
