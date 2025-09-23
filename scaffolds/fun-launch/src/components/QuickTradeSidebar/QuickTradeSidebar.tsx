@@ -11,52 +11,14 @@ import { Connection } from '@solana/web3.js';
 import { getAssociatedTokenAddress, getAccount, getMint } from '@solana/spl-token';
 import { DynamicBondingCurveClient, VirtualPool } from '@meteora-ag/dynamic-bonding-curve-sdk';
 import BN from 'bn.js';
-import { NATIVE_MINT } from '@solana/spl-token';
+import { getAmountInLamports, derivePoolAccount } from '@/lib/utils';
 
 interface QuickTradeSidebarProps {
   tokenId: string;
 }
 
-// Add PDA derivation functions (adapted from test-pda-derivation.mjs)
-const DYNAMIC_BONDING_CURVE_PROGRAM_ID = new PublicKey('dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN');
-
-// Utility function to convert decimal amount to lamports/smallest unit
-function getAmountInLamports(amount: number | string, decimals: number): BN {
-  const amountStr = amount.toString();
-  const [integerPart, decimalPart = ''] = amountStr.split('.');
-  const paddedDecimal = decimalPart.padEnd(decimals, '0').slice(0, decimals);
-  const lamportsStr = integerPart + paddedDecimal;
-  return new BN(lamportsStr);
-}
-
-function derivePoolAccount(configAccount: string, tokenMint: string) {
-  const config = new PublicKey(configAccount);
-  const baseMint = new PublicKey(tokenMint);
-  const quoteMint = NATIVE_MINT;
-
-  return PublicKey.findProgramAddressSync(
-    [
-      Buffer.from('pool'),
-      config.toBuffer(),
-      getFirstKey(baseMint, quoteMint),
-      getSecondKey(baseMint, quoteMint),
-    ],
-    DYNAMIC_BONDING_CURVE_PROGRAM_ID
-  )[0];
-}
-
-// Re-add necessary functions for derivePoolAccount
-function getFirstKey(key1: PublicKey, key2: PublicKey) {
-  const buf1 = key1.toBuffer();
-  const buf2 = key2.toBuffer();
-  return Buffer.compare(buf1, buf2) === 1 ? buf1 : buf2;
-}
-
-function getSecondKey(key1: PublicKey, key2: PublicKey) {
-  const buf1 = key1.toBuffer();
-  const buf2 = key2.toBuffer();
-  return Buffer.compare(buf1, buf2) === 1 ? buf2 : buf1;
-}
+// Add PDA derivation functions
+const DYNAMIC_BONDING_CURVE_PROGRAM_ID = new PublicKey(GOR_CONFIG.DBC_PROGRAM_ID);
 
 export const QuickTradeSidebar = ({ tokenId }: QuickTradeSidebarProps) => {
   const { publicKey, signTransaction } = useWallet();
@@ -124,7 +86,7 @@ export const QuickTradeSidebar = ({ tokenId }: QuickTradeSidebarProps) => {
       try {
         const connection = new Connection(GOR_CONFIG.RPC_URL, 'confirmed');
         const dbcInstance = new DynamicBondingCurveClient(connection, 'confirmed');
-        const derivedPool = derivePoolAccount('HBqdy1Kq4ybRoBCYL8LiRWhCJLeYW98yp7hKLYzxwPwF', tokenId);
+        const derivedPool = derivePoolAccount(GOR_CONFIG.POOL_CONFIG_KEY, tokenId, DYNAMIC_BONDING_CURVE_PROGRAM_ID);
         const poolStateLocal = await dbcInstance.state.getPool(derivedPool);
         if (!poolStateLocal) throw new Error('Pool not found');
  
@@ -193,7 +155,7 @@ export const QuickTradeSidebar = ({ tokenId }: QuickTradeSidebarProps) => {
       const dbcInstance = new DynamicBondingCurveClient(connection, 'confirmed');
 
       // Derive pool if not provided (using env POOL_CONFIG_KEY)
-      const derivedPool = derivePoolAccount('HBqdy1Kq4ybRoBCYL8LiRWhCJLeYW98yp7hKLYzxwPwF', tokenId);
+      const derivedPool = derivePoolAccount(GOR_CONFIG.POOL_CONFIG_KEY, tokenId, DYNAMIC_BONDING_CURVE_PROGRAM_ID);
 
       // Fetch pool state (use derived if poolAddress is null)
       const effectivePool =  derivedPool;

@@ -1,9 +1,9 @@
 // GOR Chain Configuration for Dynamic Bonding Curve Integration
 export const GOR_CONFIG = {
-  RPC_URL: process.env.GOR_RPC_URL || process.env.RPC_URL || 'https://rpc.gorbagana.wtf/',
+  RPC_URL: 'https://rpc.gorbagana.wtf/',
   DBC_PROGRAM_ID: 'dbcij3LWUppWqq96dh6gJWwBifmcGfLSB5D4DuSMaqN',
   POOL_AUTHORITY_PDA: 'FhVo3mqL8PW5pH5U2CN4XE33DokiyZnUwuGpH2hmHLuM',
-  POOL_CONFIG_KEY: 'HBqdy1Kq4ybRoBCYL8LiRWhCJLeYW98yp7hKLYzxwPwF',
+  POOL_CONFIG_KEY: process.env.POOL_CONFIG_KEY || 'CPT7s2VgE4dd69vueWVyKcDJDyPjCKRktYjUiHwbJxKa',
 } as const;
 
 
