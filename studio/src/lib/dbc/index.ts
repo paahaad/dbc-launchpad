@@ -24,6 +24,7 @@ import {
   DynamicBondingCurveClient,
 } from '@meteora-ag/dynamic-bonding-curve-sdk';
 import BN from 'bn.js';
+import { uploadTokenMetadata } from '../../helpers/metadata';
 
 /**
  * Create a DBC config
@@ -43,12 +44,6 @@ export async function createDbcConfig(
     throw new Error('Missing dbc configuration');
   }
   console.log('\n> Initializing DBC config...');
-
-  // check if using an existing config key address
-  if (config.dbcConfigAddress) {
-    console.log(`> Using existing config key: ${config.dbcConfigAddress.toString()}`);
-    return config.dbcConfigAddress;
-  }
 
   let curveConfig: ConfigParameters | null = null;
 
@@ -131,7 +126,8 @@ export async function createDbcPool(
   connection: Connection,
   wallet: Wallet,
   quoteMint: PublicKey,
-  baseMint: Keypair
+  baseMint: Keypair,
+  dbcConfigKey: PublicKey | null
 ) {
   if (!config.dbcConfig) {
     throw new Error('Missing dbc configuration');
@@ -140,9 +136,36 @@ export async function createDbcPool(
     throw new Error('Missing dbc pool configuration');
   }
 
-  const configPublicKey = await createDbcConfig(config, connection, wallet, quoteMint);
+  let configPublicKey: PublicKey;
+  if (!dbcConfigKey) {
+    configPublicKey = await createDbcConfig(config, connection, wallet, quoteMint);
+  } else {
+    configPublicKey = dbcConfigKey;
+  }
 
   const dbcInstance = new DynamicBondingCurveClient(connection, 'confirmed');
+
+  let metadataUri: string;
+  if (config.dbcPool.metadata.uri) {
+    console.log('Using existing metadata URI:', config.dbcPool.metadata.uri);
+    metadataUri = config.dbcPool.metadata.uri;
+  } else {
+    console.log('Uploading metadata to Irys...');
+    if (!config.dbcPool.metadata.image) {
+      throw new Error('Image is required for DBC pool metadata');
+    }
+    metadataUri = await uploadTokenMetadata(
+      connection.rpcEndpoint,
+      wallet.payer as Keypair,
+      config.dbcPool.name,
+      config.dbcPool.symbol,
+      config.dbcPool.metadata.image,
+      config.dbcPool.metadata.description || '',
+      config.dbcPool.metadata.website || '',
+      config.dbcPool.metadata.twitter || '',
+      config.dbcPool.metadata.telegram || ''
+    );
+  }
 
   if (config.dryRun) {
     console.log(
@@ -154,7 +177,7 @@ export async function createDbcPool(
         config: configPublicKey,
         name: config.dbcPool.name,
         symbol: config.dbcPool.symbol,
-        uri: config.dbcPool.uri,
+        uri: metadataUri,
         payer: wallet.publicKey,
         poolCreator: wallet.publicKey,
       });
@@ -177,7 +200,7 @@ export async function createDbcPool(
       config: configPublicKey,
       name: config.dbcPool.name,
       symbol: config.dbcPool.symbol,
-      uri: config.dbcPool.uri,
+      uri: metadataUri,
       payer: wallet.publicKey,
       poolCreator: wallet.publicKey,
     });

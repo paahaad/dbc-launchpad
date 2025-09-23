@@ -17,19 +17,111 @@ export const CONFIG_SCHEMA = {
       type: 'object',
       nullable: true,
       properties: {
-        mintBaseTokenAmount: {
-          anyOf: [{ type: 'number' }, { type: 'string' }],
-        },
-        baseDecimals: {
+        supply: {
           type: 'number',
         },
+        decimals: {
+          type: 'number',
+        },
+        tokenMintKeypairFilePath: {
+          type: 'string',
+        },
+        name: {
+          type: 'string',
+        },
+        symbol: {
+          type: 'string',
+        },
+        metadata: {
+          type: 'object',
+          properties: {
+            uri: {
+              type: 'string',
+            },
+            image: {
+              type: 'string',
+            },
+            description: {
+              type: 'string',
+            },
+            website: {
+              type: 'string',
+            },
+            twitter: {
+              type: 'string',
+            },
+            telegram: {
+              type: 'string',
+            },
+          },
+          additionalProperties: false,
+        },
+        authorities: {
+          type: 'object',
+          properties: {
+            mint: {
+              anyOf: [{ type: 'string' }, { type: 'null' }],
+            },
+            freeze: {
+              anyOf: [{ type: 'string' }, { type: 'null' }],
+            },
+            update: {
+              anyOf: [{ type: 'string' }, { type: 'null' }],
+            },
+          },
+          required: ['mint', 'freeze', 'update'],
+          additionalProperties: false,
+        },
+        sellerFeeBasisPoints: {
+          type: 'number',
+        },
+        creators: {
+          anyOf: [
+            {
+              type: 'array',
+              items: {
+                type: 'object',
+                // Creator properties would need to be defined based on @metaplex-foundation/mpl-token-metadata
+                additionalProperties: true,
+              },
+            },
+            { type: 'null' },
+          ],
+        },
+        collection: {
+          anyOf: [
+            {
+              type: 'object',
+              // Collection properties would need to be defined based on @metaplex-foundation/mpl-token-metadata
+              additionalProperties: true,
+            },
+            { type: 'null' },
+          ],
+        },
+        uses: {
+          anyOf: [
+            {
+              type: 'object',
+              // Uses properties would need to be defined based on @metaplex-foundation/mpl-token-metadata
+              additionalProperties: true,
+            },
+            { type: 'null' },
+          ],
+        },
       },
-      required: ['mintBaseTokenAmount', 'baseDecimals'],
+      required: [
+        'supply',
+        'decimals',
+        'name',
+        'symbol',
+        'metadata',
+        'authorities',
+        'sellerFeeBasisPoints',
+        'creators',
+        'collection',
+        'uses',
+      ],
       additionalProperties: false,
-    },
-    baseMint: {
-      type: 'string',
-      nullable: true,
     },
     quoteSymbol: {
       type: 'string',
@@ -39,7 +131,7 @@ export const CONFIG_SCHEMA = {
       type: 'string',
       nullable: true,
     },
-    dynamicAmm: {
+    dammV1Config: {
       type: 'object',
       nullable: true,
       properties: {
@@ -53,7 +145,7 @@ export const CONFIG_SCHEMA = {
           type: 'number',
         },
         activationType: {
-          enum: ['slot', 'timestamp'],
+          type: 'number',
         },
         activationPoint: {
           type: 'number',
@@ -72,7 +164,56 @@ export const CONFIG_SCHEMA = {
       ],
       additionalProperties: false,
     },
-    dynamicAmmV2: {
+    dammV1LockLiquidity: {
+      type: 'object',
+      nullable: true,
+      properties: {
+        allocations: {
+          type: 'array',
+          items: {
+            type: 'object',
+            properties: {
+              percentage: {
+                type: 'number',
+              },
+              address: {
+                type: 'string',
+              },
+            },
+            required: ['percentage', 'address'],
+            additionalProperties: false,
+          },
+        },
+      },
+      required: ['allocations'],
+      additionalProperties: false,
+    },
+    stake2EarnFarm: {
+      type: 'object',
+      nullable: true,
+      properties: {
+        topListLength: {
+          type: 'number',
+        },
+        unstakeLockDurationSecs: {
+          type: 'number',
+        },
+        secondsToFullUnlock: {
+          type: 'number',
+        },
+        startFeeDistributeTimestamp: {
+          type: 'number',
+        },
+      },
+      required: [
+        'topListLength',
+        'unstakeLockDurationSecs',
+        'secondsToFullUnlock',
+        'startFeeDistributeTimestamp',
+      ],
+      additionalProperties: false,
+    },
+    dammV2Config: {
       type: 'object',
       nullable: true,
       properties: {
@@ -139,8 +280,7 @@ export const CONFIG_SCHEMA = {
           enum: [0, 1],
         },
         activationType: {
-          type: 'string',
-          enum: ['slot', 'timestamp'],
+          type: 'number',
         },
         activationPoint: {
           type: 'number',
@@ -153,7 +293,58 @@ export const CONFIG_SCHEMA = {
       required: ['activationType', 'hasAlphaVault', 'collectFeeMode', 'poolFees'],
       additionalProperties: false,
     },
-    dlmm: {
+    addLiquidity: {
+      type: 'object',
+      nullable: true,
+      properties: {
+        amountIn: {
+          type: 'number',
+        },
+        isTokenA: {
+          type: 'boolean',
+        },
+      },
+      required: ['amountIn', 'isTokenA'],
+      additionalProperties: false,
+    },
+    splitPosition: {
+      type: 'object',
+      nullable: true,
+      properties: {
+        newPositionOwner: {
+          type: 'string',
+        },
+        unlockedLiquidityPercentage: {
+          type: 'number',
+        },
+        permanentLockedLiquidityPercentage: {
+          type: 'number',
+        },
+        feeAPercentage: {
+          type: 'number',
+        },
+        feeBPercentage: {
+          type: 'number',
+        },
+        reward0Percentage: {
+          type: 'number',
+        },
+        reward1Percentage: {
+          type: 'number',
+        },
+      },
+      required: [
+        'newPositionOwner',
+        'unlockedLiquidityPercentage',
+        'permanentLockedLiquidityPercentage',
+        'feeAPercentage',
+        'feeBPercentage',
+        'reward0Percentage',
+        'reward1Percentage',
+      ],
+      additionalProperties: false,
+    },
+    dlmmConfig: {
       type: 'object',
       nullable: true,
       properties: {
@@ -167,7 +358,7 @@ export const CONFIG_SCHEMA = {
           type: 'number',
         },
         activationType: {
-          enum: ['slot', 'timestamp'],
+          type: 'number',
         },
         activationPoint: {
           type: 'number',
@@ -190,6 +381,7 @@ export const CONFIG_SCHEMA = {
         'activationType',
         'priceRounding',
         'hasAlphaVault',
+        'creatorPoolOnOffControl',
       ],
       additionalProperties: false,
     },
@@ -241,7 +433,7 @@ export const CONFIG_SCHEMA = {
       type: 'object',
       nullable: true,
       properties: {
-        alllocations: {
+        allocations: {
           type: 'array',
           items: {
             type: 'object',
@@ -339,10 +531,9 @@ export const CONFIG_SCHEMA = {
       type: 'object',
       nullable: true,
       properties: {
-        poolAddress: { type: 'string' },
         enabled: { type: 'boolean' },
       },
-      required: ['poolAddress', 'enabled'],
+      required: ['enabled'],
     },
   },
   required: ['rpcUrl', 'dryRun', 'keypairFilePath', 'computeUnitPriceMicroLamports'],

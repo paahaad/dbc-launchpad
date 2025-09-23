@@ -56,22 +56,14 @@ meteora-invent/
     │   ├── dbc_config.jsonc
     │   └── dlmm_config.jsonc
     ├── data
-    │   ├── kv_proof.json
-    │   └── whitelist_wallet.csv
+    │   ├── image
+    │   │   └── test-token.jpg
+    │   ├── kv_proof_example.json
+    │   └── whitelist_wallet_example.csv
     ├── LLM.txt
     ├── package.json
     ├── README.md
     ├── src
-    │   ├── helpers
-    │   │   ├── accounts.ts
-    │   │   ├── cli.ts
-    │   │   ├── common.ts
-    │   │   ├── config.ts
-    │   │   ├── index.ts
-    │   │   ├── token.ts
-    │   │   ├── transaction.ts
-    │   │   ├── utils.ts
-    │   │   └── validation.ts
     │   ├── actions
     │   │   ├── alpha_vault
     │   │   │   └── create_alpha_vault.ts
@@ -81,13 +73,13 @@ meteora-invent/
     │   │   │   ├── lock_liquidity_stake2earn.ts
     │   │   │   └── lock_liquidity.ts
     │   │   ├── damm_v2
+    │   │   │   ├── add_liquidity.ts
+    │   │   │   ├── claim_position_fee.ts
+    │   │   │   ├── close_position.ts
     │   │   │   ├── create_balanced_pool.ts
     │   │   │   ├── create_one_sided_pool.ts
-    │   │   │   ├── claim_position_fee.ts
-    │   │   │   ├── split_position.ts
-    │   │   │   ├── add_liquidity.ts
     │   │   │   ├── remove_liquidity.ts
-    │   │   │   └── close_position.ts
+    │   │   │   └── split_position.ts
     │   │   ├── dbc
     │   │   │   ├── claim_trading_fee.ts
     │   │   │   ├── create_config.ts
@@ -103,14 +95,25 @@ meteora-invent/
     │   │   └── settings
     │   │       ├── airdrop_sol.ts
     │   │       └── generate_keypair.ts
+    │   ├── helpers
+    │   │   ├── accounts.ts
+    │   │   ├── cli.ts
+    │   │   ├── common.ts
+    │   │   ├── config.ts
+    │   │   ├── index.ts
+    │   │   ├── metadata.ts
+    │   │   ├── token.ts
+    │   │   ├── transaction.ts
+    │   │   ├── utils.ts
+    │   │   └── validation.ts
     │   ├── lib
     │   │   ├── alpha_vault
-    │   │   │   ├── index.ts
     │   │   │   ├── merkle_tree
     │   │   │   │   ├── balance_tree.ts
     │   │   │   │   ├── index.ts
     │   │   │   │   └── merkle_tree.ts
     │   │   │   │   └── metadata.ts
+    │   │   │   ├── index.ts
     │   │   │   └── utils.ts
     │   │   ├── damm_v1
     │   │   │   ├── index.ts

@@ -1,8 +1,7 @@
 import { Wallet } from '@coral-xyz/anchor';
 import { Connection, PublicKey } from '@solana/web3.js';
-import { DammV1Config } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
-import { safeParseKeypairFromFile, parseConfigFromCli } from '../../helpers';
+import { safeParseKeypairFromFile, getDammV1Config, parseCliArguments } from '../../helpers';
 import {
   createProgram,
   deriveCustomizablePermissionlessConstantProductPoolAddress,
@@ -10,12 +9,12 @@ import {
 import { createDammV1Stake2EarnPool } from '../../lib/damm_v1/stake2earn';
 
 async function main() {
-  const config = (await parseConfigFromCli()) as DammV1Config;
+  const config = await getDammV1Config();
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
 
-  console.log('\n> Initializing with general configuration...');
+  console.log('\n> Initializing configuration...');
   console.log(`- Using RPC URL ${config.rpcUrl}`);
   console.log(`- Dry run = ${config.dryRun}`);
   console.log(`- Using payer ${keypair.publicKey} to execute commands`);
@@ -23,14 +22,20 @@ async function main() {
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
   const wallet = new Wallet(keypair);
 
-  if (!config.baseMint) {
-    throw new Error('Missing baseMint in configuration');
+  const { baseMint: baseMintArg } = parseCliArguments();
+  if (!baseMintArg) {
+    throw new Error('Please provide --baseMint flag to do this action');
   }
-  const baseMint = new PublicKey(config.baseMint);
+  const baseMint = new PublicKey(baseMintArg);
+  if (!baseMint) {
+    throw new Error('Please provide --baseMint flag to do this action');
+  }
+
   if (!config.quoteMint) {
     throw new Error('Missing quoteMint in configuration');
   }
   const quoteMint = new PublicKey(config.quoteMint);
+
   const ammProgram = createProgram(connection as any).ammProgram;
   const poolKey = deriveCustomizablePermissionlessConstantProductPoolAddress(
     baseMint,

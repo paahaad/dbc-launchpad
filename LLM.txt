@@ -1,36 +1,39 @@
 # LLM.txt - Meteora Invent Repository
 
-**AI-Optimized Monorepo for Solana DeFi Operations**
+**AI-Optimized Monorepo for Solana DeFi Operations with Meteora**
 
 ## 🎯 Quick AI Context
 
-Meteora Invent is a comprehensive monorepo providing:
-- **Automated Actions**: Config-driven protocol interactions
-- **Production Templates**: Ready-to-deploy frontend scaffolds  
-- **Shared Libraries**: Reusable configurations and utilities
+Meteora Invent is a comprehensive toolkit consisting of everything you need to invent innovative token launches on Meteora. Meet **Metsumi**, your personal launch assistant engineered to help you launch anything and do any action on Meteora programs with just a few configurations and CLI commands.
+
+### Core Components:
+- **Studio**: Scripts for doing any action on Meteora programs
+- **Scaffolds**: Production-ready frontend application templates compatible with Meteora's Dynamic Bonding Curve program.
+- **Shared Packages**: Reusable configurations, utilities, and TypeScript settings
 
 **AI Navigation**: Follow the hierarchical LLM.txt structure → Each directory contains specific AI guidance
 
 ## 📊 Repository Architecture
 
 ### **Core Workspaces**
-- **`studio/`** → **Backend Operations**: Protocol actions, config-driven automation
-- **`scaffolds/`** → **Frontend Templates**: Production-ready UI applications  
-- **`packages/`** → **Shared Code**: Configurations, utilities, TypeScript settings
+- **`studio/`** → **Scripts Operations**: Meteora program actions, config-driven automation for Meteora programs
+- **`scaffolds/`** → **Frontend Templates**: Production-ready UI applications
+- **`packages/`** → **Shared Code**: ESLint, Prettier, TypeScript configs, and utility functions
 
 ### **AI-Friendly Design**
 - ✅ **Hierarchical LLM.txt**: Detailed guidance at every level
-- ✅ **Config-Driven**: All parameters externalized to JSON files
+- ✅ **Config-Driven**: All parameters externalized to JSONC files
 - ✅ **Safe Execution**: Built-in dry-run and validation modes
 - ✅ **Clear Boundaries**: Explicit files AI can/cannot modify
+- ✅ **Metsumi**: (coming soon)
 
 ## 🚀 Global Setup & Prerequisites
 
 ### **System Requirements**
 - **Node.js** >= 18.0.0
-- **pnpm** >= 9.0.0 (package manager)
+- **pnpm** >= 10.0.0 (package manager)
 - **Solana wallet** with SOL balance
-- **RPC endpoint** (recommended: Helius, QuickNode)
+- **RPC endpoint** (recommended: Helius, QuickNode, or similar)
 
 ### **Initial Repository Setup**
 ```bash
@@ -38,7 +41,7 @@ Meteora Invent is a comprehensive monorepo providing:
 git clone https://github.com/MeteoraAg/meteora-invent.git
 cd meteora-invent
 
-# 2. Install all dependencies (handles workspaces)
+# 2. Install all dependencies (handles workspaces automatically)
 pnpm install
 
 # 3. Build all packages (creates shared libraries)
@@ -100,6 +103,10 @@ Is this a new token?
 | Linting | `pnpm lint` | Check all workspaces |
 | Build all | `pnpm build` | Compile all packages |
 | Clean all | `pnpm clean` | Remove artifacts and node_modules |
+| Format code | `pnpm format` | Format all code with Prettier |
+| Check formatting | `pnpm format:check` | Check code formatting |
+| Validate environment | `pnpm validate-env` | Validate environment setup |
+| Sync dependencies | `pnpm syncpack:fix` | Fix dependency mismatches |
 
 ## 📁 Hierarchical Repository Structure
 
@@ -110,93 +117,101 @@ meteora-invent/
 ├── 📄 turbo.json                     # Build system configuration
 ├── 📄 pnpm-workspace.yaml            # Workspace definitions
 │
-├── 🏗️ studio/                        # BACKEND - Protocol automation scripts
+├── 🏗️ studio/                        # Scripts - Program scripts (@meteora-invent/studio)
 │   ├── 📄 LLM.txt                    # ⭐ STUDIO MASTER GUIDE (updated & comprehensive)
 │   ├── 📄 package.json               # Studio-specific scripts (pnpm studio ...)
+│   ├── 📄 README.md                  # Studio documentation
 │   ├── 📁 config/                    # ⚙️ Configuration files (AI modifies these)
 │   │   ├── alpha_vault_config.jsonc  # Alpha Vault settings
 │   │   ├── dbc_config.jsonc          # Dynamic Bonding Curve settings
 │   │   ├── damm_v1_config.jsonc      # DAMM V1 pool settings
 │   │   ├── damm_v2_config.jsonc      # DAMM V2 pool settings
 │   │   └── dlmm_config.jsonc         # DLMM pool settings
+│   ├── 📁 data/                      # Static data files and examples
+│   │   ├── image/                    # Sample token images
+│   │   ├── kv_proof_example.json     # KV proof examples
+│   │   ├── kv_proofs/                # KV proof data
+│   │   └── whitelist_wallet_example.csv # Wallet whitelist examples
 │   ├── 📁 src/                       # 🔒 Source code (AI never modifies)
 │   │   ├── actions/                  # Executable protocol actions
+│   │   │   ├── alpha_vault/          # Alpha Vault actions
+│   │   │   ├── damm_v1/              # DAMM V1 actions
+│   │   │   ├── damm_v2/              # DAMM V2 actions
+│   │   │   ├── dbc/                  # DBC actions
+│   │   │   ├── dlmm/                 # DLMM actions
+│   │   │   └── settings/             # Utility actions (generate keypair, airdrop SOL on devnet/localnet)
 │   │   ├── lib/                      # Protocol-specific libraries
 │   │   ├── helpers/                  # Utility functions
+│   │   ├── tests/                    # Test artifacts and data
 │   │   └── utils/                    # Types and constants
+│   ├── 📁 test-ledger/               # Local validator data (generated)
 │   ├── 📄 .env                       # Environment variables (create from .env.example)
-│   └── 📄 keypair.json               # Generated wallet file
+│   ├── 📄 keypair.json               # Generated wallet file
+│   ├── 📄 baseMintKeypair.json       # Generated base mint keypair
+│   └── 📄 mint-keypair.json          # Generated mint keypair
 │
 ├── 🎨 scaffolds/                     # FRONTEND - Production-ready templates
 │   ├── 📄 LLM.txt                    # Scaffold overview & usage guide
-│   └── 📁 fun-launch/                # Token launchpad template
+│   └── 📁 fun-launch/                # Token launchpad template (@meteora-invent/scaffold/fun-launch)
 │       ├── 📄 LLM.txt                # ⭐ DETAILED FRONTEND GUIDE
+│       ├── 📄 README.md              # Fun Launch specific documentation
 │       ├── 📄 package.json           # Next.js application scripts
+│       ├── 📄 next.config.ts         # Next.js configuration
+│       ├── 📄 tailwind.config.js     # Tailwind CSS configuration
+│       ├── 📄 tsconfig.json          # TypeScript configuration
 │       ├── 📁 src/                   # React components & pages
-│       ├── 📄 .env.example           # Frontend environment template
-│       └── 📄 next.config.ts         # Next.js configuration
+│       │   ├── components/           # Reusable UI components
+│       │   │   ├── ui/               # Base components (Button, Dialog, etc.)
+│       │   │   ├── Token/            # Token-specific components
+│       │   │   ├── TokenChart/       # TradingView chart integration
+│       │   │   ├── TokenHeader/      # Token page headers
+│       │   │   ├── TokenTable/       # Transaction and holder tables
+│       │   │   ├── Terminal/         # Trading interface
+│       │   │   ├── Explore/          # Token exploration components
+│       │   │   └── CreatePoolButton.tsx # Pool creation
+│       │   ├── pages/                # Next.js routes
+│       │   │   ├── _app.tsx          # App wrapper
+│       │   │   ├── index.tsx         # Home/explore page
+│       │   │   ├── create-pool.tsx   # Pool creation page
+│       │   │   ├── token/[tokenId].tsx # Dynamic token pages
+│       │   │   └── api/              # API routes
+│       │   ├── contexts/             # React contexts for state
+│       │   ├── hooks/                # Custom React hooks
+│       │   ├── lib/                  # Utility functions
+│       │   ├── types/                # TypeScript definitions
+│       │   ├── icons/                # SVG icons & components
+│       │   └── styles/               # Global styles
+│       ├── 📁 public/                # Static assets
+│       │   ├── favicon.ico
+│       │   ├── coins/                # Token icons
+│       │   └── *.svg                 # Various UI icons
+│       └── 📄 .env.example           # Frontend environment template
 │
 └── 📦 packages/                      # SHARED - Reusable configurations
     ├── 📄 LLM.txt                    # Shared packages guide
     ├── 📁 config/                    # Shared configurations
-    │   ├── eslint/                   # ESLint configurations
-    │   ├── prettier/                 # Prettier configurations
-    │   └── typescript/               # TypeScript configurations
+    │   ├── eslint/                   # ESLint configurations (@meteora-invent/config-eslint)
+    │   │   ├── index.js              # Base ESLint config
+    │   │   ├── next.js               # Next.js specific rules
+    │   │   ├── node.js               # Node.js specific rules
+    │   │   └── package.json
+    │   ├── prettier/                 # Prettier configurations (@meteora-invent/config-prettier)
+    │   │   ├── index.js              # Prettier formatting rules
+    │   │   └── package.json
+    │   ├── typescript/               # TypeScript configurations (@meteora-invent/config-typescript)
+    │   │   ├── base.json             # Common TypeScript settings
+    │   │   ├── nextjs.json           # Next.js projects
+    │   │   ├── node.json             # Node.js scripts
+    │   │   └── package.json
+    │   └── tsconfig.json             # Root TypeScript config
     └── 📁 shared/                    # Shared utilities
-        └── utils/                    # Common utility functions
-```
-
-## 🔄 Complete Workflow Examples
-
-### **1. Token Launch to Trading (Full Stack)**
-```bash
-# Step 1: Launch token with bonding curve (Backend)
-cd studio/
-cp .env.example .env  # Configure wallet & RPC
-pnpm studio dbc-create-pool --config ./config/dbc_config.jsonc
-
-# Step 2: Build trading interface (Frontend)  
-cd ../scaffolds/fun-launch/
-cp .env.example .env  # Configure API endpoints
-pnpm install && pnpm dev
-
-# Step 3: Monitor & migrate when ready (Backend)
-cd ../../studio/
-pnpm studio dbc-migrate-to-damm-v2 --config ./config/dbc_config.jsonc
-```
-
-### **2. AMM Pool Creation Workflow**
-```bash
-# Navigate to studio workspace
-cd studio/
-
-# Configure pool parameters
-# Edit studio/config/damm_v2_config.jsonc with:
-# - tokenMintA: "TOKEN_A_MINT_ADDRESS"
-# - tokenMintB: "TOKEN_B_MINT_ADDRESS" 
-# - feeBps: 30
-
-# Create pool
-pnpm studio damm-v2-create-balanced-pool --config ./config/damm_v2_config.jsonc
-
-# Verify on explorer using returned pool address
-```
-
-### **3. Frontend Development Workflow**
-```bash
-# Copy scaffold to new project
-cp -r scaffolds/fun-launch /path/to/your-project
-cd /path/to/your-project
-
-# Setup environment
-cp .env.example .env
-# Edit .env with:
-# - NEXT_PUBLIC_RPC_URL=your_rpc_endpoint
-# - NEXT_PUBLIC_NETWORK=mainnet-beta
-
-# Install & develop
-pnpm install
-pnpm dev  # Runs on http://localhost:3000
+        └── utils/                    # Common utility functions (@meteora-invent/utils)
+            ├── src/                  # Source code
+            │   ├── formatting.ts     # Text formatting utilities
+            │   ├── numbers.ts        # Number formatting utilities
+            │   └── index.ts          # Main exports
+            ├── package.json
+            └── tsconfig.json
 ```
 
 ## 🛡️ AI Safety & Security Guidelines
@@ -214,7 +229,7 @@ pnpm dev  # Runs on http://localhost:3000
 - `scaffolds/*/src/**` - Frontend source code (when building UIs)
 
 ### **Files AI Must NEVER Modify**
-- `studio/src/**` - Protocol logic and actions
+- `studio/src/**` - Program logic and actions
 - `**/package.json` - Dependencies and scripts (unless explicitly requested)
 - `**/node_modules/**` - Generated dependencies
 - `**/.git/**` - Git repository data
@@ -247,26 +262,17 @@ const privateKey = "actual_private_key_here"  // NEVER DO THIS
 ## 🎯 Next Steps for AI
 
 ### **New to Repository?**
-1. **Start Here**: `studio/LLM.txt` - Comprehensive studio guide
-2. **Frontend Needs**: `scaffolds/fun-launch/LLM.txt` - UI development
-3. **Configuration**: `packages/LLM.txt` - Shared tools setup
+1. **To do actions on Meteora programs**: `studio/LLM.txt` - Comprehensive studio guide
+2. **To build the frontend user interface**: `scaffolds/fun-launch/LLM.txt` - UI development
+3. **Common configuration files**: `packages/LLM.txt` - Shared tools setup
 
-### **Task-Specific Entry Points**
-- **Token Operations**: Always start with `studio/LLM.txt`
-- **UI Development**: Navigate to `scaffolds/LLM.txt` first
-- **Tool Configuration**: Check `packages/LLM.txt` for shared configs
-
-### **For Advanced Users**
-- **Custom Actions**: Extend existing actions in `studio/src/actions/`
-- **New Scaffolds**: Create based on `scaffolds/fun-launch/` pattern
-- **Shared Libraries**: Contribute to `packages/shared/utils/`
 
 ## 📚 Support & Resources
 
 ### **Documentation**
-- **Meteora Docs**: https://docs.meteora.ag - Protocol documentation
-- **Solana Docs**: https://docs.solana.com - Blockchain fundamentals
-- **Next.js Docs**: https://nextjs.org/docs - Frontend framework
+- **Meteora Docs**: https://docs.meteora.ag - Meteora protocol documentation
+- **Next.js Docs**: https://nextjs.org/docs - Next.js frontend framework documentation
+- **Solana Docs**: https://solana.com/docs - Solana blockchain fundamentals
 
 ### **Tools & Explorers**
 - **Solana Explorer**: https://explorer.solana.com - Transaction verification

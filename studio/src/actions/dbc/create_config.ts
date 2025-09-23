@@ -1,17 +1,16 @@
 import { Connection, PublicKey } from '@solana/web3.js';
-import { safeParseKeypairFromFile, parseConfigFromCli } from '../../helpers';
+import { safeParseKeypairFromFile, getDbcConfig } from '../../helpers';
 import { Wallet } from '@coral-xyz/anchor';
-import { DbcConfig } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 import { createDbcConfig } from '../../lib/dbc';
 
 async function main() {
-  const config = (await parseConfigFromCli()) as DbcConfig;
+  const config = await getDbcConfig();
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
 
-  console.log('\n> Initializing with general configuration...');
+  console.log('\n> Initializing configuration...');
   console.log(`- Using RPC URL ${config.rpcUrl}`);
   console.log(`- Dry run = ${config.dryRun}`);
   console.log(`- Using wallet ${keypair.publicKey} to deploy config`);
@@ -26,7 +25,6 @@ async function main() {
 
   console.log(`- Using quote token mint ${quoteMint.toString()}`);
 
-  /// --------------------------------------------------------------------------
   if (config) {
     await createDbcConfig(config, connection, wallet, quoteMint);
   } else {

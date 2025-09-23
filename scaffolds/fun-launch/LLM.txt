@@ -4,12 +4,14 @@
 
 ## 🎯 Quick AI Context
 
-Fun Launch is a **production-ready Next.js application** for building token launchpads with Meteora protocol integration. Features include:
+Fun Launch (`@meteora-invent/scaffold/fun-launch`) is a **production-ready Next.js 15 application** for building token launchpads with Meteora protocol integration. Features include:
 - ✅ **Token Discovery**: Real-time token exploration with filters & search
-- ✅ **Trading Interface**: Complete buy/sell terminal with slippage controls
+- ✅ **Trading Interface**: Complete buy/sell terminal with Jupiter integration
+- ✅ **TradingView Charts**: Professional charting with technical indicators
 - ✅ **Portfolio Tracking**: Wallet integration with position management
 - ✅ **Protocol Integration**: DBC, DAMM, DLMM support out-of-the-box
 - ✅ **Mobile Responsive**: Optimized for all devices with modern UI
+- ✅ **Modern Stack**: Next.js 15, Tailwind CSS v4, TypeScript, Turbopack
 
 **AI Navigation**: This is the detailed implementation guide for the Fun Launch scaffold.
 
@@ -27,9 +29,9 @@ cp .env.example .env
 # NEXT_PUBLIC_RPC_URL=https://your-rpc-endpoint.com
 # NEXT_PUBLIC_NETWORK=mainnet-beta
 
-# 3. Install & run
+# 3. Install & run (with Turbopack for faster development)
 pnpm install && pnpm dev
-# Opens http://localhost:3000
+# Opens http://localhost:3000 with hot reloading
 ```
 
 ### **Environment Configuration**
@@ -38,9 +40,12 @@ pnpm install && pnpm dev
 NEXT_PUBLIC_RPC_URL=https://api.mainnet-beta.solana.com
 NEXT_PUBLIC_NETWORK=mainnet-beta  # or 'devnet' for testing
 
-# Optional but Recommended
+# Optional but Recommended for Production
 NEXT_PUBLIC_ANALYTICS_ID=your_analytics_id
 NEXT_PUBLIC_SENTRY_DSN=your_sentry_dsn
+
+# See scaffolds/fun-launch/README.md for additional configuration options
+# including Cloudflare R2 storage setup for token metadata
 ```
 
 ## 📁 Detailed Project Architecture
@@ -921,8 +926,14 @@ ANALYZE=true pnpm build
 # Vercel deployment with environment variables
 vercel env add NEXT_PUBLIC_RPC_URL production
 vercel env add NEXT_PUBLIC_NETWORK production
-vercel env add SENTRY_DSN production
-vercel env add ANALYTICS_ID production
+vercel env add NEXT_PUBLIC_SENTRY_DSN production
+vercel env add NEXT_PUBLIC_ANALYTICS_ID production
+
+# For Cloudflare R2 storage (see README.md for setup)
+vercel env add R2_ACCESS_KEY_ID production
+vercel env add R2_SECRET_ACCESS_KEY production
+vercel env add R2_ACCOUNT_ID production
+vercel env add R2_BUCKET production
 
 # Deploy to production
 vercel --prod
