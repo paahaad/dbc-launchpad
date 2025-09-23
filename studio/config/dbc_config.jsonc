@@ -119,7 +119,7 @@
       /* Only use the following parameters for createBaseToken if you don't have an existing metadata uri
        * This will create an image uri and a new metadata uri and upload everything to Irys
        */
-      "image": "./data/test-token.jpg", // this can be a URL of the image address (e.g. https://example.com/token-image.png) or the image file path (e.g. ./data/test-token.jpg)
+      "image": "./data/image/test-token.jpg", // this can be a URL of the image address (e.g. https://example.com/token-image.png) or the image file path (e.g. ./data/image/test-token.jpg)
       "description": "YOUR_TOKEN_DESCRIPTION", // token description
       "website": "https://example.com", // project website
       "twitter": "https://x.com/yourproject", // twitter URL

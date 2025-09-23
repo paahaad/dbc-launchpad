@@ -431,8 +431,8 @@ meteora-invent/
     │   ├── dbc_config.jsonc
     │   └── dlmm_config.jsonc
     ├── data
-    │   ├── kv_proof.json
-    │   └── whitelist_wallet.csv
+    │   ├── kv_proof_example.json
+    │   └── whitelist_wallet_example.csv
     ├── LLM.txt
     ├── package.json
     ├── README.md
