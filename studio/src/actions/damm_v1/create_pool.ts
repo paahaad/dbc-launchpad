@@ -30,7 +30,11 @@ async function main() {
   const wallet = new Wallet(keypair);
 
   let baseMint: PublicKey;
-  baseMint = new PublicKey(parseCliArguments().baseMint);
+  const { baseMint: baseMintArg } = parseCliArguments();
+  if (!baseMintArg) {
+    throw new Error('Please provide --baseMint flag to do this action');
+  }
+  baseMint = new PublicKey(baseMintArg);
   if (!baseMint && config.createBaseToken) {
     baseMint = await createTokenMint(connection, wallet, {
       dryRun: config.dryRun,

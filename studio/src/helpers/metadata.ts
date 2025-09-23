@@ -133,6 +133,9 @@ export async function uploadImage(
     const [imageUri] = await umi.uploader.upload([genericFile]);
     console.log('Image uploaded successfully!');
     console.log('Image URI:', imageUri);
+    if (!imageUri) {
+      throw new Error('Image upload failed - no URI returned');
+    }
     return imageUri;
   } catch (error) {
     console.error('Error uploading image:', error);

@@ -16,7 +16,11 @@ async function main() {
 
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
 
-  const baseMint = new PublicKey(parseCliArguments().baseMint);
+  const { baseMint: baseMintArg } = parseCliArguments();
+  if (!baseMintArg) {
+    throw new Error('Please provide --baseMint flag to do this action');
+  }
+  const baseMint = new PublicKey(baseMintArg);
   if (!baseMint) {
     throw new Error('Please provide --baseMint flag to do this action');
   }

@@ -24,8 +24,7 @@ async function main() {
 
     console.log(`\n>> Generating keypair...`);
 
-    const network = args.network;
-    const shouldAirdrop = args.airdrop;
+    const { network, airdrop: shouldAirdrop } = args;
 
     const privateKeyString = process.env.PRIVATE_KEY;
 
@@ -45,6 +44,9 @@ async function main() {
     console.log(`Keypair saved to: ${outputPath}`);
 
     if (shouldAirdrop) {
+      if (!network) {
+        throw new Error('Please provide --network flag (devnet or localnet) when using --airdrop');
+      }
       const networkConfig = getNetworkConfig(network);
       console.log(
         `\n>> Attempting to airdrop ${networkConfig.airdropAmount} SOL on ${network.toUpperCase()}...`

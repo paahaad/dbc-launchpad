@@ -151,16 +151,19 @@ export async function createDbcPool(
     metadataUri = config.dbcPool.metadata.uri;
   } else {
     console.log('Uploading metadata to Irys...');
+    if (!config.dbcPool.metadata.image) {
+      throw new Error('Image is required for DBC pool metadata');
+    }
     metadataUri = await uploadTokenMetadata(
       connection.rpcEndpoint,
       wallet.payer as Keypair,
       config.dbcPool.name,
       config.dbcPool.symbol,
       config.dbcPool.metadata.image,
-      config.dbcPool.metadata.description,
-      config.dbcPool.metadata.website,
-      config.dbcPool.metadata.twitter,
-      config.dbcPool.metadata.telegram
+      config.dbcPool.metadata.description || '',
+      config.dbcPool.metadata.website || '',
+      config.dbcPool.metadata.twitter || '',
+      config.dbcPool.metadata.telegram || ''
     );
   }
 

@@ -21,7 +21,10 @@ async function main() {
       return undefined;
     }
 
-    const network = args.network;
+    const { network } = args;
+    if (!network) {
+      throw new Error('Please provide --network flag (devnet or localnet)');
+    }
 
     const networkConfig = getNetworkConfig(network);
     console.log(`\n>> Using network: ${network.toUpperCase()}`);

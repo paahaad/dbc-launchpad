@@ -37,15 +37,16 @@ export async function createTokenMint(
     throw new Error('Cannot create token mint when in dry run mode');
   }
 
-  const mintAmount = getAmountInLamports(
-    options.tokenConfig?.supply,
-    options.tokenConfig?.decimals
-  );
+  if (!options.tokenConfig) {
+    throw new Error('tokenConfig is required');
+  }
+
+  const mintAmount = getAmountInLamports(options.tokenConfig.supply, options.tokenConfig.decimals);
 
   const mint: PublicKey = await createAndMintToken(
     connection,
     wallet,
-    options.tokenConfig?.decimals,
+    options.tokenConfig.decimals,
     mintAmount,
     options.computeUnitPriceMicroLamports,
     options.tokenConfig
@@ -64,31 +65,31 @@ async function createAndMintToken(
   mintDecimals: number,
   mintAmountLamport: BN,
   computeUnitPriceMicroLamports: number,
-  tokenConfig?: TokenConfig
+  tokenConfig: TokenConfig
 ): Promise<PublicKey> {
   let baseMintKeypair: Keypair;
-  if (tokenConfig?.tokenMintKeypairFilePath) {
+  if (tokenConfig.tokenMintKeypairFilePath) {
     baseMintKeypair = await safeParseKeypairFromFile(tokenConfig.tokenMintKeypairFilePath);
   } else {
     baseMintKeypair = Keypair.generate();
   }
 
   let mintAuthority: PublicKey | null;
-  if (tokenConfig?.authorities.mint) {
+  if (tokenConfig.authorities.mint) {
     mintAuthority = new PublicKey(tokenConfig.authorities.mint);
   } else {
     mintAuthority = null;
   }
 
   let freezeAuthority: PublicKey | null;
-  if (tokenConfig?.authorities.freeze) {
+  if (tokenConfig.authorities.freeze) {
     freezeAuthority = new PublicKey(tokenConfig.authorities.freeze);
   } else {
     freezeAuthority = null;
   }
 
-  let updateAuthority: PublicKey | null;
-  if (tokenConfig?.authorities.update) {
+  let updateAuthority: PublicKey;
+  if (tokenConfig.authorities.update) {
     updateAuthority = new PublicKey(tokenConfig.authorities.update);
   } else {
     updateAuthority = new PublicKey('11111111111111111111111111111111');
@@ -135,7 +136,7 @@ async function createMintWithPriorityFee(
   connection: Connection,
   wallet: Wallet,
   freezeAuthority: PublicKey | null,
-  updateAuthority: PublicKey | null,
+  updateAuthority: PublicKey,
   decimals: number,
   computeUnitPriceMicroLamports: number,
   keypair: Keypair,
@@ -178,16 +179,19 @@ async function createMintWithPriorityFee(
       metadataUri = tokenConfig.metadata.uri;
     } else {
       console.log('Uploading metadata to Irys...');
+      if (!tokenConfig.metadata.image) {
+        throw new Error('Image is required for token metadata');
+      }
       metadataUri = await uploadTokenMetadata(
         connection.rpcEndpoint,
         wallet.payer as Keypair,
         tokenConfig.name,
         tokenConfig.symbol,
         tokenConfig.metadata.image,
-        tokenConfig.metadata.description,
-        tokenConfig.metadata.website,
-        tokenConfig.metadata.twitter,
-        tokenConfig.metadata.telegram
+        tokenConfig.metadata.description || '',
+        tokenConfig.metadata.website || '',
+        tokenConfig.metadata.twitter || '',
+        tokenConfig.metadata.telegram || ''
       );
     }
 
@@ -213,7 +217,7 @@ async function createMintWithPriorityFee(
         mint: keypair.publicKey,
         mintAuthority: wallet.publicKey,
         payer: wallet.publicKey,
-        updateAuthority,
+        updateAuthority: updateAuthority,
       },
       {
         createMetadataAccountArgsV3: {

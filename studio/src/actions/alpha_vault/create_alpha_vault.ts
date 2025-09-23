@@ -26,10 +26,11 @@ async function main() {
 
   const wallet = new Wallet(keypair);
 
-  const baseMint = new PublicKey(parseCliArguments().baseMint);
-  if (!baseMint) {
+  const { baseMint: baseMintArg } = parseCliArguments();
+  if (!baseMintArg) {
     throw new Error('Please provide --baseMint flag to do this action');
   }
+  const baseMint = new PublicKey(baseMintArg);
 
   if (!config.quoteMint) {
     throw new Error('Missing quoteMint in configuration');

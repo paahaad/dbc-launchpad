@@ -28,7 +28,11 @@ async function main() {
     throw new Error('Missing setDlmmPoolStatus in configuration');
   }
 
-  const poolAddress = new PublicKey(parseCliArguments().poolAddress);
+  const { poolAddress: poolAddressArg } = parseCliArguments();
+  if (!poolAddressArg) {
+    throw new Error('Please provide --poolAddress flag to do this action');
+  }
+  const poolAddress = new PublicKey(poolAddressArg);
   if (!poolAddress) {
     throw new Error('Please provide --poolAddress flag to do this action');
   }
