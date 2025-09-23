@@ -29,11 +29,6 @@ async function main() {
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
   const wallet = new Wallet(keypair);
 
-  if (!config.quoteMint) {
-    throw new Error('Missing quoteMint in configuration');
-  }
-  const quoteMint = new PublicKey(config.quoteMint);
-
   let baseMint: PublicKey;
   baseMint = new PublicKey(parseCliArguments().baseMint);
   if (!baseMint && config.createBaseToken) {
@@ -44,14 +39,18 @@ async function main() {
     });
   } else {
     throw new Error(
-      'Please either provide --baseMint flag in cli or createBaseToken in configuration to do this action'
+      'Please either provide --baseMint flag in cli or createBaseToken in damm_v1_config.jsonc to do this action'
     );
   }
+
+  if (!config.quoteMint) {
+    throw new Error('Missing quoteMint in configuration');
+  }
+  const quoteMint = new PublicKey(config.quoteMint);
 
   console.log(`- Using base token mint ${baseMint.toString()}`);
   console.log(`- Using quote token mint ${quoteMint.toString()}`);
 
-  /// --------------------------------------------------------------------------
   if (config) {
     await createDammV1Pool(config, connection, wallet, baseMint, quoteMint);
 

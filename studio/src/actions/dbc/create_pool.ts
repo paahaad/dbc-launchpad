@@ -33,8 +33,8 @@ async function main() {
   }
   const quoteMint = new PublicKey(config.quoteMint);
 
-  console.log(`- Using quote token mint ${quoteMint.toString()}`);
   console.log(`- Using base token mint ${baseMint.publicKey.toString()}`);
+  console.log(`- Using quote token mint ${quoteMint.toString()}`);
 
   if (config) {
     await createDbcPool(config, connection, wallet, quoteMint, baseMint);
