@@ -229,7 +229,6 @@ export type DbcConfig = MeteoraConfigBase & {
     | (BuildCurveWithTwoSegments & { buildCurveMode: 2 })
     | (BuildCurveWithLiquidityWeights & { buildCurveMode: 3 })
     | null;
-  dbcConfigAddress?: PublicKey | null;
   dbcPool?: DbcPool | null;
   dbcSwap?: DbcSwap | null;
 };

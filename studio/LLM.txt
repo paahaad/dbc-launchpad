@@ -121,7 +121,6 @@ All configurations are in `studio/config/`:
 {
   "quoteMint": "So11111111111111111111111111111111111111112", // SOL
   "baseMint": "YOUR_TOKEN_MINT_ADDRESS",
-  "dbcConfigAddress": "CONFIG_PUBKEY_OR_LEAVE_EMPTY",
   "swapDirection": "Buy", // or "Sell"
   "swapAmountLamports": "1000000000", // 1 SOL in lamports
   

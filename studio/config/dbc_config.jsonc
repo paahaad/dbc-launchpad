@@ -18,16 +18,10 @@
    */
   "quoteMint": "So11111111111111111111111111111111111111112",
 
-  /* Either use dbcConfigAddress or dbcConfig, but not both.
-   *
-   * dbcConfigAddress is only used in the following action:
-   * 1. dbc-create-pool (if the dbcConfigAddress is already created)
-   *
-   * dbcConfig is only used in the following actions:
+  /* dbcConfig is only used in the following actions:
    * 1. dbc-create-config
-   * 2. dbc-create-pool (if there is no dbcConfigAddress)
+   * 2. dbc-create-pool (if there is no --config flag indicated in the command)
    */
-  // "dbcConfigAddress": "3dEznPXi5zd27coszGUXA4VPyD9CaTJKoGWVPVHQabJF",
   "dbcConfig": {
     "buildCurveMode": 0, // 0 - buildCurve | 1 - buildCurveWithMarketCap | 2 - buildCurveWithTwoSegments | 3 - buildCurveWithLiquidityWeights
 

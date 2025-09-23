@@ -35,6 +35,9 @@ export function parseCliArguments(): CliArguments {
       help: {
         type: 'boolean',
       },
+      config: {
+        type: 'string',
+      },
     },
     strict: true,
     allowPositionals: true,

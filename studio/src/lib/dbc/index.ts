@@ -45,12 +45,6 @@ export async function createDbcConfig(
   }
   console.log('\n> Initializing DBC config...');
 
-  // check if using an existing config key address
-  if (config.dbcConfigAddress) {
-    console.log(`> Using existing config key: ${config.dbcConfigAddress.toString()}`);
-    return config.dbcConfigAddress;
-  }
-
   let curveConfig: ConfigParameters | null = null;
 
   if (config.dbcConfig.buildCurveMode === 0) {
@@ -132,7 +126,8 @@ export async function createDbcPool(
   connection: Connection,
   wallet: Wallet,
   quoteMint: PublicKey,
-  baseMint: Keypair
+  baseMint: Keypair,
+  dbcConfigKey: PublicKey | null
 ) {
   if (!config.dbcConfig) {
     throw new Error('Missing dbc configuration');
@@ -141,7 +136,12 @@ export async function createDbcPool(
     throw new Error('Missing dbc pool configuration');
   }
 
-  const configPublicKey = await createDbcConfig(config, connection, wallet, quoteMint);
+  let configPublicKey: PublicKey;
+  if (!dbcConfigKey) {
+    configPublicKey = await createDbcConfig(config, connection, wallet, quoteMint);
+  } else {
+    configPublicKey = dbcConfigKey;
+  }
 
   const dbcInstance = new DynamicBondingCurveClient(connection, 'confirmed');
 

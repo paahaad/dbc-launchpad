@@ -11,11 +11,11 @@ action on Meteora programs with just a few configurations and CLI commands.
 
 ## 📋 Table of Contents
 
-- [🏗️ Structure](#%EF%B8%8F-structure)
 - [🚀 Getting Started](#-getting-started)
 - [📦 Workspaces](#-workspaces)
   - [Studio](#studio-meteora-inventstudio)
   - [Scaffolds](#scaffolds)
+- [🏗️ Structure](#%EF%B8%8F-structure)
 - [🤝 Contributing](#-contributing)
 - [📄 License](#-license)
 
@@ -52,7 +52,7 @@ pnpm install
 
 The studio workspace contains all the actions for interacting with Meteora's programs.
 
-#### Getting Started
+#### Setup
 
 1. Copy the `.env.example` file to `.env` and configure the environment variables.
 
@@ -60,7 +60,7 @@ The studio workspace contains all the actions for interacting with Meteora's pro
 cp studio/.env.example studio/.env
 ```
 
-2. Optional: Start a Local Test Validator
+2. (Optional) Start a Local Test Validator
 
 _You can also run the studio actions on localnet - http://localhost:8899 with the following command_
 
@@ -107,152 +107,275 @@ pnpm studio airdrop-sol --network localnet
 
 #### DLMM Actions
 
-**Create a Customizable Permissionless DLMM Pool**
+##### Create a Customizable Permissionless DLMM Pool
+
+Configure `dlmmConfig` in `dlmm_config.jsonc` file and run the following command to create the DLMM
+pool.
+
+_If you don't have a base mint, you can configure `createBaseToken` in the config file and run the
+following command._
 
 ```bash
-pnpm studio dlmm-create-pool --config ./studio/config/dlmm_config.jsonc
+pnpm studio dlmm-create-pool
 ```
 
-**Seed Liquidity (LFG)**
+_If you already have a base mint created, you can provide it via the CLI with a `--baseMint` flag
+and run the following command._
 
 ```bash
-pnpm studio dlmm-seed-liquidity-lfg --config ./studio/config/dlmm_config.jsonc
+pnpm studio dlmm-create-pool --baseMint <YOUR_BASE_MINT_ADDRESS>
 ```
 
-**Seed Liquidity (Single Bin)**
+##### Seed Liquidity (LFG)
+
+Configure `lfgSeedLiquidity` in `dlmm_config.jsonc` file and run the following command to seed the
+liquidity in the already deployed DLMM pool.
+
+**Note:** You need to ensure that the deployed DLMM pool is not trading yet.
 
 ```bash
-pnpm studio dlmm-seed-liquidity-single-bin --config ./studio/config/dlmm_config.jsonc
+pnpm studio dlmm-seed-liquidity-lfg --baseMint <YOUR_BASE_MINT_ADDRESS>
 ```
 
-**Set DLMM Pool Status**
+##### Seed Liquidity (Single Bin)
+
+Configure `singleBinSeedLiquidity` in `dlmm_config.jsonc` file and run the following command to seed
+the liquidity in a single bin in the already deployed DLMM pool.
+
+**Note:** You need to ensure that the deployed DLMM pool is not trading yet.
 
 ```bash
-pnpm studio dlmm-set-pool-status --config ./studio/config/dlmm_config.jsonc
+pnpm studio dlmm-seed-liquidity-single-bin --baseMint <YOUR_BASE_MINT_ADDRESS>
+```
+
+##### Set DLMM Pool Status
+
+Configure `setDlmmPoolStatus` in `dlmm_config.jsonc` file and run the following command to set the
+trading status of the DLMM pool. This command is used by the operator of the pool to either enable
+or disable trading for the DLMM pool.
+
+```bash
+pnpm studio dlmm-set-pool-status --poolAddress <YOUR_POOL_ADDRESS>
 ```
 
 ---
 
 #### DAMM v2 Actions
 
-**Create a Balanced Constant Product Pool**
+##### Create a Balanced Constant Product Pool
+
+Configure `dammV2Config` in `damm_v2_config.jsonc` file and run the following command to create the
+DAMM v2 pool.
+
+_If you don't have a base mint, you can configure `createBaseToken` in the config file and run the
+following command._
 
 ```bash
-pnpm studio damm-v2-create-balanced-pool --config ./studio/config/damm_v2_config.jsonc
+pnpm studio damm-v2-create-balanced-pool
 ```
 
-**Create a One-Sided Pool**
+_If you already have a base mint, you can provide it via the CLI with a `--baseMint` flag and run
+the following command._
 
 ```bash
-pnpm studio damm-v2-create-one-sided-pool --config ./studio/config/damm_v2_config.jsonc
+pnpm studio damm-v2-create-balanced-pool --baseMint <YOUR_BASE_MINT_ADDRESS>
 ```
 
-**Split Position**
+##### Create a One-Sided Pool
+
+Configure `dammV2Config` in `damm_v2_config.jsonc` file and run the following command to create the
+DAMM v2 one-sided pool.
+
+_If you don't have a base mint, you can configure `createBaseToken` in the config file and run the
+following command._
 
 ```bash
-pnpm studio damm-v2-split-position --config ./studio/config/damm_v2_config.jsonc
+pnpm studio damm-v2-create-one-sided-pool
 ```
 
-**Claim Position Fee**
+_If you already have a base mint, you can provide it via the CLI with a `--baseMint` flag and run
+the following command._
 
 ```bash
-pnpm studio damm-v2-claim-position-fee --config ./studio/config/damm_v2_config.jsonc
+pnpm studio damm-v2-create-one-sided-pool --baseMint <YOUR_BASE_MINT_ADDRESS>
 ```
 
-**Add Liquidity**
+##### Split Position
+
+Configure `splitPosition` in `damm_v2_config.jsonc` file and run the following command to split an
+existing position in the already deployed DAMM v2 pool.
 
 ```bash
-pnpm studio damm-v2-add-liquidity --config ./studio/config/damm_v2_config.jsonc
+pnpm studio damm-v2-split-position --poolAddress <YOUR_POOL_ADDRESS>
 ```
 
-**Remove Liquidity**
+##### Claim Position Fee
+
+If you already have an existing position in a DAMM v2 pool with unclaimed fees, you can run the
+following command to claim the fees.
 
 ```bash
-pnpm studio damm-v2-remove-liquidity --config ./studio/config/damm_v2_config.jsonc
+pnpm studio damm-v2-claim-position-fee --poolAddress <YOUR_POOL_ADDRESS>
 ```
 
-**Close Position**
+##### Add Liquidity
+
+Configure `addLiquidity` in `damm_v2_config.jsonc` file and run the following command to add
+liquidity to an existing position in the already deployed DAMM v2 pool.
 
 ```bash
-pnpm studio damm-v2-close-position --config ./studio/config/damm_v2_config.jsonc
+pnpm studio damm-v2-add-liquidity --poolAddress <YOUR_POOL_ADDRESS>
+```
+
+##### Remove Liquidity
+
+If you already have an existing position in a DAMM v2 pool with liquidity, you can run the following
+command to remove the liquidity and close the position.
+
+```bash
+pnpm studio damm-v2-remove-liquidity --poolAddress <YOUR_POOL_ADDRESS>
+```
+
+##### Close Position
+
+If you already have an existing position in a DAMM v2 pool without liquidity, you can run the
+following command to close the position.
+
+```bash
+pnpm studio damm-v2-close-position --poolAddress <YOUR_POOL_ADDRESS>
 ```
 
 ---
 
 #### DAMM v1 Actions
 
-**Create a Constant Product Pool**
+##### Create a Constant Product Pool
+
+Configure `dammV1Config` in `damm_v1_config.jsonc` file and run the following command to create the
+DAMM v1 pool.
+
+_If you don't have a base mint, you can configure `createBaseToken` in the config file and run the
+following command._
 
 ```bash
-pnpm studio damm-v1-create-pool --config ./studio/config/damm_v1_config.jsonc
+pnpm studio damm-v1-create-pool
 ```
 
-**Lock Liquidity**
+_If you already have a base mint created, you can provide it via the CLI with a `--baseMint` flag
+and run the following command._
 
 ```bash
-pnpm studio damm-v1-lock-liquidity --config ./studio/config/damm_v1_config.jsonc
+pnpm studio damm-v1-create-pool --baseMint <YOUR_BASE_MINT_ADDRESS>
 ```
 
-**Create a Stake2Earn Farm**
+##### Lock Liquidity
+
+Configure `dammV1LockLiquidity` in `damm_v1_config.jsonc` file and run the following command to lock
+the liquidity in the already deployed DAMM v1 pool.
 
 ```bash
-pnpm studio damm-v1-create-stake2earn-farm --config ./studio/config/damm_v1_config.jsonc
+pnpm studio damm-v1-lock-liquidity --baseMint <YOUR_BASE_MINT_ADDRESS>
 ```
 
-**Lock Liquidity (Stake2Earn)**
+##### Create a Stake2Earn Farm
+
+Configure `stake2EarnFarm` in `damm_v1_config.jsonc` file and run the following command to create
+the Stake2Earn farm on top of the already deployed DAMM v1 pool.
 
 ```bash
-pnpm studio damm-v1-lock-liquidity-stake2earn --config ./studio/config/damm_v1_config.jsonc
+pnpm studio damm-v1-create-stake2earn-farm --baseMint <YOUR_BASE_MINT_ADDRESS>
+```
+
+##### Lock Liquidity (Stake2Earn)
+
+Configure `dammV1LockLiquidity` in `damm_v1_config.jsonc` file and run the following command to lock
+the liquidity in the already deployed DAMM v1 pool with the Stake2Earn farm.
+
+```bash
+pnpm studio damm-v1-lock-liquidity-stake2earn --baseMint <YOUR_BASE_MINT_ADDRESS>
 ```
 
 ---
 
 #### DBC Actions
 
-**Create a DBC Config**
+##### Create a DBC Config
+
+Configure `dbcConfig` in `dbc_config.jsonc` file and run the following command to create the DBC
+config key. This config key is used to create the DBC pool and contains all the settings for the
+pre-graduation and post-graduation pools.
 
 ```bash
-pnpm studio dbc-create-config --config ./studio/config/dbc_config.jsonc
+pnpm studio dbc-create-config
 ```
 
-**Create a DBC Pool**
+##### Create a DBC Pool
+
+Configure `dbcPool` in `dbc_config.jsonc` file and run the following command to create the DBC pool.
+
+_If you don't have a DBC config key, you can run the following command and the config key + pool
+will be created together._
 
 ```bash
-pnpm studio dbc-create-pool --config ./studio/config/dbc_config.jsonc
+pnpm studio dbc-create-pool
 ```
 
-**Claim Trading Fees**
+_If you already have an existing DBC config key, you can provide it via the CLI with a `--config`
+flag and run the following command._
 
 ```bash
-pnpm studio dbc-claim-trading-fee --config ./studio/config/dbc_config.jsonc
+pnpm studio dbc-create-pool --config <YOUR_DBC_CONFIG_KEY>
 ```
 
-**Migrate to DAMM v1**
+##### Claim Trading Fees
+
+If you already have an existing DBC pool with accumulated fees, you can run the following command
+with the `--baseMint` flag to claim the fees.
 
 ```bash
-pnpm studio dbc-migrate-to-damm-v1 --config ./studio/config/dbc_config.jsonc
+pnpm studio dbc-claim-trading-fee --baseMint <YOUR_BASE_MINT_ADDRESS>
 ```
 
-**Migrate to DAMM v2**
+##### Migrate to DAMM v1
+
+If you already have an existing DBC pool, with `poolState.quoteReserve` >
+`poolConfig.migrationQuoteThreshold` (100% bonding curve progress), you can run the following
+command with the `--baseMint` flag to migrate the DBC pool to DAMM v1.
 
 ```bash
-pnpm studio dbc-migrate-to-damm-v2 --config ./studio/config/dbc_config.jsonc
+pnpm studio dbc-migrate-to-damm-v1 --baseMint <YOUR_BASE_MINT_ADDRESS>
 ```
 
-**Swap (Buy/Sell)**
+##### Migrate to DAMM v2
+
+If you already have an existing DBC pool, with `poolState.quoteReserve` >
+`poolConfig.migrationQuoteThreshold` (100% bonding curve progress), you can run the following
+command with the `--baseMint` flag to migrate the DBC pool to DAMM v2.
 
 ```bash
-pnpm studio dbc-swap --config ./studio/config/dbc_config.jsonc
+pnpm studio dbc-migrate-to-damm-v2 --baseMint <YOUR_BASE_MINT_ADDRESS>
+```
+
+##### Swap (Buy/Sell)
+
+Configure `dbcSwap` in `dbc_config.jsonc` file and run the following command to swap in the DBC
+pool.
+
+```bash
+pnpm studio dbc-swap --baseMint <YOUR_BASE_MINT_ADDRESS>
 ```
 
 ---
 
 #### Alpha Vault Actions
 
-**Create an Alpha Vault**
+##### Create an Alpha Vault
+
+Configure `alphaVault` in `alpha_vault_config.jsonc` file and run the following command to create
+the alpha vault with an existing DAMM v1 or DAMM v2 or DLMM pool.
 
 ```bash
-pnpm studio alpha-vault-create --config ./studio/config/alpha_vault_config.jsonc
+pnpm studio alpha-vault-create --baseMint <YOUR_BASE_MINT_ADDRESS>
 ```
 
 ---
