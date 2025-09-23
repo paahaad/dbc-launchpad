@@ -17,7 +17,7 @@ async function main() {
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
 
-  console.log('\n> Initializing with general configuration...');
+  console.log('\n> Initializing configuration...');
   console.log(`- Using RPC URL ${config.rpcUrl}`);
   console.log(`- Dry run = ${config.dryRun}`);
   console.log(`- Using payer ${keypair.publicKey} to execute commands`);
@@ -26,7 +26,6 @@ async function main() {
 
   const wallet = new Wallet(keypair);
 
-  // parse baseMint
   const baseMint = new PublicKey(parseCliArguments().baseMint);
   if (!baseMint) {
     throw new Error('Please provide --baseMint flag to do this action');

@@ -34,7 +34,7 @@ export async function createTokenMint(
   options: CreateTokenMintOptions
 ): Promise<PublicKey> {
   if (options.dryRun) {
-    throw new Error('cannot create token mint when in dry run mode');
+    throw new Error('Cannot create token mint when in dry run mode');
   }
 
   const mintAmount = getAmountInLamports(

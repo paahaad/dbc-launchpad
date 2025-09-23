@@ -10,7 +10,7 @@ async function main() {
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
 
-  console.log('\n> Initializing with general configuration...');
+  console.log('\n> Initializing configuration...');
   console.log(`- Using RPC URL ${config.rpcUrl}`);
   console.log(`- Dry run = ${config.dryRun}`);
   console.log(`- Using wallet ${keypair.publicKey} to deploy pool`);
@@ -18,10 +18,6 @@ async function main() {
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
   const wallet = new Wallet(keypair);
 
-  if (!config.quoteMint) {
-    throw new Error('Missing quoteMint in configuration');
-  }
-  const quoteMint = new PublicKey(config.quoteMint);
   let baseMint: Keypair;
   if (!config.dbcPool) {
     throw new Error('Missing dbcPool in configuration');
@@ -32,10 +28,14 @@ async function main() {
     baseMint = Keypair.generate();
   }
 
+  if (!config.quoteMint) {
+    throw new Error('Missing quoteMint in configuration');
+  }
+  const quoteMint = new PublicKey(config.quoteMint);
+
   console.log(`- Using quote token mint ${quoteMint.toString()}`);
   console.log(`- Using base token mint ${baseMint.publicKey.toString()}`);
 
-  /// --------------------------------------------------------------------------
   if (config) {
     await createDbcPool(config, connection, wallet, quoteMint, baseMint);
   } else {

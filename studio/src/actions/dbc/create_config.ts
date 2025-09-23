@@ -10,7 +10,7 @@ async function main() {
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
 
-  console.log('\n> Initializing with general configuration...');
+  console.log('\n> Initializing configuration...');
   console.log(`- Using RPC URL ${config.rpcUrl}`);
   console.log(`- Dry run = ${config.dryRun}`);
   console.log(`- Using wallet ${keypair.publicKey} to deploy config`);
@@ -25,7 +25,6 @@ async function main() {
 
   console.log(`- Using quote token mint ${quoteMint.toString()}`);
 
-  /// --------------------------------------------------------------------------
   if (config) {
     await createDbcConfig(config, connection, wallet, quoteMint);
   } else {

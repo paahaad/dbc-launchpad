@@ -10,7 +10,7 @@ async function main() {
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
 
-  console.log('\n> Initializing with general configuration...');
+  console.log('\n> Initializing configuration...');
   console.log(`- Using RPC URL ${config.rpcUrl}`);
   console.log(`- Dry run = ${config.dryRun}`);
   console.log(`- Using wallet ${keypair.publicKey} to migrate from DBC to DAMM v2`);
@@ -18,21 +18,19 @@ async function main() {
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
   const wallet = new Wallet(keypair);
 
-  if (!config.quoteMint) {
-    throw new Error('Missing quoteMint in configuration');
-  }
-  const quoteMint = new PublicKey(config.quoteMint);
-
-  // parse baseMint
   const baseMint = new PublicKey(parseCliArguments().baseMint);
   if (!baseMint) {
     throw new Error('Please provide --baseMint flag to do this action');
   }
 
+  if (!config.quoteMint) {
+    throw new Error('Missing quoteMint in configuration');
+  }
+  const quoteMint = new PublicKey(config.quoteMint);
+
   console.log(`- Using quote token mint ${quoteMint.toString()}`);
   console.log(`- Using base token mint ${baseMint.toString()}`);
 
-  /// --------------------------------------------------------------------------
   if (config) {
     await migrateDammV2(config, connection, wallet);
   } else {

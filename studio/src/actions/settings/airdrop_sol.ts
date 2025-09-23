@@ -9,7 +9,6 @@ config();
 
 async function main() {
   try {
-    // parse network flag
     const network = parseCliArguments().network;
     if (!network) {
       throw new Error('Please provide --network flag (devnet or localnet)');
@@ -19,7 +18,6 @@ async function main() {
     console.log(`\nUsing network: ${network.toUpperCase()}`);
     console.log(`RPC URL: ${networkConfig.rpcUrl}`);
 
-    // Load keypair from file
     const keypairPath = path.join(__dirname, '../../../keypair.json');
 
     if (!fs.existsSync(keypairPath)) {

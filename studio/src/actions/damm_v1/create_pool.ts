@@ -21,7 +21,7 @@ async function main() {
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
 
-  console.log('\n> Initializing with general configuration...');
+  console.log('\n> Initializing configuration...');
   console.log(`- Using RPC URL ${config.rpcUrl}`);
   console.log(`- Dry run = ${config.dryRun}`);
   console.log(`- Using payer ${keypair.publicKey} to execute commands`);
@@ -35,18 +35,17 @@ async function main() {
   const quoteMint = new PublicKey(config.quoteMint);
 
   let baseMint: PublicKey;
-  if (config.createBaseToken) {
+  baseMint = new PublicKey(parseCliArguments().baseMint);
+  if (!baseMint && config.createBaseToken) {
     baseMint = await createTokenMint(connection, wallet, {
       dryRun: config.dryRun,
       computeUnitPriceMicroLamports: config.computeUnitPriceMicroLamports,
       tokenConfig: config.createBaseToken,
     });
   } else {
-    // parse baseMint
-    baseMint = new PublicKey(parseCliArguments().baseMint);
-    if (!baseMint) {
-      throw new Error('Please provide --baseMint flag to do this action');
-    }
+    throw new Error(
+      'Please either provide --baseMint flag in cli or createBaseToken in configuration to do this action'
+    );
   }
 
   console.log(`- Using base token mint ${baseMint.toString()}`);
