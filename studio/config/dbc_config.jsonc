@@ -1,6 +1,6 @@
 {
   /* rpcUrl is required. You can switch between mainnet, devnet and localnet or use your own RPC URL. */
-  "rpcUrl": "https://meteora-backend.rpcpool.com/f88bad7f-1d57-4bdc-8039-009f4e17997d", // mainnet: https://api.mainnet-beta.solana.com | devnet: https://api.devnet.solana.com | localnet: http://localhost:8899
+  "rpcUrl": "https://api.devnet.solana.com", // mainnet: https://api.mainnet-beta.solana.com | devnet: https://api.devnet.solana.com | localnet: http://localhost:8899
 
   /* dryRun is required. If true, transactions will be simulated and not executed. If false, transactions will be executed. */
   "dryRun": false,
@@ -117,16 +117,16 @@
    */
   "dbcPool": {
     // "baseMintKeypairFilepath": "./mint-keypair.json", // optional base mint keypair file path
-    "name": "chiobu", // token name
-    "symbol": "CHIOBU", // token symbol
+    "name": "YOUR_TOKEN_NAME", // token name
+    "symbol": "YOUR_TOKEN_SYMBOL", // token symbol
     "metadata": {
       // "uri": "https://gateway.irys.xyz/123456789", // if you already have a metadata URI created, you can specify it here
       
       /* Only use the following parameters for createBaseToken if you don't have an existing metadata uri
       * This will create an image uri and a new metadata uri and upload everything to Irys
       */
-      "image": "https://www.beautycrew.com.au/media/60443/ss-pc-nails-square.png?width=460&height=460", // this can be a URL of the image address (e.g. https://example.com/token-image.png) or the image file path (e.g. ./data/test-token.jpg)
-      "description": "chiobu siol", // token description
+      "image": "./data/test-token.jpg", // this can be a URL of the image address (e.g. https://example.com/token-image.png) or the image file path (e.g. ./data/test-token.jpg)
+      "description": "YOUR_TOKEN_DESCRIPTION", // token description
       "website": "https://example.com", // project website
       "twitter": "https://x.com/yourproject", // twitter URL 
       "telegram": "https://t.me/yourproject" // telegram URL

@@ -25,8 +25,8 @@
     "supply": 1000000000, // total amount of base token to be minted
     "decimals": 6, // decimals of the base token
     // "tokenMintKeypairFilePath": "./mint-keypair.json", // path to token mint keypair if you have a specific keypair for the token mint. If not provided, a new keypair will be generated.
-    "name": "Test Token", // token name
-    "symbol": "TT", // token symbol
+    "name": "YOUR_TOKEN_NAME", // token name
+    "symbol": "YOUR_TOKEN_SYMBOL", // token symbol
     "authorities": {
       "mint": "YOUR_MINT_AUTHORITY_ADDRESS", // token mint authority address. <PublicKey | null>
       "freeze": "YOUR_FREEZE_AUTHORITY_ADDRESS", // token freeze authority address. <PublicKey | null>
@@ -58,7 +58,7 @@
    * 2. damm-v2-create-one-sided-pool
    */
   "dammV2Config": {
-    "creator": "Dc85YcHkAWs62ndssWcGN5V4xYaQzPzgUDiRGtvnZas6", // creator address
+    "creator": "YOUR_CREATOR_ADDRESS", // creator address
     "baseAmount": 100000000, // base token amount
     "quoteAmount": null, // quote token amount
     "initPrice": 0.001, // initial price (in terms of quote/base   price) 1 SOL / 1000000000 = initialPrice
@@ -69,20 +69,19 @@
       "numberOfPeriod": 0, // number of period
       "totalDuration": 0, // total duration (If activationType is 0 (slots), totalDuration = duration / 0.4 | If activationType is 1 (timestamp), totalDuration = duration)
       "feeSchedulerMode": 0, // 0 - Fee Scheduler: Linear | 1 - Fee Scheduler: Exponential
-      "useDynamicFee": true,
+      "useDynamicFee": true // if useDynamicFee is true, the default dynamic fee configuration will be 20% of minBaseFeeBps
 
       /* Optional Configuration.
-       * Only used if useDynamicFee is true and if you want to configure dynamic fee.
-       * If you don't want to configure dynamic fee, and useDynamicFee is true, the default fee will be 20% of minBaseFeeBps.
+       * Only used if you want to configure dynamic fee and not use the default dynamic fee configuration
        * Formula: dynamicFee = (variableFeeControl * (volatilityAccumulator * binStep)^2 + 99_999_999_999) / 100_000_000_000
        */
-      "dynamicFeeConfig": {
-        "filterPeriod": 10, // Time period (in slots/seconds) over which volatility is measured and smoothed
-        "decayPeriod": 120, // Time period (in slots/seconds) over which volatility accumulator decays back to zero
-        "reductionFactor": 5000, // Volatility decay rate in basis points (5000 = 50% reduction per decay period)
-        "variableFeeControl": 14460000, // Scaling factor that controls how much volatility affects dynamic fees
-        "maxVolatilityAccumulator": 239 // Maximum allowed volatility accumulator value (caps dynamic fee calculation)
-      }
+      // "dynamicFeeConfig": {
+      //   "filterPeriod": 10, // Time period (in slots/seconds) over which volatility is measured and smoothed
+      //   "decayPeriod": 120, // Time period (in slots/seconds) over which volatility accumulator decays back to zero
+      //   "reductionFactor": 5000, // Volatility decay rate in basis points (5000 = 50% reduction per decay period)
+      //   "variableFeeControl": 14460000, // Scaling factor that controls how much volatility affects dynamic fees
+      //   "maxVolatilityAccumulator": 239 // Maximum allowed volatility accumulator value (caps dynamic fee calculation)
+      // }
     },
     "collectFeeMode": 1, // 0 - Both Token | 1 - Token B Only
     "activationType": 1, // 0 - Slot | 1 - Timestamp
