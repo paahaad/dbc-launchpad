@@ -71,12 +71,14 @@ pnpm studio start-test-validator
 3. Generate a keypair from your private key:
 
 ```bash
+pnpm studio generate-keypair
+
 # For devnet (airdrops 5 SOL)
-pnpm studio generate-keypair --network devnet
+pnpm studio generate-keypair --network devnet --airdrop
 
 # For localnet (airdrops 5 SOL)
 # Ensure that you have already started the local validator with pnpm start-test-validator
-pnpm studio generate-keypair --network localnet
+pnpm studio generate-keypair --network localnet --airdrop
 ```
 
 4. Configure the config files in the `studio/config` directory.
@@ -89,6 +91,17 @@ pnpm studio generate-keypair --network localnet
 
 **Note:** You can use the provided example configurations as a starting point. Make sure to replace
 the placeholders with your actual values.
+
+5. (Optional) Airdrop SOL to your generated keypair if you need SOL to test on devnet or localnet:
+
+```bash
+# Airdrop 5 SOL on devnet
+pnpm studio airdrop-sol --network devnet
+
+# Airdrop 5 SOL on localnet
+# Ensure that you have already started the local validator with pnpm start-test-validator
+pnpm studio airdrop-sol --network localnet
+```
 
 ---
 

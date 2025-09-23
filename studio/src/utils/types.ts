@@ -7,6 +7,16 @@ export interface CliArguments {
   network?: string | undefined;
   baseMint?: string | undefined;
   poolAddress?: string | undefined;
+  airdrop?: boolean | undefined;
+  help?: boolean | undefined;
+}
+
+export interface CommandOption {
+  flag: string;
+  description: string;
+  required: boolean;
+  type: 'string' | 'boolean';
+  example?: string;
 }
 
 /* COMMON */
@@ -63,7 +73,6 @@ export type AllocationByAmount = {
 
 export interface NetworkConfig {
   rpcUrl: string;
-  shouldAirdrop: boolean;
   airdropAmount: number;
 }
 

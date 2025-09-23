@@ -1,6 +1,7 @@
 import {
   AlphaVaultConfig,
   CliArguments,
+  CommandOption,
   DammV1Config,
   DammV2Config,
   DbcConfig,
@@ -27,6 +28,12 @@ export function parseCliArguments(): CliArguments {
       },
       poolAddress: {
         type: 'string',
+      },
+      airdrop: {
+        type: 'boolean',
+      },
+      help: {
+        type: 'boolean',
       },
     },
     strict: true,
@@ -75,13 +82,11 @@ export function getNetworkConfig(network: string): NetworkConfig {
     case 'devnet':
       return {
         rpcUrl: 'https://api.devnet.solana.com',
-        shouldAirdrop: true,
         airdropAmount: 5,
       };
     case 'localnet':
       return {
         rpcUrl: 'http://localhost:8899',
-        shouldAirdrop: true,
         airdropAmount: 5,
       };
     default:
@@ -145,5 +150,28 @@ export async function promptForSelection(
     };
 
     askQuestion();
+  });
+}
+
+export function displayHelp(
+  commandName: string,
+  description: string,
+  options: CommandOption[]
+): void {
+  console.log(`\n> Command: ${commandName}`);
+  console.log(`${description}`);
+
+  console.log('\n>> Usage:');
+  console.log(`- pnpm studio ${commandName} [options]`);
+
+  console.log('\n>> Options:');
+  options.forEach((option) => {
+    const required = option.required ? ' (required)' : ' (optional)';
+    const typeInfo = option.type === 'boolean' ? '' : ` <${option.type}>`;
+    const example = option.example ? ` (e.g. ${option.example})` : '';
+
+    console.log(`--${option.flag}${typeInfo}${required}`);
+    console.log(`~ ${option.description}${example}`);
+    console.log();
   });
 }

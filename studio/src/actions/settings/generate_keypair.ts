@@ -3,21 +3,29 @@ import bs58 from 'bs58';
 import { config } from 'dotenv';
 import fs from 'fs';
 import path from 'path';
-import { parseCliArguments, getNetworkConfig } from '../../helpers/cli';
+import { parseCliArguments, getNetworkConfig, displayHelp } from '../../helpers/cli';
 import { airdropSol } from '../../helpers/utils';
+import { GENERATE_KEYPAIR_COMMAND_OPTIONS } from '../../utils/constants';
 
 config();
 
 async function main() {
   try {
-    const network = parseCliArguments().network;
-    if (!network) {
-      throw new Error('Please provide --network flag (devnet or localnet)');
+    const args = parseCliArguments();
+
+    if (args.help) {
+      displayHelp(
+        'generate-keypair',
+        'Generate a keypair from your PRIVATE_KEY environment variable and save it to keypair.json',
+        GENERATE_KEYPAIR_COMMAND_OPTIONS
+      );
+      return undefined;
     }
 
-    const networkConfig = getNetworkConfig(network);
-    console.log(`\nUsing network: ${network.toUpperCase()}`);
-    console.log(`RPC URL: ${networkConfig.rpcUrl}`);
+    console.log(`\n>> Generating keypair...`);
+
+    const network = args.network;
+    const shouldAirdrop = args.airdrop;
 
     const privateKeyString = process.env.PRIVATE_KEY;
 
@@ -36,25 +44,26 @@ async function main() {
 
     console.log(`Keypair saved to: ${outputPath}`);
 
-    if (networkConfig.shouldAirdrop) {
+    if (shouldAirdrop) {
+      const networkConfig = getNetworkConfig(network);
       console.log(
-        `\nAttempting to airdrop ${networkConfig.airdropAmount} SOL on ${network.toUpperCase()}...`
+        `\n>> Attempting to airdrop ${networkConfig.airdropAmount} SOL on ${network.toUpperCase()}...`
       );
       const connection = new Connection(networkConfig.rpcUrl, 'confirmed');
 
       try {
         const signature = await airdropSol(connection, keypair, networkConfig.airdropAmount);
         console.log(
-          `Successfully airdropped ${networkConfig.airdropAmount} SOL on ${network.toUpperCase()}! Signature: ${signature}`
+          `- Successfully airdropped ${networkConfig.airdropAmount} SOL on ${network.toUpperCase()}! Transaction Signature: ${signature}`
         );
       } catch (airdropError) {
         console.warn(`Airdrop failed: ${airdropError}`);
         if (network === 'localnet') {
           console.log(
-            'Make sure you have a local Solana validator running with: npm run start-test-validator'
+            '\n>> Make sure you have a local Solana validator running with: npm run start-test-validator'
           );
         } else {
-          console.log('This might be due to network congestion or RPC endpoint issues.');
+          console.log('\n>> This might be due to claiming rate limit. Try again later.');
         }
       }
     }
