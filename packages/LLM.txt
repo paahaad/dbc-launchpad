@@ -25,24 +25,24 @@ packages/
 
 ## Available Packages
 
-### @meteora-invent/eslint-config
+### @meteora-invent/config-eslint
 **Location**: `packages/config/eslint`
 **Purpose**: Shared ESLint rules for consistent code quality
 **Variants**:
-- Base configuration
-- Next.js specific rules
-- Node.js specific rules
+- `index.js`: Base configuration
+- `next.js`: Next.js specific rules
+- `node.js`: Node.js specific rules
 
-### @meteora-invent/prettier-config
+### @meteora-invent/config-prettier
 **Location**: `packages/config/prettier`
 **Purpose**: Consistent code formatting across all workspaces
 **Features**:
 - 2-space indentation
 - Single quotes
-- No semicolons
 - Trailing commas
+- Consistent formatting rules
 
-### @meteora-invent/typescript-config
+### @meteora-invent/config-typescript
 **Location**: `packages/config/typescript`
 **Purpose**: Shared TypeScript configurations
 **Variants**:
@@ -54,9 +54,9 @@ packages/
 **Location**: `packages/shared/utils`
 **Purpose**: Common utility functions
 **Includes**:
-- Number formatting
-- String utilities
-- Common helpers
+- Number formatting (`numbers.ts`)
+- Text formatting (`formatting.ts`)
+- Common helpers and utilities
 
 ## Using Packages
 
@@ -65,8 +65,9 @@ packages/
 // In studio/package.json
 {
   "devDependencies": {
-    "@meteora-invent/eslint-config": "workspace:*",
-    "@meteora-invent/typescript-config": "workspace:*"
+    "@meteora-invent/config-eslint": "workspace:*",
+    "@meteora-invent/config-prettier": "workspace:*",
+    "@meteora-invent/config-typescript": "workspace:*"
   }
 }
 ```
@@ -75,25 +76,26 @@ packages/
 ```json
 // In scaffolds/fun-launch/package.json
 {
-  "dependencies": {
-    "@meteora-invent/utils": "workspace:*"
+  "devDependencies": {
+    "@meteora-invent/config-eslint": "workspace:*",
+    "@meteora-invent/config-prettier": "workspace:*",
+    "@meteora-invent/config-typescript": "workspace:*"
   }
 }
 ```
 
 ### ESLint Configuration
 ```javascript
-// .eslintrc.js
-module.exports = {
-  extends: ["@meteora-invent/eslint-config/next"]
-};
+// eslint.config.js
+import config from "@meteora-invent/config-eslint";
+export default config;
 ```
 
 ### TypeScript Configuration
 ```json
 // tsconfig.json
 {
-  "extends": "@meteora-invent/typescript-config/nextjs.json",
+  "extends": "@meteora-invent/config-typescript/nextjs.json",
   "compilerOptions": {
     // Project-specific overrides
   }
@@ -103,7 +105,7 @@ module.exports = {
 ### Prettier Configuration
 ```json
 // .prettierrc
-"@meteora-invent/prettier-config"
+"@meteora-invent/config-prettier"
 ```
 
 ## Utility Functions

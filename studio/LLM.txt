@@ -9,7 +9,7 @@ Meteora Studio is a TypeScript-based automation toolkit for Meteora's Solana DeF
 ### Core Architecture
 - **Config-driven**: All parameters are in `studio/config/*.jsonc` files
 - **CLI-based**: Actions are executed via `pnpm studio [command]`
-- **Modular**: Each protocol (DBC, DAMM, DLMM) has dedicated actions
+- **Modular**: Each protocol (DBC, DAMM v1, DAMM v2, DLMM) has dedicated actions
 - **Safe**: Built-in dry-run mode for testing
 
 ## 🛠️ Initial Setup & Prerequisites
@@ -54,45 +54,113 @@ pnpm studio generate-keypair
 # Generate keypair from private key
 pnpm studio generate-keypair
 
+# For devnet (airdrops 5 SOL)
+pnpm studio generate-keypair --network devnet --airdrop
+
+# For localnet (airdrops 5 SOL)
+# Ensure that you have already started the local validator with pnpm start-test-validator
+pnpm studio generate-keypair --network localnet --airdrop
+
+# Airdrop SOL to keypair (devnet/localnet only)
+# Airdrop 5 SOL on devnet
+pnpm studio airdrop-sol --network devnet
+
+# Airdrop 5 SOL on localnet
+pnpm studio airdrop-sol --network localnet
+
 # Start local test validator (for development)
 pnpm studio start-test-validator
 ```
 
-### DBC (Dynamic Bonding Curve) - Token Launches
+### DBC (Dynamic Bonding Curve) - Bonding Curve with Virtual Liquidity
 ```bash
-pnpm studio dbc-create-config --config ./studio/config/dbc_config.jsonc      # Create launch configuration
-pnpm studio dbc-create-pool --config ./studio/config/dbc_config.jsonc        # Deploy token with bonding curve
-pnpm studio dbc-swap --config ./studio/config/dbc_config.jsonc               # Buy/sell on bonding curve
-pnpm studio dbc-claim-trading-fee --config ./studio/config/dbc_config.jsonc  # Claim accumulated fees
-pnpm studio dbc-migrate-to-damm-v1 --config ./studio/config/dbc_config.jsonc # Migrate to DAMM V1 pool
-pnpm studio dbc-migrate-to-damm-v2 --config ./studio/config/dbc_config.jsonc # Migrate to DAMM V2 pool
+# Create a DBC Config
+pnpm studio dbc-create-config
+
+# Create a DBC Pool
+pnpm studio dbc-create-pool
+# If you already have an existing DBC config key:
+pnpm studio dbc-create-pool --config <YOUR_DBC_CONFIG_KEY>
+
+# Swap (Buy/Sell)
+pnpm studio dbc-swap --baseMint <YOUR_BASE_MINT_ADDRESS>
+
+# Claim Trading Fees
+pnpm studio dbc-claim-trading-fee --baseMint <YOUR_BASE_MINT_ADDRESS>
+
+# Migrate to DAMM v1
+pnpm studio dbc-migrate-to-damm-v1 --baseMint <YOUR_BASE_MINT_ADDRESS>
+
+# Migrate to DAMM v2
+pnpm studio dbc-migrate-to-damm-v2 --baseMint <YOUR_BASE_MINT_ADDRESS>
 ```
 
-### DAMM V1 (Dynamic AMM V1) - Constant Product AMM
+### DAMM V1 (Dynamic AMM V1) - Constant Product AMM v1
 ```bash
-pnpm studio damm-v1-create-pool --config ./studio/config/damm_v1_config.jsonc              # Create CP-AMM pool
-pnpm studio damm-v1-lock-liquidity --config ./studio/config/damm_v1_config.jsonc           # Lock liquidity in pool
-pnpm studio damm-v1-create-stake2earn-farm --config ./studio/config/damm_v1_config.jsonc   # Create yield farming
-pnpm studio damm-v1-lock-liquidity-stake2earn --config ./studio/config/damm_v1_config.jsonc # Lock in yield farm
+# Create a Constant Product Pool
+pnpm studio damm-v1-create-pool
+# If you already have a base mint:
+pnpm studio damm-v1-create-pool --baseMint <YOUR_BASE_MINT_ADDRESS>
+
+# Lock Liquidity
+pnpm studio damm-v1-lock-liquidity --baseMint <YOUR_BASE_MINT_ADDRESS>
+
+# Create a Stake2Earn Farm
+pnpm studio damm-v1-create-stake2earn-farm --baseMint <YOUR_BASE_MINT_ADDRESS>
+
+# Lock Liquidity (Stake2Earn)
+pnpm studio damm-v1-lock-liquidity-stake2earn --baseMint <YOUR_BASE_MINT_ADDRESS>
 ```
 
-### DAMM V2 (Dynamic AMM V2) - Enhanced AMM
+### DAMM V2 (Dynamic AMM V2) - Constant Product AMM v2
 ```bash
-pnpm studio damm-v2-create-balanced-pool --config ./studio/config/damm_v2_config.jsonc   # Create balanced pool
-pnpm studio damm-v2-create-one-sided-pool --config ./studio/config/damm_v2_config.jsonc  # Create single-asset pool
+# Create a Balanced Constant Product Pool
+pnpm studio damm-v2-create-balanced-pool
+# If you already have a base mint:
+pnpm studio damm-v2-create-balanced-pool --baseMint <YOUR_BASE_MINT_ADDRESS>
+
+# Create a One-Sided Pool
+pnpm studio damm-v2-create-one-sided-pool
+# If you already have a base mint:
+pnpm studio damm-v2-create-one-sided-pool --baseMint <YOUR_BASE_MINT_ADDRESS>
+
+# Split Position
+pnpm studio damm-v2-split-position --poolAddress <YOUR_POOL_ADDRESS>
+
+# Claim Position Fee
+pnpm studio damm-v2-claim-position-fee --poolAddress <YOUR_POOL_ADDRESS>
+
+# Add Liquidity
+pnpm studio damm-v2-add-liquidity --poolAddress <YOUR_POOL_ADDRESS>
+
+# Remove Liquidity
+pnpm studio damm-v2-remove-liquidity --poolAddress <YOUR_POOL_ADDRESS>
+
+# Close Position
+pnpm studio damm-v2-close-position --poolAddress <YOUR_POOL_ADDRESS>
 ```
 
-### DLMM (Dynamic Liquidity Market Maker) - Concentrated Liquidity
+### DLMM (Dynamic Liquidity Market Maker) - Concentrated Liquidity Market Maker
 ```bash
-pnpm studio dlmm-create-pool --config ./studio/config/dlmm_config.jsonc                # Create DLMM pool
-pnpm studio dlmm-seed-liquidity-lfg --config ./studio/config/dlmm_config.jsonc         # Add liquidity (LFG mode)
-pnpm studio dlmm-seed-liquidity-single-bin --config ./studio/config/dlmm_config.jsonc  # Add liquidity (single bin)
-pnpm studio dlmm-set-pool-status --config ./studio/config/dlmm_config.jsonc           # Manage pool status
+# Create a Customizable Permissionless DLMM Pool
+pnpm studio dlmm-create-pool
+# If you already have a base mint:
+pnpm studio dlmm-create-pool --baseMint <YOUR_BASE_MINT_ADDRESS>
+
+# Seed Liquidity (LFG)
+pnpm studio dlmm-seed-liquidity-lfg --baseMint <YOUR_BASE_MINT_ADDRESS>
+
+# Seed Liquidity (Single Bin)
+pnpm studio dlmm-seed-liquidity-single-bin --baseMint <YOUR_BASE_MINT_ADDRESS>
+
+# Set DLMM Pool Status
+pnpm studio dlmm-set-pool-status --poolAddress <YOUR_POOL_ADDRESS>
 ```
 
 ### Alpha Vault - Yield Strategies
 ```bash
-pnpm studio alpha-vault-create --config ./studio/config/alpha_vault_config.jsonc  # Create yield vault
+# Create an Alpha Vault
+pnpm studio alpha-vault-create --baseMint <YOUR_BASE_MINT_ADDRESS>
 ```
 
 ## 📋 Configuration System
@@ -103,6 +171,7 @@ All configurations are in `studio/config/`:
 - `damm_v1_config.jsonc` - DAMM V1 pool settings  
 - `damm_v2_config.jsonc` - DAMM V2 pool settings
 - `dlmm_config.jsonc` - DLMM pool settings
+- `alpha_vault_config.jsonc` - Alpha Vault settings
 
 ### Key Configuration Parameters
 
@@ -110,85 +179,232 @@ All configurations are in `studio/config/`:
 ```jsonc
 {
   "rpcUrl": "https://api.devnet.solana.com",  // Network endpoint
-  "dryRun": false,                            // Simulation mode
-  "keypairFilePath": "./keypair.json",        // Wallet file
-  "computeUnitPriceMicroLamports": 100000     // Transaction priority
+  // mainnet: https://api.mainnet-beta.solana.com 
+  // devnet: https://api.devnet.solana.com 
+  // localnet: http://localhost:8899
+  
+  "dryRun": false,                            // If true, transactions simulated only
+  "keypairFilePath": "./keypair.json",        // Wallet file (payer + signer)
+  "computeUnitPriceMicroLamports": 100000,    // Transaction priority fees
+  "quoteMint": "So11111111111111111111111111111111111111112" // SOL or USDC or other token
 }
 ```
 
 #### DBC-Specific Settings
 ```jsonc
 {
-  "quoteMint": "So11111111111111111111111111111111111111112", // SOL
-  "baseMint": "YOUR_TOKEN_MINT_ADDRESS",
-  "swapDirection": "Buy", // or "Sell"
-  "swapAmountLamports": "1000000000", // 1 SOL in lamports
-  
-  // Advanced DBC Parameters
-  "buildCurveMode": 0, // 0: Basic | 1: TwoSegments | 2: WithTwoSegments | 3: WithLiquidityWeights
-  "totalTokenSupply": 1000000000, // Total token supply (not in lamports)
-  "migrationOption": 1, // 0: Migrate to DAMM v1 | 1: Migrate to DAMM v2
-  "tokenBaseDecimal": 6, // Token base decimal
-  "tokenQuoteDecimal": 9, // Token quote decimal
-  
-  // Curve Configuration (varies by buildCurveMode)
-  "initialMarketCap": 20, // Starting market cap in quoteMint terms
-  "migrationMarketCap": 600, // Market cap when curve graduates
-  "percentageSupplyOnMigration": 20, // % of supply to migrate (mode 2)
-  "liquidityWeights": [1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16], // Liquidity segments (mode 3)
-  
-  // Vesting Parameters
-  "lockedVestingParam": {
-    "totalLockedVestingAmount": 100000000, // Locked amount (not in lamports)
-    "numberOfVestingPeriod": 24, // Number of vesting periods
-    "cliffUnlockAmount": 100000000, // Cliff unlock amount
-    "totalVestingDuration": 2592000, // Vesting duration (seconds)
-    "cliffDurationFromMigrationTime": 0 // Cliff delay (seconds)
+  "dbcConfig": {
+    "buildCurveMode": 0, // 0: buildCurve | 1: buildCurveWithMarketCap | 
+                        // 2: buildCurveWithTwoSegments | 3: buildCurveWithLiquidityWeights
+    
+    // Mode 0 (buildCurve) Parameters:
+    "percentageSupplyOnMigration": 20, // % of total token supply to migrate
+    "migrationQuoteThreshold": 10, // Quote threshold needed to migrate
+    
+    // Mode 1 (buildCurveWithMarketCap) Parameters:
+    // "initialMarketCap": 20, // Market cap when pool created (quoteMint terms)
+    // "migrationMarketCap": 600, // Market cap when pool graduates
+    
+    // Mode 2 (buildCurveWithTwoSegments) adds percentageSupplyOnMigration
+    // Mode 3 (buildCurveWithLiquidityWeights) adds liquidityWeights array
+    
+    "totalTokenSupply": 1000000000, // Total token supply (not in lamports)
+    "migrationOption": 1, // 0: Migrate to DAMM v1 | 1: Migrate to DAMM v2
+    "tokenBaseDecimal": 6, // Token decimals
+    "tokenQuoteDecimal": 9, // Quote token decimals
+    
+    "lockedVestingParam": {
+      "totalLockedVestingAmount": 0, // Locked vesting amount (not in lamports)
+      "numberOfVestingPeriod": 0, // Number of vesting periods
+      "cliffUnlockAmount": 0, // Cliff unlock amount
+      "totalVestingDuration": 0, // Vesting duration (seconds)
+      "cliffDurationFromMigrationTime": 0 // Cliff delay (seconds)
+    },
+    
+    "baseFeeParams": {
+      "baseFeeMode": 0, // 0: Linear | 1: Exponential | 2: Rate Limiter
+      "feeSchedulerParam": {
+        "startingFeeBps": 100, // Starting fee (max 99% = 9900 bps)
+        "endingFeeBps": 100, // Ending fee (min 0.01% = 1 bps)
+        "numberOfPeriod": 0, // Number of periods
+        "totalDuration": 0 // Duration (slots/timestamp based on activationType)
+      }
+    },
+    
+    "dynamicFeeEnabled": true, // Adds 20% of minimum base fee to total
+    "activationType": 1, // 0: Slot | 1: Timestamp
+    "collectFeeMode": 0, // 0: Quote Token | 1: Output Token
+    "migrationFeeOption": 3, // 0: 0.25% | 1: 0.3% | 2: 1% | 3: 2% | 4: 4% | 5: 6%
+    "tokenType": 0, // 0: SPL | 1: Token 2022
+    
+    "partnerLpPercentage": 100, // Partner claimable LP after migration
+    "creatorLpPercentage": 0, // Creator claimable LP after migration
+    "partnerLockedLpPercentage": 0, // Partner permanently locked LP
+    "creatorLockedLpPercentage": 0, // Creator permanently locked LP
+    "creatorTradingFeePercentage": 0, // Creator fee share (0-100%)
+    "leftover": 0, // Leftover tokens (claimable after migration)
+    "tokenUpdateAuthority": 1 // 0: Creator | 1: Immutable | 2: Partner | etc.
   },
   
-  // Fee Configuration
-  "baseFeeParams": {
-    "baseFeeMode": 0, // 0: Linear | 1: Exponential | 2: Rate Limiter
-    "feeSchedulerParam": {
-      "startingFeeBps": 200, // Starting fee (max 9900 bps = 99%)
-      "endingFeeBps": 200, // Ending fee (min 1 bps = 0.01%)
-      "numberOfPeriod": 0, // Number of fee periods
-      "totalDuration": 0 // Total duration (slots or timestamp)
+  "dbcPool": {
+    "name": "YOUR_TOKEN_NAME",
+    "symbol": "YOUR_TOKEN_SYMBOL",
+    "metadata": {
+      "image": "./data/image/test-token.jpg", // Image path or URL
+      "description": "YOUR_TOKEN_DESCRIPTION",
+      "website": "https://example.com",
+      "twitter": "https://x.com/yourproject",
+      "telegram": "https://t.me/yourproject"
     }
+  },
+  
+  "dbcSwap": {
+    "amountIn": 1.03, // Amount to swap
+    "slippageBps": 100, // Slippage in basis points
+    "swapBaseForQuote": false, // true: base→quote | false: quote→base
+    "referralTokenAccount": null // Optional referral account
   }
 }
 ```
 
-#### Pool Creation Settings
+#### DAMM V1 Settings
 ```jsonc
 {
-  "tokenMintA": "TOKEN_A_MINT_ADDRESS",
-  "tokenMintB": "TOKEN_B_MINT_ADDRESS", 
-  "tokenAAmount": "1000000000",  // Amount in smallest unit
-  "tokenBAmount": "1000000000",  // Amount in smallest unit
-  "feeBps": 30                   // 0.3% fee
+  "createBaseToken": {
+    "supply": 1000000000, // Total token supply to mint
+    "decimals": 6, // Token decimals
+    "name": "Test Token",
+    "symbol": "TT",
+    "authorities": {
+      "mint": "YOUR_MINT_AUTHORITY_ADDRESS", // null for no authority
+      "freeze": "YOUR_FREEZE_AUTHORITY_ADDRESS",
+      "update": "YOUR_UPDATE_AUTHORITY_ADDRESS"
+    },
+    "metadata": {
+      "image": "./data/image/test-token.jpg",
+      "description": "YOUR_TOKEN_DESCRIPTION",
+      "website": "https://example.com"
+    }
+  },
+  
+  "dammV1Config": {
+    "baseAmount": 100, // Base token amount for pool
+    "quoteAmount": 0.001, // Quote token amount for pool
+    "tradeFeeNumerator": 2500, // Pool fee in bps
+    "activationType": 1, // 0: Slot | 1: Timestamp
+    "activationPoint": null, // When pool becomes active
+    "hasAlphaVault": false // Create alpha vault with pool
+  },
+  
+  "dammV1LockLiquidity": {
+    "allocations": [
+      {
+        "percentage": 80, // % of LP tokens to address
+        "address": "YOUR_ADDRESS_1"
+      }
+    ]
+  }
 }
 ```
 
-## 🔧 AI Automation Patterns
+#### DAMM V2 Settings
+```jsonc
+{
+  "dammV2Config": {
+    "creator": "YOUR_CREATOR_ADDRESS",
+    "baseAmount": 100000000, // Base token amount
+    "quoteAmount": null, // Quote token amount (or null)
+    "initPrice": 0.001, // Initial price (quote/base)
+    "maxPrice": null, // Maximum price
+    
+    "poolFees": {
+      "maxBaseFeeBps": 120, // Maximum base fee in bps
+      "minBaseFeeBps": 120, // Minimum base fee in bps
+      "numberOfPeriod": 0, // Fee scheduler periods
+      "totalDuration": 0, // Fee scheduler duration
+      "feeSchedulerMode": 0, // 0: Linear | 1: Exponential
+      "useDynamicFee": true // Enable dynamic fees (20% of minBaseFeeBps)
+    },
+    
+    "collectFeeMode": 1, // 0: Both Token | 1: Token B Only
+    "activationType": 1, // 0: Slot | 1: Timestamp
+    "activationPoint": null, // When pool becomes active
+    "hasAlphaVault": false
+  },
+  
+  "addLiquidity": {
+    "amountIn": 5, // Amount to add
+    "isTokenA": false // true: token A | false: token B
+  },
+  
+  "splitPosition": {
+    "newPositionOwner": "YOUR_NEW_POSITION_OWNER_ADDRESS",
+    "unlockedLiquidityPercentage": 50, // % of unlocked liquidity to split
+    "permanentLockedLiquidityPercentage": 50,
+    "feeAPercentage": 50, // % of unclaimed fees to transfer
+    "feeBPercentage": 50
+  }
+}
+```
 
-### Pattern 1: Token Launch (DBC)
-1. **Configure**: Edit `studio/config/dbc_config.jsonc`
-2. **Create Config**: `pnpm studio dbc-create-config`
-3. **Launch Token**: `pnpm studio dbc-create-pool`
-4. **Monitor**: Check transaction on Solana Explorer
+#### DLMM Settings
+```jsonc
+{
+  "dlmmConfig": {
+    "binStep": 25, // Price increment % in bps (400 = 4% step)
+    "feeBps": 1, // Trading fee in bps (200 = 2%)
+    "initialPrice": 1.333, // Initial price (quote/base)
+    "activationType": 1, // 0: Slot | 1: Timestamp
+    "activationPoint": null, // When pool becomes active
+    "priceRounding": "up", // "up" or "down" for bin ID conversion
+    "creatorPoolOnOffControl": true, // Creator can enable/disable trading
+    "hasAlphaVault": false
+  },
+  
+  "lfgSeedLiquidity": {
+    "minPrice": 0.003393, // Minimum price boundary
+    "maxPrice": 0.004393, // Maximum price boundary
+    "curvature": 0.6, // Distribution curvature (0-1, lower = more concentrated)
+    "seedAmount": "200000", // Total liquidity amount
+    "positionOwner": "YOUR_POSITION_OWNER_ADDRESS",
+    "feeOwner": "YOUR_FEE_OWNER_ADDRESS",
+    "lockReleasePoint": 0, // When position becomes withdrawable (0 = immediate)
+    "seedTokenXToPositionOwner": true
+  },
+  
+  "singleBinSeedLiquidity": {
+    "price": 1.333, // Exact price for single bin
+    "priceRounding": "up",
+    "seedAmount": "750000000", // Amount of token X to seed
+    "positionOwner": "YOUR_POSITION_OWNER_ADDRESS",
+    "feeOwner": "YOUR_FEE_OWNER_ADDRESS",
+    "lockReleasePoint": 0
+  }
+}
+```
 
-### Pattern 2: AMM Pool Creation (DAMM V2)
-1. **Configure**: Edit `studio/config/damm_v2_config.jsonc`
-2. **Set token mints**: Update `tokenMintA` and `tokenMintB`
-3. **Create Pool**: `pnpm studio damm-v2-create-balanced-pool`
-4. **Verify**: Pool address returned in output
-
-### Pattern 3: Migration Workflow
-1. **DBC Launch**: Create token with bonding curve
-2. **Wait for Completion**: Monitor bonding curve progress
-3. **Configure Migration**: Update config with DBC pool address
-4. **Migrate**: `pnpm studio dbc-migrate-to-damm-v2`
+#### Alpha Vault Settings (for all pool types)
+```jsonc
+{
+  "alphaVault": {
+    "poolType": "dlmm", // "dlmm" | "dynamic" (v1) | "damm2" (v2)
+    "alphaVaultType": "fcfs", // "fcfs" | "prorata"
+    
+    // FCFS Parameters:
+    "maxDepositCap": 10000, // Max total deposit (quote token)
+    "individualDepositingCap": 1, // Max per user (quote token)
+    
+    // Prorata Parameters:
+    // "maxBuyingCap": 10000, // Max total buying cap
+    
+    "depositingPoint": 1733626299, // When deposits start
+    "startVestingPoint": 1746808201, // When vesting begins
+    "endVestingPoint": 1746808201, // When vesting ends
+    "escrowFee": 0, // Fee for stake escrow account
+    "whitelistMode": "permissionless" // "permissionless" | "permissioned_with_merkle_proof" | "permissioned_with_authority"
+  }
+}
+```
 
 ## 🛡️ Safety Features
 
@@ -330,16 +546,60 @@ pnpm studio dlmm-seed-liquidity-lfg
 
 ## 🛠️ Troubleshooting & Common Issues
 
+### Configuration Best Practices
+
+#### Essential Steps Before Execution
+1. **Set Network Correctly**:
+   ```jsonc
+   "rpcUrl": "https://api.devnet.solana.com" // Use devnet for testing
+   ```
+
+2. **Use Dry Run for Testing**:
+   ```jsonc
+   "dryRun": true // Simulate transactions without execution
+   ```
+
+3. **Configure Proper Token Authorities**:
+   ```jsonc
+   "authorities": {
+     "mint": null, // null = revoke mint authority (recommended)
+     "freeze": null, // null = revoke freeze authority
+     "update": "YOUR_ADDRESS" // Keep update authority if needed
+   }
+   ```
+
+4. **Set Appropriate Fee Levels**:
+   ```jsonc
+   // For DBC
+   "startingFeeBps": 100, // 1% (reasonable starting fee)
+   
+   // For DAMM V2
+   "minBaseFeeBps": 120, // 1.2% (consider market standards)
+   
+   // For DLMM
+   "feeBps": 1 // 0.01% (very low for concentrated liquidity)
+   ```
+
+5. **Configure Alpha Vault Security**:
+   ```jsonc
+   "whitelistMode": "permissionless", // Start permissionless for testing
+   "maxDepositCap": 10000, // Reasonable cap to limit exposure
+   "individualDepositingCap": 1 // Prevent whale dominance
+   ```
+
 ### Pre-Execution Validation
 ```bash
-# 1. Validate JSON syntax
-node -e "console.log(JSON.parse(require('fs').readFileSync('./studio/config/dbc_config.jsonc', 'utf8')))"
+# 1. Validate JSONC syntax (handles comments)
+node -e "console.log('Config valid:', require('jsonc-parser').parse(require('fs').readFileSync('./config/dbc_config.jsonc', 'utf8')))"
 
 # 2. Check keypair exists and SOL balance
 pnpm studio generate-keypair
 
 # 3. Test RPC connection
 curl -X POST -H "Content-Type: application/json" -d '{"jsonrpc":"2.0","id":1,"method":"getHealth"}' YOUR_RPC_URL
+
+# 4. Verify token metadata image exists
+ls -la ./data/image/test-token.jpg
 ```
 
 ### Common Error Solutions
