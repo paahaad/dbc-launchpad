@@ -24,6 +24,7 @@ interface WatchlistToken {
   twitter: string | null;
   telegram: string | null;
   discord: string | null;
+  priceChange24h: number | null | undefined;
 }
 
 export default function Watchlist() {
@@ -100,6 +101,10 @@ export default function Watchlist() {
     router.push('/')
   }
 
+  const handleTokenClick = (mintAddress: string) => {
+    router.push(`/token/${mintAddress}`)
+  }
+
   // Utility functions
   const formatMarketCap = (mcap: string | null): string => {
     if (!mcap) return 'N/A'
@@ -110,6 +115,20 @@ export default function Watchlist() {
       return `$${(value / 1000).toFixed(0)}K`
     }
     return `$${value}`
+  }
+
+  const formatPriceChange = (change: number | null | undefined): { text: string; className: string } => {
+    if (change === null || change === undefined || isNaN(change)) return { text: 'N/A', className: 'text-neutral-400' }
+    
+    const isPositive = change > 0
+    const isNegative = change < 0
+    
+    let className = 'text-neutral-400'
+    if (isPositive) className = 'text-green-400'
+    else if (isNegative) className = 'text-red-400'
+    
+    const sign = isPositive ? '+' : ''
+    return { text: `${sign}${change.toFixed(2)}%`, className }
   }
 
   const formatDate = (dateString: string): string => {
@@ -177,15 +196,18 @@ export default function Watchlist() {
             <tr>
               <th className="px-6 py-4 text-left text-sm font-medium text-neutral-300">Token</th>
               <th className="px-6 py-4 text-left text-sm font-medium text-neutral-300">Market Cap</th>
-              <th className="px-6 py-4 text-left text-sm font-medium text-neutral-300">Holders</th>
+              <th className="px-6 py-4 text-left text-sm font-medium text-neutral-300">24h Change</th>
               <th className="px-6 py-4 text-left text-sm font-medium text-neutral-300">Added</th>
-              <th className="px-6 py-4 text-left text-sm font-medium text-neutral-300">Links</th>
               <th className="px-6 py-4 text-center text-sm font-medium text-neutral-300">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-neutral-800">
             {watchlistTokens.map((token) => (
-              <tr key={token.id} className="hover:bg-neutral-800/30 transition-colors">
+              <tr 
+                key={token.id} 
+                className="hover:bg-neutral-800/30 transition-colors cursor-pointer"
+                onClick={() => handleTokenClick(token.mintAddress)}
+              >
                 {/* Token Info */}
                 <td className="px-6 py-4">
                   <div className="flex items-center gap-3">
@@ -224,10 +246,10 @@ export default function Watchlist() {
                   </div>
                 </td>
 
-                {/* Holders */}
+                {/* 24h Change */}
                 <td className="px-6 py-4">
-                  <div className="text-white">
-                    {token.holders.toLocaleString()}
+                  <div className={`font-medium ${formatPriceChange(token.priceChange24h).className}`}>
+                    {formatPriceChange(token.priceChange24h).text}
                   </div>
                 </td>
 
@@ -238,46 +260,13 @@ export default function Watchlist() {
                   </div>
                 </td>
 
-                {/* Links */}
-                <td className="px-6 py-4">
-                  <div className="flex gap-2">
-                    {token.website && (
-                      <a 
-                        href={token.website} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-400 hover:text-blue-300 text-sm"
-                      >
-                        Website
-                      </a>
-                    )}
-                    {token.twitter && (
-                      <a 
-                        href={token.twitter} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-400 hover:text-blue-300 text-sm"
-                      >
-                        Twitter
-                      </a>
-                    )}
-                    {token.telegram && (
-                      <a 
-                        href={token.telegram} 
-                        target="_blank" 
-                        rel="noopener noreferrer"
-                        className="text-blue-400 hover:text-blue-300 text-sm"
-                      >
-                        Telegram
-                      </a>
-                    )}
-                  </div>
-                </td>
-
                 {/* Actions */}
                 <td className="px-6 py-4 text-center">
                   <Button
-                    onClick={() => removeFromWatchlist(token.mintAddress)}
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      removeFromWatchlist(token.mintAddress)
+                    }}
                     size="sm"
                     variant="ghost"
                     className="text-yellow-400 hover:text-yellow-300 hover:bg-yellow-400/10"
@@ -353,7 +342,7 @@ export default function Watchlist() {
         {/* Helper text when not empty */}
         {watchlistTokens.length > 0 && (
           <div className="text-center text-neutral-500 text-sm">
-            <p>💡 Tip: Click the star icon to remove tokens from your watchlist</p>
+            <p>💡 Tip: Click on any token row to view details, or click the star icon to remove from watchlist</p>
           </div>
         )}
       </div>
