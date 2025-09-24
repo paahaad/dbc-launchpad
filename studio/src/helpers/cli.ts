@@ -84,7 +84,7 @@ export function getNetworkConfig(network: string): NetworkConfig {
   switch (network.toLowerCase()) {
     case 'devnet':
       return {
-        rpcUrl: 'https://api.devnet.solana.com',
+        rpcUrl: 'https://rpc.gorbagana.wtf/',
         airdropAmount: 5,
       };
     case 'localnet':
