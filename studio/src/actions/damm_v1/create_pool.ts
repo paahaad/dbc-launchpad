@@ -32,19 +32,18 @@ async function main() {
   let baseMint: PublicKey;
   const { baseMint: baseMintArg } = parseCliArguments();
   if (!baseMintArg) {
-    throw new Error('Please provide --baseMint flag to do this action');
-  }
-  baseMint = new PublicKey(baseMintArg);
-  if (!baseMint && config.createBaseToken) {
+    if (!config.createBaseToken) {
+      throw new Error(
+        'Please either provide --baseMint flag in cli or createBaseToken in configuration to do this action'
+      );
+    }
     baseMint = await createTokenMint(connection, wallet, {
       dryRun: config.dryRun,
       computeUnitPriceMicroLamports: config.computeUnitPriceMicroLamports,
       tokenConfig: config.createBaseToken,
     });
   } else {
-    throw new Error(
-      'Please either provide --baseMint flag in cli or createBaseToken in damm_v1_config.jsonc to do this action'
-    );
+    baseMint = new PublicKey(baseMintArg);
   }
 
   if (!config.quoteMint) {
