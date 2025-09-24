@@ -62,11 +62,10 @@ async function main() {
 
       const alphaVaultConfig: AlphaVaultConfig = {
         ...config,
-        baseMint: baseMint.toString(),
         quoteMint: quoteMint.toString(),
       };
 
-      await createAlphaVault(connection, wallet, alphaVaultConfig, poolKey);
+      await createAlphaVault(connection, wallet, alphaVaultConfig, poolKey, baseMint);
 
       console.log('\n>>> DLMM pool and alpha vault created successfully! 🎉');
     }

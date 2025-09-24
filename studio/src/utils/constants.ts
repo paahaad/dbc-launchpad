@@ -2,6 +2,10 @@ import { NATIVE_MINT } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
 import { CommandOption } from './types';
 
+export const LOCALNET_RPC_URL = 'http://localhost:8899';
+export const DEVNET_RPC_URL = 'https://api.devnet.solana.com';
+export const MAINNET_RPC_URL = 'https://api.mainnet-beta.solana.com';
+
 export const DEFAULT_COMMITMENT_LEVEL = 'confirmed';
 export const DEFAULT_SEND_TX_MAX_RETRIES = 3;
 

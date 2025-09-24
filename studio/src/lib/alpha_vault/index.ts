@@ -594,7 +594,8 @@ export async function createAlphaVault(
   connection: Connection,
   wallet: Wallet,
   config: AlphaVaultConfig,
-  poolAddress: PublicKey
+  poolAddress: PublicKey,
+  baseMint: PublicKey
 ) {
   if (!config.alphaVault) {
     throw new Error('Alpha vault configuration is missing');
@@ -602,10 +603,6 @@ export async function createAlphaVault(
 
   if (!config.quoteMint) {
     throw new Error('Quote mint configuration is missing');
-  }
-
-  if (!config.baseMint) {
-    throw new Error('Base mint configuration is missing');
   }
 
   const quoteDecimals = await getQuoteDecimals(connection, config.quoteMint);
@@ -634,7 +631,7 @@ export async function createAlphaVault(
       config.alphaVault.alphaVaultType,
       poolType,
       poolAddress,
-      new PublicKey(config.baseMint),
+      baseMint,
       new PublicKey(config.quoteMint),
       quoteDecimals,
       config.alphaVault,
@@ -649,7 +646,7 @@ export async function createAlphaVault(
         wallet,
         poolType,
         poolAddress,
-        new PublicKey(config.baseMint),
+        baseMint,
         new PublicKey(config.quoteMint),
         quoteDecimals,
         config.alphaVault as FcfsAlphaVaultConfig,
@@ -662,7 +659,7 @@ export async function createAlphaVault(
         wallet,
         poolType,
         poolAddress,
-        new PublicKey(config.baseMint),
+        baseMint,
         new PublicKey(config.quoteMint),
         quoteDecimals,
         config.alphaVault as ProrataAlphaVaultConfig,
@@ -695,7 +692,7 @@ export async function createAlphaVault(
       config.alphaVault.alphaVaultType,
       poolType,
       poolAddress,
-      new PublicKey(config.baseMint),
+      baseMint,
       new PublicKey(config.quoteMint),
       quoteDecimals,
       config.alphaVault,

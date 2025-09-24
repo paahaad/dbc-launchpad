@@ -61,11 +61,10 @@ async function main() {
 
       const alphaVaultConfig: AlphaVaultConfig = {
         ...config,
-        baseMint: baseMint.toString(),
         quoteMint: quoteMint.toString(),
       };
 
-      await createAlphaVault(connection, wallet, alphaVaultConfig, poolAddress);
+      await createAlphaVault(connection, wallet, alphaVaultConfig, poolAddress, baseMint);
 
       console.log('\n>>> DAMM V2 pool and alpha vault created successfully! 🎉');
     }
