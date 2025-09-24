@@ -1,10 +1,16 @@
 import { SOL_TOKEN_DECIMALS } from '../utils/constants';
 import Decimal from 'decimal.js';
 import BN from 'bn.js';
-import { Signer, PublicKey, Connection } from '@solana/web3.js';
+import { Signer, PublicKey, Connection, Keypair } from '@solana/web3.js';
 import { getMint } from '@solana/spl-token';
 import { AllocationByAmount, LockLiquidityAllocation } from '../utils/types';
-import { ActivationType } from '@meteora-ag/dynamic-bonding-curve-sdk';
+import {
+  ActivationType,
+  createDammV2Program,
+  DAMM_V2_PROGRAM_ID,
+  getDynamicFeeParams,
+} from '@meteora-ag/dynamic-bonding-curve-sdk';
+import { MAX_SQRT_PRICE, MIN_SQRT_PRICE } from '@meteora-ag/cp-amm-sdk';
 
 export function getAmountInLamports(amount: number | string, decimals: number): BN {
   const amountD = new Decimal(amount);
@@ -113,4 +119,76 @@ export async function getCurrentPoint(
     }
     return new BN(currentTime);
   }
+}
+
+export async function createDammV2Config(
+  connection: Connection,
+  payer: Keypair,
+  poolCreatorAuthority: PublicKey,
+  migrationFeeOption: number
+): Promise<PublicKey> {
+  const program = createDammV2Program(connection);
+
+  let baseFeeBps = 100;
+  let cliffFeeNumerator = new BN(10000000);
+  if (migrationFeeOption === 0) {
+    baseFeeBps = 25;
+    cliffFeeNumerator = new BN(2500000);
+  } else if (migrationFeeOption === 1) {
+    cliffFeeNumerator = new BN(3000000);
+    baseFeeBps = 30;
+  } else if (migrationFeeOption === 2) {
+    baseFeeBps = 100;
+    cliffFeeNumerator = new BN(10000000);
+  } else if (migrationFeeOption === 3) {
+    baseFeeBps = 200;
+    cliffFeeNumerator = new BN(20000000);
+  } else if (migrationFeeOption === 4) {
+    baseFeeBps = 400;
+    cliffFeeNumerator = new BN(40000000);
+  } else if (migrationFeeOption === 5) {
+    baseFeeBps = 600;
+    cliffFeeNumerator = new BN(60000000);
+  }
+  const dynamicFeeParams = getDynamicFeeParams(baseFeeBps);
+
+  const [config] = PublicKey.findProgramAddressSync(
+    [Buffer.from('config'), new BN(0).toBuffer('le', 8)],
+    DAMM_V2_PROGRAM_ID
+  );
+
+  const configParameters = {
+    poolFees: {
+      baseFee: {
+        cliffFeeNumerator: cliffFeeNumerator,
+        numberOfPeriod: 0,
+        periodFrequency: new BN(0),
+        reductionFactor: new BN(0),
+        feeSchedulerMode: 0,
+      },
+      padding: new Array(32).fill(0) as number[],
+      dynamicFee: dynamicFeeParams,
+    },
+    sqrtMinPrice: MIN_SQRT_PRICE,
+    sqrtMaxPrice: MAX_SQRT_PRICE,
+    vaultConfigKey: PublicKey.default,
+    poolCreatorAuthority,
+    collectFeeMode: 1,
+    activationType: 0,
+  };
+
+  const transaction = await program.methods
+    .createConfig(new BN(0), configParameters)
+    .accountsPartial({
+      config,
+      admin: payer.publicKey,
+    })
+    .transaction();
+
+  const { blockhash } = await connection.getLatestBlockhash();
+  transaction.recentBlockhash = blockhash;
+  transaction.sign(payer);
+  await connection.sendRawTransaction(transaction.serialize());
+
+  return config;
 }

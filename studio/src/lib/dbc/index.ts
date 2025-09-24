@@ -7,8 +7,13 @@ import {
 } from '@solana/web3.js';
 import { DbcConfig } from '../../utils/types';
 import { Wallet } from '@coral-xyz/anchor';
-import { getQuoteDecimals, modifyComputeUnitPriceIx, runSimulateTransaction } from '../../helpers';
-import { DEFAULT_SEND_TX_MAX_RETRIES } from '../../utils/constants';
+import {
+  createDammV2Config,
+  getQuoteDecimals,
+  modifyComputeUnitPriceIx,
+  runSimulateTransaction,
+} from '../../helpers';
+import { DEFAULT_SEND_TX_MAX_RETRIES, LOCALNET_RPC_URL } from '../../utils/constants';
 import {
   buildCurve,
   buildCurveWithLiquidityWeights,
@@ -20,6 +25,7 @@ import {
   deriveBaseKeyForLocker,
   deriveDammV1MigrationMetadataAddress,
   deriveDammV2MigrationMetadataAddress,
+  deriveDbcPoolAuthority,
   deriveEscrow,
   DynamicBondingCurveClient,
 } from '@meteora-ag/dynamic-bonding-curve-sdk';
@@ -231,16 +237,16 @@ export async function createDbcPool(
  * @param connection - The connection to the network
  * @param wallet - The wallet to use for the transaction
  */
-export async function claimTradingFee(config: DbcConfig, connection: Connection, wallet: Wallet) {
-  if (!config.baseMint) {
-    throw new Error('Missing baseMint configuration');
-  }
-
+export async function claimTradingFee(
+  config: DbcConfig,
+  connection: Connection,
+  wallet: Wallet,
+  baseMint: PublicKey
+) {
   console.log('\n> Initializing DBC claim trading fee...');
 
   const dbcInstance = new DynamicBondingCurveClient(connection, 'confirmed');
 
-  const baseMint = new PublicKey(config.baseMint);
   const poolState = await dbcInstance.state.getPoolByBaseMint(baseMint);
   if (!poolState) {
     throw new Error(`DBC Pool not found for ${baseMint.toString()}`);
@@ -338,23 +344,23 @@ export async function claimTradingFee(config: DbcConfig, connection: Connection,
  * @param connection - The connection to the network
  * @param wallet - The wallet to use for the transaction
  */
-export async function swap(config: DbcConfig, connection: Connection, wallet: Wallet) {
+export async function swap(
+  config: DbcConfig,
+  connection: Connection,
+  wallet: Wallet,
+  baseMint: PublicKey
+) {
   if (!config.dbcSwap) {
     throw new Error('Missing dbc swap parameters');
-  }
-
-  if (!config.baseMint) {
-    throw new Error('Missing baseMint configuration');
   }
 
   console.log('\n> Initializing DBC swap...');
 
   const dbcInstance = new DynamicBondingCurveClient(connection, 'confirmed');
 
-  const baseMint = new PublicKey(config.baseMint);
   const poolState = await dbcInstance.state.getPoolByBaseMint(new PublicKey(baseMint));
   if (!poolState) {
-    throw new Error(`DBC Pool not found for ${config.baseMint}`);
+    throw new Error(`DBC Pool not found for ${baseMint.toString()}`);
   }
 
   const poolAddress = poolState.publicKey;
@@ -428,16 +434,16 @@ export async function swap(config: DbcConfig, connection: Connection, wallet: Wa
  * @param connection - The connection to the network
  * @param wallet - The wallet to use for the transaction
  */
-export async function migrateDammV1(config: DbcConfig, connection: Connection, wallet: Wallet) {
-  if (!config.baseMint) {
-    throw new Error('Missing baseMint configuration');
-  }
-
+export async function migrateDammV1(
+  config: DbcConfig,
+  connection: Connection,
+  wallet: Wallet,
+  baseMint: PublicKey
+) {
   console.log('\n> Initializing migration from DBC to DAMM v1...');
 
   const dbcInstance = new DynamicBondingCurveClient(connection, 'confirmed');
 
-  const baseMint = new PublicKey(config.baseMint);
   const poolState = await dbcInstance.state.getPoolByBaseMint(baseMint);
   if (!poolState) {
     throw new Error(`DBC Pool not found for ${baseMint.toString()}`);
@@ -780,16 +786,16 @@ export async function migrateDammV1(config: DbcConfig, connection: Connection, w
  * @param connection - The connection to the network
  * @param wallet - The wallet to use for the transaction
  */
-export async function migrateDammV2(config: DbcConfig, connection: Connection, wallet: Wallet) {
-  if (!config.baseMint) {
-    throw new Error('Missing baseMint configuration');
-  }
-
+export async function migrateDammV2(
+  config: DbcConfig,
+  connection: Connection,
+  wallet: Wallet,
+  baseMint: PublicKey
+) {
   console.log('\n> Initializing migration from DBC to DAMM v2...');
 
   const dbcInstance = new DynamicBondingCurveClient(connection, 'confirmed');
 
-  const baseMint = new PublicKey(config.baseMint);
   const poolState = await dbcInstance.state.getPoolByBaseMint(baseMint);
   if (!poolState) {
     throw new Error(`DBC Pool not found for ${baseMint.toString()}`);
@@ -811,9 +817,17 @@ export async function migrateDammV2(config: DbcConfig, connection: Connection, w
   }
 
   const migrationFeeOption = poolConfig.migrationFeeOption;
-  const dammConfigAddress = DAMM_V2_MIGRATION_FEE_ADDRESS[migrationFeeOption];
-  if (!dammConfigAddress) {
-    throw new Error(`No DAMM config address found for migration fee option: ${migrationFeeOption}`);
+  console.log('> Migration fee option:', migrationFeeOption);
+  let dammConfigAddress = DAMM_V2_MIGRATION_FEE_ADDRESS[migrationFeeOption];
+  console.log('> DAMM config address:', dammConfigAddress);
+  if (config.rpcUrl === LOCALNET_RPC_URL) {
+    const poolAuthority = deriveDbcPoolAuthority();
+    dammConfigAddress = await createDammV2Config(
+      connection,
+      wallet.payer as Keypair,
+      poolAuthority,
+      migrationFeeOption
+    );
   }
 
   const poolAddress = poolState.publicKey;

@@ -61,7 +61,6 @@ export type MeteoraConfigBase = {
   dryRun: boolean;
   keypairFilePath: string;
   computeUnitPriceMicroLamports: number;
-  baseMint?: string | null;
   quoteMint?: string | null;
 };
 
