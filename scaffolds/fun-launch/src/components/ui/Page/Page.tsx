@@ -1,4 +1,3 @@
-import Header from '@/components/Header';
 import { cn } from '@/lib/utils';
 
 interface IProps {
@@ -14,11 +13,10 @@ const Page: React.FC<React.PropsWithChildren<IProps>> = ({
   return (
     <div
       className={cn(
-        'flex min-h-screen flex-col justify-between bg-black text-white',
+        'flex flex-col min-h-full',
         pageClassName
       )}
     >
-      <Header />
       <div
         className={cn(
           'flex flex-1 flex-col items-center px-1 md:px-3 pt-4 pb-16',

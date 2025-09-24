@@ -31,7 +31,7 @@ export const ExploreColumn: React.FC<ExploreColumnProps> = ({ tab }) => {
   );
 
   return (
-    <div className="flex flex-col h-full lg:h-[calc(100vh-300px)]">
+    <div className="flex flex-col h-full lg:h-[calc(100vh-200px)]">
       {/* Desktop Column Header */}
       <div className="flex items-center justify-between p-3 max-lg:hidden">
         <div className="flex items-center gap-x-2">

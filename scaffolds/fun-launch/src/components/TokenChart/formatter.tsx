@@ -6,7 +6,7 @@ const getDecimalCount = (value: string) => {
 };
 
 const userLocale =
-  typeof window !== 'undefined'
+  false // Always use false for SSR safety, will be overridden on client
     ? navigator.languages && navigator.languages.length
       ? navigator.languages[0]
       : navigator.language

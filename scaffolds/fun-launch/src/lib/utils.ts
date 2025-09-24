@@ -1,5 +1,8 @@
 import { type ClassValue, clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import BN from 'bn.js';
+import { PublicKey } from '@solana/web3.js';
+import { NATIVE_MINT } from '@solana/spl-token';
 
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
@@ -77,3 +80,41 @@ export function shortenAddress(address: string) {
 
 export const delay = async (time: number) =>
   await new Promise((resolve) => setTimeout(resolve, time));
+
+// Utility function to convert decimal amount to lamports/smallest unit
+export function getAmountInLamports(amount: number | string, decimals: number): BN {
+  const amountStr = amount.toString();
+  const [integerPart, decimalPart = ''] = amountStr.split('.');
+  const paddedDecimal = decimalPart.padEnd(decimals, '0').slice(0, decimals);
+  const lamportsStr = integerPart + paddedDecimal;
+  return new BN(lamportsStr);
+}
+
+// Helper functions for derivePoolAccount
+export function getFirstKey(key1: PublicKey, key2: PublicKey) {
+  const buf1 = key1.toBuffer();
+  const buf2 = key2.toBuffer();
+  return Buffer.compare(buf1, buf2) === 1 ? buf1 : buf2;
+}
+
+export function getSecondKey(key1: PublicKey, key2: PublicKey) {
+  const buf1 = key1.toBuffer();
+  const buf2 = key2.toBuffer();
+  return Buffer.compare(buf1, buf2) === 1 ? buf2 : buf1;
+}
+
+export function derivePoolAccount(configAccount: string, tokenMint: string, programId: PublicKey) {
+  const config = new PublicKey(configAccount);
+  const baseMint = new PublicKey(tokenMint);
+  const quoteMint = NATIVE_MINT;
+
+  return PublicKey.findProgramAddressSync(
+    [
+      Buffer.from('pool'),
+      config.toBuffer(),
+      getFirstKey(baseMint, quoteMint),
+      getSecondKey(baseMint, quoteMint),
+    ],
+    programId
+  )[0];
+}

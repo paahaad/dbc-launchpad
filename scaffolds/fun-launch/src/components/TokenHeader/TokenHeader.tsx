@@ -1,4 +1,4 @@
-import { useMinimalTokenInfo, useTokenInfo } from '@/hooks/queries';
+import { useMinimalTokenInfo, useTokenInfo, useTokenAddress } from '@/hooks/queries';
 import { cn } from '@/lib/utils';
 import { memo } from 'react';
 import { getNumberColorCn, ReadableNumber } from '../ui/ReadableNumber';
@@ -13,13 +13,62 @@ type TokenHeaderProps = {
 };
 
 export const TokenHeader: React.FC<TokenHeaderProps> = memo(({ className }) => {
-  const { data: pool } = useTokenInfo();
-  const { data: minimalTokenInfo } = useMinimalTokenInfo();
+  const tokenId = useTokenAddress();
+  const { data: pool, isLoading: poolLoading, error: poolError } = useTokenInfo();
+  const { data: minimalTokenInfo, isLoading: minimalLoading, error: minimalError } = useMinimalTokenInfo();
 
   const pctChange =
     pool?.baseAsset.stats24h?.priceChange === undefined
       ? undefined
       : pool.baseAsset.stats24h.priceChange / 100;
+
+  // Show loading state
+  if (poolLoading || minimalLoading /* || dbcLoading */) {
+    return (
+      <div className={cn('flex items-center overflow-hidden w-full', className)}>
+        <div className="relative mr-2 flex shrink-0 items-center rounded-lg bg-neutral-850">
+          <div className="w-8 h-8 rounded-lg bg-neutral-700 animate-pulse" />
+        </div>
+        <div className="flex flex-1 justify-between gap-2.5 overflow-hidden">
+          <div className="flex flex-col justify-center gap-0.5">
+            <div className="h-5 bg-neutral-700 rounded animate-pulse w-20" />
+            <div className="h-4 bg-neutral-700 rounded animate-pulse w-32" />
+          </div>
+          <div className="flex flex-col items-end justify-center gap-0.5">
+            <div className="h-5 bg-neutral-700 rounded animate-pulse w-16" />
+            <div className="h-4 bg-neutral-700 rounded animate-pulse w-12" />
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state
+  if (poolError || minimalError) {
+    return (
+      <div className={cn('flex items-center overflow-hidden w-full', className)}>
+        <div className="text-red-400 text-sm">
+          Error loading token data: {poolError ? String(poolError) : minimalError ? String(minimalError) : 'Unknown error'}
+        </div>
+      </div>
+    );
+  }
+
+  // Show empty state if no data
+  if (!pool && !minimalTokenInfo) {
+    return (
+      <div className={cn('flex items-center overflow-hidden w-full', className)}>
+        <div className="text-neutral-500 text-sm">No token data available</div>
+      </div>
+    );
+  }
+
+  // Use DBC data if available, fallback to original data
+  const tokenData = pool;
+  const tokenSymbol = minimalTokenInfo?.symbol || pool?.baseAsset.symbol || 'Unknown Token';
+  const tokenPrice = pool?.baseAsset.usdPrice || 0;
+  const tokenMarketCap = pool?.baseAsset.mcap || 0;
+  const priceChange = pctChange || 0;
 
   return (
     <div className={cn('flex items-center overflow-hidden w-full', className)}>
@@ -32,7 +81,7 @@ export const TokenHeader: React.FC<TokenHeaderProps> = memo(({ className }) => {
       <div className="flex flex-1 justify-between gap-2.5 overflow-hidden">
         <div className="flex flex-col justify-center gap-0.5">
           <h1 className="cursor-pointer truncate font-medium leading-none tracking-tight">
-            {minimalTokenInfo?.symbol}
+            {tokenSymbol}
           </h1>
 
           {minimalTokenInfo && (
@@ -69,13 +118,13 @@ export const TokenHeader: React.FC<TokenHeaderProps> = memo(({ className }) => {
           <ReadableNumber
             className="leading-none tracking-tight font-semibold"
             format="price"
-            num={pool?.baseAsset.usdPrice}
+            num={tokenPrice}
             prefix="$"
             animated
             showDirection
           />
-          <div className={cn('text-xs leading-none font-semibold', getNumberColorCn(pctChange))}>
-            {formatReadablePercentChange(pctChange, { hideSign: 'positive' })}
+          <div className={cn('text-xs leading-none font-semibold', getNumberColorCn(priceChange))}>
+            {formatReadablePercentChange(priceChange, { hideSign: 'positive' })}
           </div>
         </div>
       </div>

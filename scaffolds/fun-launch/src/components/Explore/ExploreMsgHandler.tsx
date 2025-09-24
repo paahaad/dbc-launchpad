@@ -8,7 +8,7 @@ import {
 import { ApeQueries, QueryData } from '@/components/Explore/queries';
 import { useDataStreamListener } from '@/contexts/DataStreamProvider';
 import { ExploreTab, TokenListSortByField, normalizeSortByField } from '@/components/Explore/types';
-import { assertNever } from '@/lib/utils';
+import { assertNever } from '@/types/fancytypes';
 
 export const ExploreMsgHandler: React.FC = () => {
   const queryClient = useQueryClient();

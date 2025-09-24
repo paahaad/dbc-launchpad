@@ -3,9 +3,11 @@ import { Adapter, UnifiedWalletProvider } from '@jup-ag/wallet-adapter';
 import type { AppProps } from 'next/app';
 import { Toaster } from 'sonner';
 import { PhantomWalletAdapter, SolflareWalletAdapter } from '@solana/wallet-adapter-wallets';
-import { useMemo } from 'react';
+import { useMemo, useEffect } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useWindowWidthListener } from '@/lib/device';
+import { useWallet } from '@jup-ag/wallet-adapter';
+import { Layout } from '@/components/Layout';
 
 export default function App({ Component, pageProps }: AppProps) {
   const wallets: Adapter[] = useMemo(() => {
@@ -18,6 +20,34 @@ export default function App({ Component, pageProps }: AppProps) {
 
   useWindowWidthListener();
 
+  function UserCreator({ children }: { children: React.ReactNode }) {
+    const { publicKey } = useWallet();
+
+    useEffect(() => {
+      if (publicKey) {
+        fetch('/api/user', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ address: publicKey.toBase58() }),
+        })
+          .then((res) => {
+            if (!res.ok) {
+              throw new Error('Failed to create user');
+            }
+            return res.json();
+          })
+          .then((data) => {
+            console.log('User created/updated:', data);
+          })
+          .catch((error) => {
+            console.error('Error creating user:', error);
+          });
+      }
+    }, [publicKey]);
+
+    return <>{children}</>;
+  }
+
   return (
     <QueryClientProvider client={queryClient}>
       <UnifiedWalletProvider
@@ -26,18 +56,22 @@ export default function App({ Component, pageProps }: AppProps) {
           env: 'mainnet-beta',
           autoConnect: true,
           metadata: {
-            name: 'UnifiedWallet',
-            description: 'UnifiedWallet',
+            name: 'GOR Launchpad',
+            description: 'GOR Launchpad wallet connection',
             url: 'https://jup.ag',
-            iconUrls: ['https://jup.ag/favicon.ico'],
+            iconUrls: ['/favicon.png'],
           },
           // notificationCallback: WalletNotification,
           theme: 'dark',
           lang: 'en',
         }}
       >
-        <Toaster />
-        <Component {...pageProps} />
+        <UserCreator>
+          <Toaster />
+          <Layout>
+            <Component {...pageProps} />
+          </Layout>
+        </UserCreator>
       </UnifiedWalletProvider>
     </QueryClientProvider>
   );

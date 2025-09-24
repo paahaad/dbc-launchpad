@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import AWS from 'aws-sdk';
-import { Connection, PublicKey } from '@solana/web3.js';
+import { Connection, PublicKey, Keypair, Transaction } from '@solana/web3.js';
 import { DynamicBondingCurveClient } from '@meteora-ag/dynamic-bonding-curve-sdk';
 
 // Environment variables with type assertions
@@ -23,14 +23,14 @@ if (
 }
 
 const PRIVATE_R2_URL = `https://${R2_ACCOUNT_ID}.r2.cloudflarestorage.com`;
-const PUBLIC_R2_URL = 'https://pub-85c7f5f0dc104dc784e656b623d999e5.r2.dev';
+const PUBLIC_R2_URL = 'https://pub-f44e6969b3f94f18bf51922e5c8e4ce7.r2.dev';
 
 // Types
 type UploadRequest = {
   tokenLogo: string;
   tokenName: string;
   tokenSymbol: string;
-  mint: string;
+  mintKeypair: string; // base58 encoded secret key
   userWallet: string;
 };
 
@@ -62,27 +62,33 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   }
 
   try {
-    const { tokenLogo, tokenName, tokenSymbol, mint, userWallet } = req.body as UploadRequest;
+    const { tokenLogo, tokenName, tokenSymbol, mintKeypair, userWallet } = req.body as UploadRequest;
 
     // Validate required fields
-    if (!tokenLogo || !tokenName || !tokenSymbol || !mint || !userWallet) {
+    if (!tokenLogo || !tokenName || !tokenSymbol || !mintKeypair || !userWallet) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
 
+    // Decode the mint keypair (client generates fresh keypair)
+    const mintKeypairDecoded = Keypair.fromSecretKey(
+      Buffer.from(mintKeypair, 'base64')
+    );
+    const mintAddress = mintKeypairDecoded.publicKey.toBase58();
+
     // Upload image and metadata
-    const imageUrl = await uploadImage(tokenLogo, mint);
+    const imageUrl = await uploadImage(tokenLogo, mintAddress);
     if (!imageUrl) {
       return res.status(400).json({ error: 'Failed to upload image' });
     }
 
-    const metadataUrl = await uploadMetadata({ tokenName, tokenSymbol, mint, image: imageUrl });
+    const metadataUrl = await uploadMetadata({ tokenName, tokenSymbol, mint: mintAddress, image: imageUrl });
     if (!metadataUrl) {
       return res.status(400).json({ error: 'Failed to upload metadata' });
     }
 
     // Create pool transaction
-    const poolTx = await createPoolTransaction({
-      mint,
+    const result = await createPoolTransaction({
+      mintKeypair: mintKeypairDecoded,
       tokenName,
       tokenSymbol,
       metadataUrl,
@@ -91,12 +97,15 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 
     res.status(200).json({
       success: true,
-      poolTx: poolTx
+      poolTx: result.transaction
         .serialize({
           requireAllSignatures: false,
           verifySignatures: false,
         })
         .toString('base64'),
+      mintAddress: result.mintKeypair.publicKey.toBase58(),
+      imageUrl,
+      metadataUrl,
     });
   } catch (error) {
     console.error('Upload error:', error);
@@ -169,14 +178,16 @@ async function uploadToR2(
   });
 }
 
+
+
 async function createPoolTransaction({
-  mint,
+  mintKeypair,
   tokenName,
   tokenSymbol,
   metadataUrl,
   userWallet,
 }: {
-  mint: string;
+  mintKeypair: Keypair;
   tokenName: string;
   tokenSymbol: string;
   metadataUrl: string;
@@ -184,20 +195,26 @@ async function createPoolTransaction({
 }) {
   const connection = new Connection(RPC_URL, 'confirmed');
   const client = new DynamicBondingCurveClient(connection, 'confirmed');
+  const userPublicKey = new PublicKey(userWallet);
 
+  // Create the DBC pool (program creates mint and metadata)
   const poolTx = await client.pool.createPool({
     config: new PublicKey(POOL_CONFIG_KEY),
-    baseMint: new PublicKey(mint),
+    baseMint: mintKeypair.publicKey,
     name: tokenName,
     symbol: tokenSymbol,
     uri: metadataUrl,
-    payer: new PublicKey(userWallet),
-    poolCreator: new PublicKey(userWallet),
+    payer: userPublicKey,
+    poolCreator: userPublicKey,
   });
 
-  const { blockhash } = await connection.getLatestBlockhash();
-  poolTx.feePayer = new PublicKey(userWallet);
-  poolTx.recentBlockhash = blockhash;
+  // Transaction contains pool instructions
+  const combinedTx = new Transaction();
+  combinedTx.add(...poolTx.instructions);
 
-  return poolTx;
+  const { blockhash } = await connection.getLatestBlockhash();
+  combinedTx.feePayer = userPublicKey;
+  combinedTx.recentBlockhash = blockhash;
+
+  return { transaction: combinedTx, mintKeypair: mintKeypair };
 }

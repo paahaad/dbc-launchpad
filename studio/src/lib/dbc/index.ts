@@ -4,6 +4,7 @@ import {
   PublicKey,
   sendAndConfirmTransaction,
   Transaction,
+  VersionedTransaction,
 } from '@solana/web3.js';
 import { DbcConfig } from '../../utils/types';
 import { Wallet } from '@coral-xyz/anchor';
@@ -95,12 +96,12 @@ export async function createDbcConfig(
     console.log(`> Config simulation successful`);
   } else {
     console.log(`>> Sending create config transaction...`);
-    const createConfigTxHash = await sendAndConfirmTransaction(
+    const createConfigTxHash = await sendAndConfirmTransactionPolling(
       connection,
       createConfigTx,
       [wallet.payer, configKeypair],
       {
-        commitment: connection.commitment,
+        commitment: 'confirmed',
         maxRetries: DEFAULT_SEND_TX_MAX_RETRIES,
       }
     ).catch((err) => {
@@ -111,8 +112,7 @@ export async function createDbcConfig(
     console.log(`>>> Config created successfully with tx hash: ${createConfigTxHash}`);
     console.log(`>>> Config public key: ${configKeypair.publicKey.toString()}`);
 
-    console.log(`> Waiting for config transaction to be finalized...`);
-    await connection.confirmTransaction(createConfigTxHash, 'finalized');
+    console.log(`> Config transaction confirmed!`);
     console.log(`>>> Config transaction finalized`);
   }
 

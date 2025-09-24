@@ -186,6 +186,7 @@ export type Pool = {
     name: string;
     symbol: string;
     icon?: string | undefined;
+    image?: string | undefined;
     decimals: number;
     twitter?: string | undefined;
     telegram?: string | undefined;
@@ -232,6 +233,13 @@ export type Pool = {
     isVerified?: boolean | undefined;
     ctLikes?: number | undefined;
     smartCtLikes?: number | undefined;
+    
+    // Dynamic Bonding Curve specific fields
+    migrationProgress?: number | undefined;
+    isBonding?: boolean | undefined;
+    isAboutToGraduate?: boolean | undefined;
+    isGraduated?: boolean | undefined;
+    canTrade?: boolean | undefined; // Whether trading is still allowed
   };
 
   // frontend field

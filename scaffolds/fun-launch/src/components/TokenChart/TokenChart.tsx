@@ -374,7 +374,7 @@ export const TokenChart: React.FC<ChartProps> = memo(({ renderingId, style, opt 
 
           if (options.useUserBrowserTime) {
             const timezoneApi = activeChart.getTimezoneApi();
-            const userTz = new Date().getTimezoneOffset() * 60 * 1000 * -1; // This is how TV handles timezone offset, don't ask why, don't know why
+            const userTz = 0; // Use UTC for SSR safety, will be adjusted on client
             const detectedTimezone = timezoneApi
               .availableTimezones()
               .find((item) => item.offset === userTz);

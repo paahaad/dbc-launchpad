@@ -27,6 +27,7 @@
     "studio:dbc": "pnpm --filter @meteora-invent/studio run dbc:*",
     "studio:alpha-vault": "pnpm --filter @meteora-invent/studio run alpha-vault:*",
     "prepare": "husky install",
+    "postinstall": "pnpm --filter '@meteora-invent/scaffold/dbc-launchpad' exec prisma generate",
     "syncpack:check": "syncpack list-mismatches",
     "syncpack:fix": "syncpack fix-mismatches"
   },
@@ -48,5 +49,8 @@
     "*.{json,md,yml,yaml}": [
       "prettier --write"
     ]
+  },
+  "dependencies": {
+    "@radix-ui/react-tabs": "^1.1.13"
   }
 }
