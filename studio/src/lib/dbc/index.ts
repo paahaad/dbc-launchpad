@@ -817,9 +817,7 @@ export async function migrateDammV2(
   }
 
   const migrationFeeOption = poolConfig.migrationFeeOption;
-  console.log('> Migration fee option:', migrationFeeOption);
   let dammConfigAddress = DAMM_V2_MIGRATION_FEE_ADDRESS[migrationFeeOption];
-  console.log('> DAMM config address:', dammConfigAddress);
   if (config.rpcUrl === LOCALNET_RPC_URL) {
     const poolAuthority = deriveDbcPoolAuthority();
     dammConfigAddress = await createDammV2Config(
@@ -827,6 +825,11 @@ export async function migrateDammV2(
       wallet.payer as Keypair,
       poolAuthority,
       migrationFeeOption
+    );
+  }
+  if (!dammConfigAddress) {
+    throw new Error(
+      `No DAMM V2 config address found for migration fee option: ${migrationFeeOption}`
     );
   }
 
