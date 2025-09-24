@@ -1,19 +1,24 @@
 import { Connection, PublicKey } from '@solana/web3.js';
 import { Wallet } from '@coral-xyz/anchor';
-import { AlphaVaultConfig, DammV2Config } from '../../utils/types';
+import { AlphaVaultConfig } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
-import { createTokenMint, parseConfigFromCli, safeParseKeypairFromFile } from '../../helpers';
+import {
+  createTokenMint,
+  getDammV2Config,
+  parseCliArguments,
+  safeParseKeypairFromFile,
+} from '../../helpers';
 import { createDammV2BalancedPool } from '../../lib/damm_v2';
 import { createAlphaVault } from '../../lib/alpha_vault';
 import { deriveCustomizablePoolAddress } from '@meteora-ag/cp-amm-sdk';
 
 async function main() {
-  const config: DammV2Config = (await parseConfigFromCli()) as DammV2Config;
+  const config = await getDammV2Config();
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
 
-  console.log('\n> Initializing with general configuration...');
+  console.log('\n> Initializing configuration...');
   console.log(`- Using RPC URL ${config.rpcUrl}`);
   console.log(`- Dry run = ${config.dryRun}`);
   console.log(`- Using payer ${keypair.publicKey} to execute commands`);
@@ -22,29 +27,30 @@ async function main() {
   const wallet = new Wallet(keypair);
 
   let baseMint: PublicKey;
+  const { baseMint: baseMintArg } = parseCliArguments();
+  if (!baseMintArg) {
+    if (!config.createBaseToken) {
+      throw new Error(
+        'Please either provide --baseMint flag in cli or createBaseToken in configuration to do this action'
+      );
+    }
+    baseMint = await createTokenMint(connection, wallet, {
+      dryRun: config.dryRun,
+      computeUnitPriceMicroLamports: config.computeUnitPriceMicroLamports,
+      tokenConfig: config.createBaseToken,
+    });
+  } else {
+    baseMint = new PublicKey(baseMintArg);
+  }
+
   if (!config.quoteMint) {
     throw new Error('Missing quoteMint in configuration');
   }
   const quoteMint = new PublicKey(config.quoteMint);
 
-  if (config.createBaseToken) {
-    baseMint = await createTokenMint(connection, wallet, {
-      dryRun: config.dryRun,
-      mintTokenAmount: config.createBaseToken.mintBaseTokenAmount,
-      decimals: config.createBaseToken.baseDecimals,
-      computeUnitPriceMicroLamports: config.computeUnitPriceMicroLamports,
-    });
-  } else {
-    if (!config.baseMint) {
-      throw new Error('Missing baseMint in configuration');
-    }
-    baseMint = new PublicKey(config.baseMint);
-  }
-
   console.log(`- Using base token mint ${baseMint.toString()}`);
   console.log(`- Using quote token mint ${quoteMint.toString()}`);
 
-  /// --------------------------------------------------------------------------
   if (config.dammV2Config) {
     await createDammV2BalancedPool(config, connection, wallet, baseMint, quoteMint);
 
@@ -55,11 +61,10 @@ async function main() {
 
       const alphaVaultConfig: AlphaVaultConfig = {
         ...config,
-        baseMint: baseMint.toString(),
         quoteMint: quoteMint.toString(),
       };
 
-      await createAlphaVault(connection, wallet, alphaVaultConfig, poolAddress);
+      await createAlphaVault(connection, wallet, alphaVaultConfig, poolAddress, baseMint);
 
       console.log('\n>>> DAMM V2 pool and alpha vault created successfully! 🎉');
     }

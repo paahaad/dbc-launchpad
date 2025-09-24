@@ -1,19 +1,23 @@
 import { Connection, Keypair, PublicKey } from '@solana/web3.js';
-import { getAmountInLamports, safeParseKeypairFromFile, parseConfigFromCli } from '../../helpers';
+import {
+  getAmountInLamports,
+  safeParseKeypairFromFile,
+  getDlmmConfig,
+  parseCliArguments,
+} from '../../helpers';
 import { LBCLMM_PROGRAM_IDS, deriveCustomizablePermissionlessLbPair } from '@meteora-ag/dlmm';
 import BN from 'bn.js';
 import { unpackMint } from '@solana/spl-token';
-import { DlmmConfig } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 import { seedLiquiditySingleBin } from '../../lib/dlmm';
 
 async function main() {
-  const config: DlmmConfig = (await parseConfigFromCli()) as DlmmConfig;
+  const config = await getDlmmConfig();
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
 
-  console.log('\n> Initializing with general configuration...');
+  console.log('\n> Initializing configuration...');
   console.log(`- Using RPC URL ${config.rpcUrl}`);
   console.log(`- Dry run = ${config.dryRun}`);
   console.log(`- Using payer ${keypair.publicKey} to execute commands`);
@@ -21,14 +25,20 @@ async function main() {
   const connection = new Connection(config.rpcUrl, DEFAULT_COMMITMENT_LEVEL);
   const DLMM_PROGRAM_ID = new PublicKey(LBCLMM_PROGRAM_IDS['mainnet-beta']);
 
-  if (!config.baseMint) {
-    throw new Error('Missing baseMint in configuration');
+  const { baseMint: baseMintArg } = parseCliArguments();
+  if (!baseMintArg) {
+    throw new Error('Please provide --baseMint flag to do this action');
   }
-  const baseMint = new PublicKey(config.baseMint);
+  const baseMint = new PublicKey(baseMintArg);
+  if (!baseMint) {
+    throw new Error('Please provide --baseMint flag to do this action');
+  }
+
   const baseMintAccount = await connection.getAccountInfo(baseMint);
   if (!baseMintAccount) {
     throw new Error(`Base mint account not found: ${baseMint}`);
   }
+
   const baseMintState = unpackMint(baseMint, baseMintAccount, baseMintAccount.owner);
   const baseDecimals = baseMintState.decimals;
 

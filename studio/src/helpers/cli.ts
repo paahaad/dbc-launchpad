@@ -1,51 +1,40 @@
-import { CliArguments, MeteoraConfig, NetworkConfig } from '../utils/types';
+import {
+  AlphaVaultConfig,
+  CliArguments,
+  CommandOption,
+  DammV1Config,
+  DammV2Config,
+  DbcConfig,
+  DlmmConfig,
+  MeteoraConfig,
+  NetworkConfig,
+} from '../utils/types';
 import { parseArgs } from 'util';
 import { safeParseJsonFromFile } from './utils';
-import { validateConfig } from './validation';
 import { parse } from 'csv-parse';
 import fs from 'fs';
-import path from 'path';
 import * as readline from 'readline';
-
-export function parseNetworkFlag(): string | undefined {
-  const { values } = parseArgs({
-    args: process.argv,
-    options: {
-      network: {
-        type: 'string',
-        short: 'n',
-      },
-    },
-    strict: true,
-    allowPositionals: true,
-  });
-
-  return values.network;
-}
-
-export function getNetworkConfig(network: string): NetworkConfig {
-  switch (network.toLowerCase()) {
-    case 'devnet':
-      return {
-        rpcUrl: 'https://rpc.gorbagana.wtf',
-        shouldAirdrop: true,
-        airdropAmount: 5,
-      };
-    case 'localnet':
-      return {
-        rpcUrl: 'http://localhost:8899',
-        shouldAirdrop: true,
-        airdropAmount: 5,
-      };
-    default:
-      throw new Error('Invalid network. Please use --network devnet or --network localnet');
-  }
-}
+import path from 'path';
 
 export function parseCliArguments(): CliArguments {
   const { values } = parseArgs({
     args: process.argv,
     options: {
+      network: {
+        type: 'string',
+      },
+      baseMint: {
+        type: 'string',
+      },
+      poolAddress: {
+        type: 'string',
+      },
+      airdrop: {
+        type: 'boolean',
+      },
+      help: {
+        type: 'boolean',
+      },
       config: {
         type: 'string',
       },
@@ -57,33 +46,55 @@ export function parseCliArguments(): CliArguments {
   return values;
 }
 
-export async function parseConfigFromCli(): Promise<MeteoraConfig> {
-  const cliArguments = parseCliArguments();
-  if (!cliArguments.config) {
-    throw new Error('Please provide a config file path to --config flag');
-  }
-  let configFilePath = cliArguments.config!;
+export async function getConfigFromPath(configPath: string): Promise<MeteoraConfig> {
+  return await safeParseJsonFromFile(configPath);
+}
 
-  // If the path is relative, resolve it appropriately based on where we're running from
-  if (!path.isAbsolute(configFilePath)) {
-    const workspaceMarker = path.join(process.cwd(), '../pnpm-workspace.yaml');
-    if (fs.existsSync(workspaceMarker)) {
-      if (configFilePath.startsWith('./studio/')) {
-        configFilePath = configFilePath.replace('./studio/', './');
-      }
-      configFilePath = path.resolve(process.cwd(), configFilePath);
-    } else {
-      configFilePath = path.resolve(process.cwd(), configFilePath);
-    }
-  }
-
-  console.log(`> Using config file: ${configFilePath}`);
-
-  const config: MeteoraConfig = await safeParseJsonFromFile(configFilePath);
-
-  validateConfig(config);
-
+export async function getDammV1Config(): Promise<DammV1Config> {
+  const configPath = path.join(__dirname, '../../config/damm_v1_config.jsonc');
+  const config: DammV1Config = await safeParseJsonFromFile(configPath);
   return config;
+}
+
+export async function getDammV2Config(): Promise<DammV2Config> {
+  const configPath = path.join(__dirname, '../../config/damm_v2_config.jsonc');
+  const config: DammV2Config = await safeParseJsonFromFile(configPath);
+  return config;
+}
+
+export async function getDlmmConfig(): Promise<DlmmConfig> {
+  const configPath = path.join(__dirname, '../../config/dlmm_config.jsonc');
+  const config: DlmmConfig = await safeParseJsonFromFile(configPath);
+  return config;
+}
+
+export async function getDbcConfig(): Promise<DbcConfig> {
+  const configPath = path.join(__dirname, '../../config/dbc_config.jsonc');
+  const config: DbcConfig = await safeParseJsonFromFile(configPath);
+  return config;
+}
+
+export async function getAlphaVaultConfig(): Promise<AlphaVaultConfig> {
+  const configPath = path.join(__dirname, '../../config/alpha_vault_config.jsonc');
+  const config: AlphaVaultConfig = await safeParseJsonFromFile(configPath);
+  return config;
+}
+
+export function getNetworkConfig(network: string): NetworkConfig {
+  switch (network.toLowerCase()) {
+    case 'devnet':
+      return {
+        rpcUrl: 'https://api.devnet.solana.com',
+        airdropAmount: 5,
+      };
+    case 'localnet':
+      return {
+        rpcUrl: 'http://localhost:8899',
+        airdropAmount: 5,
+      };
+    default:
+      throw new Error('Invalid network. Please use --network devnet or --network localnet');
+  }
 }
 
 export async function parseCsv<T>(filePath: string): Promise<Array<T>> {
@@ -142,5 +153,28 @@ export async function promptForSelection(
     };
 
     askQuestion();
+  });
+}
+
+export function displayHelp(
+  commandName: string,
+  description: string,
+  options: CommandOption[]
+): void {
+  console.log(`\n> Command: ${commandName}`);
+  console.log(`${description}`);
+
+  console.log('\n>> Usage:');
+  console.log(`- pnpm studio ${commandName} [options]`);
+
+  console.log('\n>> Options:');
+  options.forEach((option) => {
+    const required = option.required ? ' (required)' : ' (optional)';
+    const typeInfo = option.type === 'boolean' ? '' : ` <${option.type}>`;
+    const example = option.example ? ` (e.g. ${option.example})` : '';
+
+    console.log(`--${option.flag}${typeInfo}${required}`);
+    console.log(`~ ${option.description}${example}`);
+    console.log();
   });
 }

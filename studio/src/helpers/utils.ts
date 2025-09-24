@@ -35,7 +35,6 @@ export async function airdropSol(
     await connection.confirmTransaction(signature, 'confirmed');
 
     console.log(`Airdropped ${amount} SOL to ${keypair.publicKey.toString()}`);
-    console.log(`Transaction signature: ${signature}`);
 
     return signature;
   } catch (error) {

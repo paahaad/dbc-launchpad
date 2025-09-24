@@ -18,17 +18,20 @@ Meteora Scaffolds provides production-ready **React/Next.js** templates for buil
 
 | **Scaffold** | **Framework** | **Purpose** | **Status** |
 |-------------|---------------|-------------|------------|
-| **dbc-launchpad** | Next.js + TypeScript | DBC token launchpad & trading UI | ✅ Production Ready |
-| **amm-interface** | Next.js + TypeScript | AMM pool management | 🚧 Coming Soon |
-| **yield-dashboard** | Next.js + TypeScript | Yield farming interface | 🚧 Coming Soon |
+| **fun-launch** | Next.js 15 + TypeScript | Token launchpad & trading UI | ✅ Production Ready |
+
+**Package**: `@meteora-invent/scaffold/fun-launch`
 
 ### **Core Technology Stack**
-- **Framework**: Next.js 14+ with App Router
+- **Framework**: Next.js 15 with Turbopack
 - **Language**: TypeScript (strict mode)
-- **Styling**: Tailwind CSS + CSS Modules
-- **State**: React Context + Custom Hooks
-- **Blockchain**: @solana/web3.js + Wallet Adapter
-- **Protocols**: Meteora DBC SDK (@meteora-ag/dynamic-bonding-curve-sdk)
+- **Styling**: Tailwind CSS v4 + CSS Modules
+- **State**: Jotai + React Context + Custom Hooks
+- **Blockchain**: @solana/web3.js + Jupiter Wallet Adapter
+- **Protocols**: Meteora SDK suite (@meteora-ag/*)
+- **UI**: Custom components with Radix UI + class-variance-authority
+- **Data Fetching**: @tanstack/react-query + native fetch (ky)
+- **Charts**: TradingView charting library integration
 
 ## 🚀 Quick Start Workflows
 
@@ -48,7 +51,7 @@ cp .env.example .env
 
 # 3. Install & develop
 pnpm install
-pnpm dev  # Opens http://localhost:3000
+pnpm dev  # Opens http://localhost:3000 with Turbopack
 
 # 4. Customize & deploy
 pnpm build && pnpm start

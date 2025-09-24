@@ -51,12 +51,6 @@ export function extraConfigValidation(config: MeteoraConfig) {
     throw new Error('Missing rpcUrl in config file.');
   }
 
-  // Check createBaseToken vs baseMint conflict for applicable config types
-  if ('createBaseToken' in config && config.createBaseToken && config.baseMint) {
-    throw new Error('Both createBaseToken and baseMint cannot be set simultaneously.');
-  }
-
-  // Type-specific validation
   if (isDammV1Config(config)) {
     validateDammV1Config(config);
   } else if (isDammV2Config(config)) {

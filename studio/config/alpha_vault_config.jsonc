@@ -17,11 +17,6 @@
    */
   "quoteMint": "So11111111111111111111111111111111111111112",
 
-  /* baseMint is required for the following actions:
-   * 1. alpha-vault-create
-   */
-  "baseMint": "YOUR_BASE_MINT_ADDRESS",
-
   /* alphaVault is only used in the following actions:
    * 1. alpha-vault-create
    * There are 2 types of alpha vault: First Come First Serve (FCFS) and Prorata.

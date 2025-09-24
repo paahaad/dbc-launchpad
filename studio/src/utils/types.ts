@@ -1,8 +1,22 @@
+import { Creator, Collection, Uses } from '@metaplex-foundation/mpl-token-metadata';
 import { PublicKey } from '@solana/web3.js';
 import BN from 'bn.js';
 
 export interface CliArguments {
   config?: string | undefined;
+  network?: string | undefined;
+  baseMint?: string | undefined;
+  poolAddress?: string | undefined;
+  airdrop?: boolean | undefined;
+  help?: boolean | undefined;
+}
+
+export interface CommandOption {
+  flag: string;
+  description: string;
+  required: boolean;
+  type: 'string' | 'boolean';
+  example?: string;
 }
 
 /* COMMON */
@@ -11,14 +25,35 @@ export type MeteoraConfig = DammV1Config | DammV2Config | DlmmConfig | DbcConfig
 
 export interface CreateTokenMintOptions {
   dryRun: boolean;
-  mintTokenAmount: string | number;
-  decimals: number;
   computeUnitPriceMicroLamports: number;
+  tokenConfig?: TokenConfig;
 }
 
-export interface CreateBaseMintConfig {
-  mintBaseTokenAmount: number | string;
-  baseDecimals: number;
+export interface TokenConfig {
+  supply: number;
+  decimals: number;
+  tokenMintKeypairFilePath?: string;
+  name: string;
+  symbol: string;
+  metadata: TokenMetadata;
+  authorities: {
+    mint: string | null;
+    freeze: string | null;
+    update: string | null;
+  };
+  sellerFeeBasisPoints: number;
+  creators: Creator[] | null;
+  collection: Collection | null;
+  uses: Uses | null;
+}
+
+export interface TokenMetadata {
+  uri?: string;
+  image?: string;
+  description?: string;
+  website?: string;
+  twitter?: string;
+  telegram?: string;
 }
 
 export type MeteoraConfigBase = {
@@ -26,7 +61,6 @@ export type MeteoraConfigBase = {
   dryRun: boolean;
   keypairFilePath: string;
   computeUnitPriceMicroLamports: number;
-  baseMint?: string | null;
   quoteMint?: string | null;
 };
 
@@ -38,14 +72,13 @@ export type AllocationByAmount = {
 
 export interface NetworkConfig {
   rpcUrl: string;
-  shouldAirdrop: boolean;
   airdropAmount: number;
 }
 
 /* DAMM v1 */
 
 export type DammV1Config = MeteoraConfigBase & {
-  createBaseToken: CreateBaseMintConfig | null;
+  createBaseToken: TokenConfig | null;
   dammV1Config: DynamicAmmV1Config | null;
   dammV1LockLiquidity: LockLiquidityConfig | null;
   stake2EarnFarm: Stake2EarnFarmConfig | null;
@@ -80,8 +113,7 @@ export interface Stake2EarnFarmConfig {
 /* DAMM v2 */
 
 export type DammV2Config = MeteoraConfigBase & {
-  createBaseToken: CreateBaseMintConfig | null;
-  poolAddress: string | null;
+  createBaseToken: TokenConfig | null;
   dammV2Config: DynamicAmmV2Config | null;
   addLiquidity: AddLiquidityConfig | null;
   splitPosition: SplitPositionConfig | null;
@@ -135,7 +167,7 @@ export interface AddLiquidityConfig {
 /* DLMM */
 
 export type DlmmConfig = MeteoraConfigBase & {
-  createBaseToken: CreateBaseMintConfig | null;
+  createBaseToken: TokenConfig | null;
   dlmmConfig: DynamicLmmConfig | null;
   alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
   lfgSeedLiquidity: LfgSeedLiquidityConfig | null;
@@ -179,7 +211,6 @@ export interface SingleBinSeedLiquidityConfig {
 }
 
 export interface SetDlmmPoolStatusConfig {
-  poolAddress: string;
   enabled: boolean;
 }
 
@@ -197,7 +228,6 @@ export type DbcConfig = MeteoraConfigBase & {
     | (BuildCurveWithTwoSegments & { buildCurveMode: 2 })
     | (BuildCurveWithLiquidityWeights & { buildCurveMode: 3 })
     | null;
-  dbcConfigAddress?: PublicKey | null;
   dbcPool?: DbcPool | null;
   dbcSwap?: DbcSwap | null;
 };
@@ -287,7 +317,7 @@ export type DbcPool = {
   baseMintKeypairFilepath?: string;
   name: string;
   symbol: string;
-  uri: string;
+  metadata: TokenMetadata;
 };
 
 export type DbcSwap = {
@@ -300,7 +330,7 @@ export type DbcSwap = {
 /* Alpha Vault */
 
 export type AlphaVaultConfig = MeteoraConfigBase & {
-  createBaseToken: CreateBaseMintConfig | null;
+  createBaseToken: TokenConfig | null;
   alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
 };
 
@@ -403,7 +433,7 @@ export interface KvMerkleProof {
 /* Stake2Earn */
 
 export type Stake2EarnConfig = MeteoraConfigBase & {
-  createBaseToken: CreateBaseMintConfig | null;
+  createBaseToken: TokenConfig | null;
   dammV1LockLiquidity: LockLiquidityConfig | null;
   alphaVault: FcfsAlphaVaultConfig | ProrataAlphaVaultConfig | null;
 };

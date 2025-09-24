@@ -1,19 +1,24 @@
 import { Connection, PublicKey } from '@solana/web3.js';
-import { safeParseKeypairFromFile, parseConfigFromCli, createTokenMint } from '../../helpers';
+import {
+  safeParseKeypairFromFile,
+  createTokenMint,
+  getDlmmConfig,
+  parseCliArguments,
+} from '../../helpers';
 import { Wallet } from '@coral-xyz/anchor';
 import { createPermissionlessDlmmPool } from '../../lib/dlmm';
-import { AlphaVaultConfig, DlmmConfig } from '../../utils/types';
+import { AlphaVaultConfig } from '../../utils/types';
 import { DEFAULT_COMMITMENT_LEVEL, DLMM_PROGRAM_IDS } from '../../utils/constants';
 import { deriveCustomizablePermissionlessLbPair } from '@meteora-ag/dlmm';
 import { createAlphaVault } from '../../lib/alpha_vault';
 
 async function main() {
-  const config: DlmmConfig = (await parseConfigFromCli()) as DlmmConfig;
+  const config = await getDlmmConfig();
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
 
-  console.log('\n> Initializing with general configuration...');
+  console.log('\n> Initializing configuration...');
   console.log(`- Using RPC URL ${config.rpcUrl}`);
   console.log(`- Dry run = ${config.dryRun}`);
   console.log(`- Using payer ${keypair.publicKey} to execute commands`);
@@ -22,30 +27,30 @@ async function main() {
   const wallet = new Wallet(keypair);
 
   let baseMint: PublicKey;
+  const { baseMint: baseMintArg } = parseCliArguments();
+  if (!baseMintArg) {
+    if (!config.createBaseToken) {
+      throw new Error(
+        'Please either provide --baseMint flag in cli or createBaseToken in configuration to do this action'
+      );
+    }
+    baseMint = await createTokenMint(connection, wallet, {
+      dryRun: config.dryRun,
+      computeUnitPriceMicroLamports: config.computeUnitPriceMicroLamports,
+      tokenConfig: config.createBaseToken,
+    });
+  } else {
+    baseMint = new PublicKey(baseMintArg);
+  }
+
   if (!config.quoteMint) {
     throw new Error('Missing quoteMint in configuration');
   }
   const quoteMint = new PublicKey(config.quoteMint);
 
-  // If we want to create a new token mint
-  if (config.createBaseToken) {
-    baseMint = await createTokenMint(connection, wallet, {
-      dryRun: config.dryRun,
-      mintTokenAmount: config.createBaseToken.mintBaseTokenAmount,
-      decimals: config.createBaseToken.baseDecimals,
-      computeUnitPriceMicroLamports: config.computeUnitPriceMicroLamports,
-    });
-  } else {
-    if (!config.baseMint) {
-      throw new Error('Missing baseMint in configuration');
-    }
-    baseMint = new PublicKey(config.baseMint);
-  }
-
   console.log(`- Using base token mint ${baseMint.toString()}`);
   console.log(`- Using quote token mint ${quoteMint.toString()}`);
 
-  /// --------------------------------------------------------------------------
   if (config.dlmmConfig) {
     await createPermissionlessDlmmPool(config, connection, wallet, baseMint, quoteMint);
 
@@ -57,11 +62,10 @@ async function main() {
 
       const alphaVaultConfig: AlphaVaultConfig = {
         ...config,
-        baseMint: baseMint.toString(),
         quoteMint: quoteMint.toString(),
       };
 
-      await createAlphaVault(connection, wallet, alphaVaultConfig, poolKey);
+      await createAlphaVault(connection, wallet, alphaVaultConfig, poolKey, baseMint);
 
       console.log('\n>>> DLMM pool and alpha vault created successfully! 🎉');
     }

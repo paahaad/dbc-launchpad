@@ -8,111 +8,13 @@ import {
 } from '@solana/web3.js';
 import { DbcConfig } from '../../utils/types';
 import { Wallet } from '@coral-xyz/anchor';
-import { getQuoteDecimals, modifyComputeUnitPriceIx, runSimulateTransaction } from '../../helpers';
-import { DEFAULT_SEND_TX_MAX_RETRIES } from '../../utils/constants';
-
-/**
- * Custom transaction sender that uses polling instead of WebSocket subscriptions
- * This avoids the WebSocket dependency for validators with WS disabled
- */
-async function sendAndConfirmTransactionPolling(
-  connection: Connection,
-  transaction: Transaction | VersionedTransaction,
-  signers: Keypair[],
-  options?: {
-    commitment?: 'processed' | 'confirmed' | 'finalized';
-    maxRetries?: number;
-    skipPreflight?: boolean;
-  }
-): Promise<string> {
-  const commitment = options?.commitment || 'confirmed';
-  const maxRetries = options?.maxRetries || 3;
-  const skipPreflight = options?.skipPreflight || false;
-
-  // Set recent blockhash and fee payer before signing
-  if (transaction instanceof Transaction) {
-    const { blockhash } = await connection.getLatestBlockhash();
-    transaction.recentBlockhash = blockhash;
-    transaction.feePayer = signers[0].publicKey;
-    transaction.sign(...signers);
-  }
-
-  let signature: string;
-  let retries = 0;
-
-  // Send transaction with retries
-  while (retries < maxRetries) {
-    try {
-      signature = await connection.sendRawTransaction(
-        transaction instanceof Transaction
-          ? transaction.serialize()
-          : Buffer.from(transaction.serialize()),
-        {
-          skipPreflight,
-          maxRetries: 0, // We handle retries ourselves
-        }
-      );
-      break;
-    } catch (error) {
-      retries++;
-      if (retries >= maxRetries) {
-        throw new Error(`Failed to send transaction after ${maxRetries} attempts: ${error}`);
-      }
-      console.log(`Send attempt ${retries} failed, retrying...`);
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Wait 1 second before retry
-    }
-  }
-
-  // Poll for confirmation instead of using WebSocket
-  console.log(`Transaction sent: ${signature!}`);
-  console.log(`Polling for ${commitment} confirmation...`);
-
-  const maxPollAttempts = 60; // 60 attempts = ~60 seconds max wait
-  let pollAttempts = 0;
-
-  while (pollAttempts < maxPollAttempts) {
-    try {
-      const status = await connection.getSignatureStatus(signature!, {
-        searchTransactionHistory: true,
-      });
-
-      if (status.value) {
-        if (status.value.err) {
-          throw new Error(`Transaction failed: ${JSON.stringify(status.value.err)}`);
-        }
-
-        // Check if we have the required confirmation level
-        if (
-          (commitment === 'processed' && status.value.confirmationStatus) ||
-          (commitment === 'confirmed' &&
-            (status.value.confirmationStatus === 'confirmed' ||
-              status.value.confirmationStatus === 'finalized')) ||
-          (commitment === 'finalized' && status.value.confirmationStatus === 'finalized')
-        ) {
-          console.log(`Transaction confirmed with ${status.value.confirmationStatus} status`);
-          return signature!;
-        }
-      }
-
-      pollAttempts++;
-      if (pollAttempts % 10 === 0) {
-        console.log(`Still waiting for confirmation... (${pollAttempts}/${maxPollAttempts})`);
-      }
-      await new Promise((resolve) => setTimeout(resolve, 1000)); // Poll every 1 second
-    } catch (error) {
-      pollAttempts++;
-      if (pollAttempts >= maxPollAttempts) {
-        throw new Error(
-          `Failed to confirm transaction after ${maxPollAttempts} attempts: ${error}`
-        );
-      }
-      await new Promise((resolve) => setTimeout(resolve, 1000));
-    }
-  }
-
-  throw new Error(`Transaction confirmation timeout after ${maxPollAttempts} seconds`);
-}
-
+import {
+  createDammV2Config,
+  getQuoteDecimals,
+  modifyComputeUnitPriceIx,
+  runSimulateTransaction,
+} from '../../helpers';
+import { DEFAULT_SEND_TX_MAX_RETRIES, LOCALNET_RPC_URL } from '../../utils/constants';
 import {
   buildCurve,
   buildCurveWithLiquidityWeights,
@@ -124,10 +26,12 @@ import {
   deriveBaseKeyForLocker,
   deriveDammV1MigrationMetadataAddress,
   deriveDammV2MigrationMetadataAddress,
+  deriveDbcPoolAuthority,
   deriveEscrow,
   DynamicBondingCurveClient,
 } from '@meteora-ag/dynamic-bonding-curve-sdk';
 import BN from 'bn.js';
+import { uploadTokenMetadata } from '../../helpers/metadata';
 
 /**
  * Create a DBC config
@@ -147,12 +51,6 @@ export async function createDbcConfig(
     throw new Error('Missing dbc configuration');
   }
   console.log('\n> Initializing DBC config...');
-
-  // check if using an existing config key address
-  if (config.dbcConfigAddress) {
-    console.log(`> Using existing config key: ${config.dbcConfigAddress.toString()}`);
-    return config.dbcConfigAddress;
-  }
 
   let curveConfig: ConfigParameters | null = null;
 
@@ -234,7 +132,8 @@ export async function createDbcPool(
   connection: Connection,
   wallet: Wallet,
   quoteMint: PublicKey,
-  baseMint: Keypair
+  baseMint: Keypair,
+  dbcConfigKey: PublicKey | null
 ) {
   if (!config.dbcConfig) {
     throw new Error('Missing dbc configuration');
@@ -243,9 +142,36 @@ export async function createDbcPool(
     throw new Error('Missing dbc pool configuration');
   }
 
-  const configPublicKey = await createDbcConfig(config, connection, wallet, quoteMint);
+  let configPublicKey: PublicKey;
+  if (!dbcConfigKey) {
+    configPublicKey = await createDbcConfig(config, connection, wallet, quoteMint);
+  } else {
+    configPublicKey = dbcConfigKey;
+  }
 
   const dbcInstance = new DynamicBondingCurveClient(connection, 'confirmed');
+
+  let metadataUri: string;
+  if (config.dbcPool.metadata.uri) {
+    console.log('Using existing metadata URI:', config.dbcPool.metadata.uri);
+    metadataUri = config.dbcPool.metadata.uri;
+  } else {
+    console.log('Uploading metadata to Irys...');
+    if (!config.dbcPool.metadata.image) {
+      throw new Error('Image is required for DBC pool metadata');
+    }
+    metadataUri = await uploadTokenMetadata(
+      connection.rpcEndpoint,
+      wallet.payer as Keypair,
+      config.dbcPool.name,
+      config.dbcPool.symbol,
+      config.dbcPool.metadata.image,
+      config.dbcPool.metadata.description || '',
+      config.dbcPool.metadata.website || '',
+      config.dbcPool.metadata.twitter || '',
+      config.dbcPool.metadata.telegram || ''
+    );
+  }
 
   if (config.dryRun) {
     console.log(
@@ -257,7 +183,7 @@ export async function createDbcPool(
         config: configPublicKey,
         name: config.dbcPool.name,
         symbol: config.dbcPool.symbol,
-        uri: config.dbcPool.uri,
+        uri: metadataUri,
         payer: wallet.publicKey,
         poolCreator: wallet.publicKey,
       });
@@ -280,7 +206,7 @@ export async function createDbcPool(
       config: configPublicKey,
       name: config.dbcPool.name,
       symbol: config.dbcPool.symbol,
-      uri: config.dbcPool.uri,
+      uri: metadataUri,
       payer: wallet.publicKey,
       poolCreator: wallet.publicKey,
     });
@@ -311,16 +237,16 @@ export async function createDbcPool(
  * @param connection - The connection to the network
  * @param wallet - The wallet to use for the transaction
  */
-export async function claimTradingFee(config: DbcConfig, connection: Connection, wallet: Wallet) {
-  if (!config.baseMint) {
-    throw new Error('Missing baseMint configuration');
-  }
-
+export async function claimTradingFee(
+  config: DbcConfig,
+  connection: Connection,
+  wallet: Wallet,
+  baseMint: PublicKey
+) {
   console.log('\n> Initializing DBC claim trading fee...');
 
   const dbcInstance = new DynamicBondingCurveClient(connection, 'confirmed');
 
-  const baseMint = new PublicKey(config.baseMint);
   const poolState = await dbcInstance.state.getPoolByBaseMint(baseMint);
   if (!poolState) {
     throw new Error(`DBC Pool not found for ${baseMint.toString()}`);
@@ -418,23 +344,23 @@ export async function claimTradingFee(config: DbcConfig, connection: Connection,
  * @param connection - The connection to the network
  * @param wallet - The wallet to use for the transaction
  */
-export async function swap(config: DbcConfig, connection: Connection, wallet: Wallet) {
+export async function swap(
+  config: DbcConfig,
+  connection: Connection,
+  wallet: Wallet,
+  baseMint: PublicKey
+) {
   if (!config.dbcSwap) {
     throw new Error('Missing dbc swap parameters');
-  }
-
-  if (!config.baseMint) {
-    throw new Error('Missing baseMint configuration');
   }
 
   console.log('\n> Initializing DBC swap...');
 
   const dbcInstance = new DynamicBondingCurveClient(connection, 'confirmed');
 
-  const baseMint = new PublicKey(config.baseMint);
   const poolState = await dbcInstance.state.getPoolByBaseMint(new PublicKey(baseMint));
   if (!poolState) {
-    throw new Error(`DBC Pool not found for ${config.baseMint}`);
+    throw new Error(`DBC Pool not found for ${baseMint.toString()}`);
   }
 
   const poolAddress = poolState.publicKey;
@@ -508,16 +434,16 @@ export async function swap(config: DbcConfig, connection: Connection, wallet: Wa
  * @param connection - The connection to the network
  * @param wallet - The wallet to use for the transaction
  */
-export async function migrateDammV1(config: DbcConfig, connection: Connection, wallet: Wallet) {
-  if (!config.baseMint) {
-    throw new Error('Missing baseMint configuration');
-  }
-
+export async function migrateDammV1(
+  config: DbcConfig,
+  connection: Connection,
+  wallet: Wallet,
+  baseMint: PublicKey
+) {
   console.log('\n> Initializing migration from DBC to DAMM v1...');
 
   const dbcInstance = new DynamicBondingCurveClient(connection, 'confirmed');
 
-  const baseMint = new PublicKey(config.baseMint);
   const poolState = await dbcInstance.state.getPoolByBaseMint(baseMint);
   if (!poolState) {
     throw new Error(`DBC Pool not found for ${baseMint.toString()}`);
@@ -860,16 +786,16 @@ export async function migrateDammV1(config: DbcConfig, connection: Connection, w
  * @param connection - The connection to the network
  * @param wallet - The wallet to use for the transaction
  */
-export async function migrateDammV2(config: DbcConfig, connection: Connection, wallet: Wallet) {
-  if (!config.baseMint) {
-    throw new Error('Missing baseMint configuration');
-  }
-
+export async function migrateDammV2(
+  config: DbcConfig,
+  connection: Connection,
+  wallet: Wallet,
+  baseMint: PublicKey
+) {
   console.log('\n> Initializing migration from DBC to DAMM v2...');
 
   const dbcInstance = new DynamicBondingCurveClient(connection, 'confirmed');
 
-  const baseMint = new PublicKey(config.baseMint);
   const poolState = await dbcInstance.state.getPoolByBaseMint(baseMint);
   if (!poolState) {
     throw new Error(`DBC Pool not found for ${baseMint.toString()}`);
@@ -891,9 +817,20 @@ export async function migrateDammV2(config: DbcConfig, connection: Connection, w
   }
 
   const migrationFeeOption = poolConfig.migrationFeeOption;
-  const dammConfigAddress = DAMM_V2_MIGRATION_FEE_ADDRESS[migrationFeeOption];
+  let dammConfigAddress = DAMM_V2_MIGRATION_FEE_ADDRESS[migrationFeeOption];
+  if (config.rpcUrl === LOCALNET_RPC_URL) {
+    const poolAuthority = deriveDbcPoolAuthority();
+    dammConfigAddress = await createDammV2Config(
+      connection,
+      wallet.payer as Keypair,
+      poolAuthority,
+      migrationFeeOption
+    );
+  }
   if (!dammConfigAddress) {
-    throw new Error(`No DAMM config address found for migration fee option: ${migrationFeeOption}`);
+    throw new Error(
+      `No DAMM V2 config address found for migration fee option: ${migrationFeeOption}`
+    );
   }
 
   const poolAddress = poolState.publicKey;

@@ -1,5 +1,10 @@
 import { NATIVE_MINT } from '@solana/spl-token';
 import { PublicKey } from '@solana/web3.js';
+import { CommandOption } from './types';
+
+export const LOCALNET_RPC_URL = 'http://localhost:8899';
+export const DEVNET_RPC_URL = 'https://api.devnet.solana.com';
+export const MAINNET_RPC_URL = 'https://api.mainnet-beta.solana.com';
 
 export const DEFAULT_COMMITMENT_LEVEL = 'confirmed';
 export const DEFAULT_SEND_TX_MAX_RETRIES = 3;
@@ -35,3 +40,44 @@ export const ALPHA_VAULT_PROGRAM_IDS = {
 export const STAKE2EARN_PROGRAM_IDS = {
   'mainnet-beta': 'FEESngU3neckdwib9X3KWqdL7Mjmqk9XNp3uh5JbP4KP',
 };
+
+export const METAPLEX_PROGRAM_ID = new PublicKey('metaqbxxUerdq28cj1RbAWkYQm3ybzjb6a8bt518x1s');
+
+export const GENERATE_KEYPAIR_COMMAND_OPTIONS: CommandOption[] = [
+  {
+    flag: 'network',
+    description: 'Specify the network to use',
+    required: false,
+    type: 'string',
+    example: 'devnet',
+  },
+  {
+    flag: 'airdrop',
+    description:
+      'Automatically airdrop SOL after generating keypair (only works on devnet/localnet)',
+    required: false,
+    type: 'boolean',
+  },
+  {
+    flag: 'help',
+    description: 'Show this help message',
+    required: false,
+    type: 'boolean',
+  },
+];
+
+export const AIRDROP_SOL_COMMAND_OPTIONS: CommandOption[] = [
+  {
+    flag: 'network',
+    description: 'Specify the network to use',
+    required: true,
+    type: 'string',
+    example: 'devnet',
+  },
+  {
+    flag: 'help',
+    description: 'Show this help message',
+    required: false,
+    type: 'boolean',
+  },
+];

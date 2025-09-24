@@ -7,17 +7,17 @@ import {
 } from '@meteora-ag/dynamic-amm-sdk/dist/cjs/src/amm/utils';
 import { deriveCustomizablePoolAddress } from '@meteora-ag/cp-amm-sdk';
 import { AlphaVaultConfig, PoolTypeConfig } from '../../utils/types';
-import { parseConfigFromCli, safeParseKeypairFromFile } from '../../helpers';
+import { getAlphaVaultConfig, parseCliArguments, safeParseKeypairFromFile } from '../../helpers';
 import { DEFAULT_COMMITMENT_LEVEL } from '../../utils/constants';
 import { createAlphaVault } from '../../lib/alpha_vault';
 
 async function main() {
-  const config = (await parseConfigFromCli()) as AlphaVaultConfig;
+  const config = await getAlphaVaultConfig();
 
   console.log(`> Using keypair file path ${config.keypairFilePath}`);
   const keypair = await safeParseKeypairFromFile(config.keypairFilePath);
 
-  console.log('\n> Initializing with general configuration...');
+  console.log('\n> Initializing configuration...');
   console.log(`- Using RPC URL ${config.rpcUrl}`);
   console.log(`- Dry run = ${config.dryRun}`);
   console.log(`- Using payer ${keypair.publicKey} to execute commands`);
@@ -26,10 +26,11 @@ async function main() {
 
   const wallet = new Wallet(keypair);
 
-  if (!config.baseMint) {
-    throw new Error('Missing baseMint in configuration');
+  const { baseMint: baseMintArg } = parseCliArguments();
+  if (!baseMintArg) {
+    throw new Error('Please provide --baseMint flag to do this action');
   }
-  const baseMint = new PublicKey(config.baseMint);
+  const baseMint = new PublicKey(baseMintArg);
 
   if (!config.quoteMint) {
     throw new Error('Missing quoteMint in configuration');
@@ -67,11 +68,10 @@ async function main() {
 
   const alphaVaultConfig: AlphaVaultConfig = {
     ...config,
-    baseMint: baseMint.toString(),
     quoteMint: quoteMint.toString(),
   };
 
-  await createAlphaVault(connection, wallet, alphaVaultConfig, poolKey);
+  await createAlphaVault(connection, wallet, alphaVaultConfig, poolKey, baseMint);
 }
 
 main();

@@ -5,13 +5,14 @@
 
 ## 🎯 Quick AI Context
 
-DBC Token Launchpad is a **production-ready Next.js application** for building token launchpads with Meteora's Dynamic Bonding Curve (DBC) protocol. Features include:
-- ✅ **DBC Token Launches**: Create tokens with Dynamic Bonding Curves for fair price discovery
-- ✅ **Customizable Parameters**: Set initial price, bonding curve slope, and total supply
+Fun Launch (`@meteora-invent/scaffold/fun-launch`) is a **production-ready Next.js 15 application** for building token launchpads with Meteora protocol integration. Features include:
 - ✅ **Token Discovery**: Real-time token exploration with filters & search
-- ✅ **Trading Interface**: Complete buy/sell terminal with slippage controls
-- ✅ **Protocol Integration**: Full Meteora DBC protocol support out-of-the-box
+- ✅ **Trading Interface**: Complete buy/sell terminal with Jupiter integration
+- ✅ **TradingView Charts**: Professional charting with technical indicators
+- ✅ **Portfolio Tracking**: Wallet integration with position management
+- ✅ **Protocol Integration**: DBC, DAMM, DLMM support out-of-the-box
 - ✅ **Mobile Responsive**: Optimized for all devices with modern UI
+- ✅ **Modern Stack**: Next.js 15, Tailwind CSS v4, TypeScript, Turbopack
 
 **AI Navigation**: This is the detailed implementation guide for the DBC Token Launchpad scaffold.
 
@@ -34,9 +35,9 @@ cp .env.example .env
 # R2_BUCKET=your_r2_bucket_name
 # POOL_CONFIG_KEY=your_pool_config_key
 
-# 3. Install & run
+# 3. Install & run (with Turbopack for faster development)
 pnpm install && pnpm dev
-# Opens http://localhost:3000
+# Opens http://localhost:3000 with hot reloading
 ```
 
 ### **Environment Configuration**
@@ -45,18 +46,12 @@ pnpm install && pnpm dev
 NEXT_PUBLIC_RPC_URL=https://api.mainnet-beta.solana.com
 NEXT_PUBLIC_NETWORK=mainnet-beta  # or 'devnet' for testing
 
-# R2 Storage (for token metadata and images)
-R2_ACCESS_KEY_ID=your_r2_access_key_id
-R2_SECRET_ACCESS_KEY=your_r2_secret_access_key
-R2_ACCOUNT_ID=your_r2_account_id
-R2_BUCKET=your_r2_bucket_name
-
-# DBC Protocol Configuration
-POOL_CONFIG_KEY=your_pool_config_key
-
-# Optional but Recommended
+# Optional but Recommended for Production
 NEXT_PUBLIC_ANALYTICS_ID=your_analytics_id
 NEXT_PUBLIC_SENTRY_DSN=your_sentry_dsn
+
+# See scaffolds/fun-launch/README.md for additional configuration options
+# including Cloudflare R2 storage setup for token metadata
 ```
 
 ## 📁 Detailed Project Architecture
@@ -616,6 +611,24 @@ pnpm type-check
 
 # 5. Bundle size analysis
 ANALYZE=true pnpm build
+```
+
+### **Production Environment Setup**
+```bash
+# Vercel deployment with environment variables
+vercel env add NEXT_PUBLIC_RPC_URL production
+vercel env add NEXT_PUBLIC_NETWORK production
+vercel env add NEXT_PUBLIC_SENTRY_DSN production
+vercel env add NEXT_PUBLIC_ANALYTICS_ID production
+
+# For Cloudflare R2 storage (see README.md for setup)
+vercel env add R2_ACCESS_KEY_ID production
+vercel env add R2_SECRET_ACCESS_KEY production
+vercel env add R2_ACCOUNT_ID production
+vercel env add R2_BUCKET production
+
+# Deploy to production
+vercel --prod
 ```
 
 ---
