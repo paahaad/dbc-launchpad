@@ -23,7 +23,7 @@
     "@meteora-invent/config-prettier": "workspace:*",
     "@meteora-invent/config-typescript": "workspace:*",
     "@types/bn.js": "^5.1.5",
-    "eslint": "^9.34.0",
+    "eslint": "^9.36.0",
     "typescript": "^5.9.2"
   }
 }
